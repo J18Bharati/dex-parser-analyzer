@@ -1,0 +1,47 @@
+{
+  "events": [
+    {
+      "confidence": "uncertain",
+      "event": "sdk_added",
+      "id": "firebase-analytics",
+      "name": "Google Firebase Analytics"
+    },
+    {
+      "confidence": "strong",
+      "event": "sdk_added",
+      "id": "firebase-messaging",
+      "name": "Firebase Cloud Messaging"
+    },
+    {
+      "confidence": "uncertain",
+      "event": "sdk_added",
+      "id": "google-mobile-ads",
+      "name": "Google Mobile Ads"
+    },
+    {
+      "event": "sdk_evidence_changed",
+      "gained": [
+        "dex_class:com.google.android.gms"
+      ],
+      "id": "google-play-services",
+      "lost": []
+    },
+    {
+      "confidence": "strong",
+      "event": "sdk_added",
+      "id": "sentry",
+      "name": "Sentry"
+    }
+  ],
+  "new": {
+    "package": "app.fixture",
+    "version_code": "2",
+    "version_name": "1.2"
+  },
+  "old": {
+    "package": "app.fixture",
+    "version_code": "1",
+    "version_name": "1.1"
+  },
+  "schema_version": 1
+}

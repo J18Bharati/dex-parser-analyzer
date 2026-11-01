@@ -1,10 +1,12 @@
+<!-- Modified by Zero (2026-11-01): dex-sdk crate, sdk-fixtures recipe, four published crates (fork M5). See NOTICE. -->
 # Agent guide
 
-dex-parser-analyzer is a Cargo workspace of four crates (layout and module roles: `docs/architecture.md`):
+dex-parser-analyzer is a Cargo workspace of five crates (layout and module roles: `docs/architecture.md`):
 
 - `dex-core/` (package `dexpa-core`): the DEX parser, bytecode decoder, graphs and DTOs. Tests are in `dex-core/tests/`, fixtures in `dex-core/tests/data/` (Androguard-derived, Apache-2.0; see NOTICE).
 - `dex-analysis/` (package `dexpa-analysis`): the pattern, structural and taint passes. Every rule id is in `docs/rules.md`, which must change in the same commit as any rule.
-- `dex-cli/`: the `dexpa` command-line front end (package `dexpa-cli`; integration tests in `dex-cli/tests/cli.rs`).
+- `dex-sdk/` (package `dexpa-sdk`, fork): the defined-class inventory, the SDK catalogue and matcher, SDK reports and their diff. `dex-gui` must not depend on it.
+- `dex-cli/`: the `dexpa` command-line front end (package `dexpa-cli`; integration tests in `dex-cli/tests/cli.rs`, and `dex-cli/tests/sdks.rs` for `dexpa sdks` with golden files in `dex-cli/tests/golden/`, rewritten by `UPDATE_GOLDEN=1`).
 - `dex-gui/`: the Leptos 0.8 browser GUI (wasm32, built with trunk; `publish = false`).
 
 ## Commands
@@ -21,7 +23,8 @@ Work inside the dev shell, which pins the toolchain from `rust-toolchain.toml`:
 | `just test` | `cargo test --workspace` |
 | `just doc` | rustdoc with `-D warnings` |
 | `just fixtures` | inside `nix develop .#fixtures` (JDK 21 and a pinned R8): recompile `dex-analysis/tests/fixtures-src` into `dex-analysis/tests/data/rules-{positive,negative}.dex` |
-| `just release` | the local release rehearsal: `ci`, `cargo publish --dry-run` for the three crates, and `nix build` of both packages; uploads nothing (RELEASING.md) |
+| `just sdk-fixtures` | (fork) inside `nix develop .#fixtures`: recompile `dex-sdk/tests/fixtures-src` into `dex-sdk/tests/data/sdk-{positive,negative}.dex` |
+| `just release` | the local release rehearsal: `ci`, `cargo publish --dry-run` for the four crates, and `nix build` of both packages; uploads nothing (RELEASING.md) |
 | `nix build .#dex-cli` / `nix build .#dex-gui` | the `dexpa` binary / the static GUI bundle |
 | `just deny` | `cargo deny check advisories bans licenses sources` (policy in `deny.toml`) |
 | `cargo run -p dexpa-cli -- <file.dex or .apk>` | run the `dexpa` CLI |

@@ -1,3 +1,4 @@
+<!-- Modified by Zero (2026-11-01): dexpa-sdk in the crate list (fork M5). See NOTICE. -->
 # Releasing dex-parser-analyzer
 
 From github.com/dhilipsiva/products/templates/RELEASING.md. The release workflow (`.github/workflows/release.yml`) and this runbook change in the same commit.
@@ -5,7 +6,7 @@ From github.com/dhilipsiva/products/templates/RELEASING.md. The release workflow
 ## What a release is
 
 - Channels: crates.io (the three crates below), a GitHub Release with the `dexpa` binaries and SHA256SUMS, and the GUI on GitHub Pages (https://dhilipsiva.github.io/dex-parser-analyzer/).
-- Crates to publish (`CRATES` in `release.yml`; cargo orders them by dependency): `dexpa-core`, `dexpa-analysis`, `dexpa-cli`. `dex-gui` is `publish = false`.
+- Crates to publish (`CRATES` in `release.yml`; cargo orders them by dependency): `dexpa-core`, `dexpa-analysis`, `dexpa-sdk` (fork), `dexpa-cli`. `dex-gui` is `publish = false`.
 - Binary and targets (`BIN` and the `build` matrix): `dexpa` for `x86_64-unknown-linux-gnu`, `aarch64-unknown-linux-gnu`, `aarch64-apple-darwin` and `x86_64-pc-windows-msvc`, built with the toolchain pinned in `rust-toolchain.toml`.
 - Secrets: `CARGO_REGISTRY_TOKEN` (crates.io, publish-update scope on exactly these three crates, with an expiry). The first publish of a new crate name needs a token with the publish-new scope; narrow it afterwards.
 

@@ -1,12 +1,15 @@
+<!-- Modified by Zero (2026-11-01): `dexpa sdks` and `dexpa sdks diff` (fork M5); APK entries in load order (fork M1a). See NOTICE. -->
 # dexpa-cli
 
 `dexpa`, the command-line front end of [dex-parser-analyzer](../README.md). It parses a `.dex` file, or every `classes*.dex` in an APK, with [`dexpa-core`](../dex-core/), runs every [`dexpa-analysis`](../dex-analysis/) pass with the default configuration, and prints the results.
 
 ```
 dexpa [OPTIONS] <FILE>
+dexpa sdks [OPTIONS] <FILE>       (fork; see "SDK detection" below)
+dexpa sdks diff [OPTIONS] <OLD> <NEW>
 
 Arguments:
-  <FILE>  A `.dex` file, or an `.apk`/zip whose `classes*.dex` entries are analysed in name order
+  <FILE>  A `.dex` file, or an `.apk`/zip whose `classes*.dex` entries are analysed in load order
 
 Options:
       --format <FORMAT>       Output format [default: text] [possible values: text, json]
@@ -89,8 +92,68 @@ One document. `schema_version` changes only with a breaking change to the shape 
 }
 ```
 
-- `dex_files` holds one entry for a `.dex` input, and one per `classes*.dex` for an APK, in entry-name order; `index` is the position.
+- `dex_files` holds one entry for a `.dex` input, and one per app DEX file for an APK (the archive-root `classes.dex`, `classes2.dex`, ... in numeric load order); `index` is the position.
 - `top_classes` lists at most ten classes, most methods first.
 - `report` is the `dexpa-analysis` `AnalysisReport` as its serde types serialise it. Findings are listed most severe first. The rule ids, their severities, CWEs and remediation texts are in [docs/rules.md](../docs/rules.md); `cwe` and `remediation` are `null` for an id outside that catalogue.
+
+## SDK detection: `dexpa sdks` (fork)
+
+```
+dexpa sdks [--catalogue T.toml] [--exodus F.json] [--format text|json] <FILE>
+dexpa sdks diff [--format text|json] <OLD.json> <NEW.json>
+```
+
+`dexpa sdks` lists the third-party SDKs an app contains, each with the evidence that found it ([`dexpa-sdk`](../dex-sdk/)):
+
+- `dex_class`: classes the app *defines* (from `class_defs`) under one of the SDK's package prefixes. Classes the app only calls into are not counted. Prefixes match on package boundaries, so `io.sentry` does not match `io.sentryx`.
+- `manifest_component`: an activity, service, receiver or provider in the SDK's packages. Android instantiates components by name, so R8 cannot rename them; this evidence survives minification when the class names do not.
+- `manifest_meta`: an exact `<meta-data>` key, such as `io.sentry.dsn`.
+
+The bundled catalogue lists 25 SDKs (`dex-sdk/catalogue/sdks.toml`). `--catalogue` replaces it with your own TOML in the same shape. `--exodus` adds the trackers from an [Exodus Privacy](https://exodus-privacy.eu.org/) JSON file you supply; that data is ODbL 1.0, is never bundled, and when it is used the report carries an `attribution`.
+
+An APK without `AndroidManifest.xml` is read as DEX only (`package` is `null`). A manifest that is present but malformed is an error.
+
+`dexpa sdks diff` compares two reports from `dexpa sdks --format json`:
+
+- `sdk_added` and `sdk_removed` have a `confidence`. It is `strong` when the side that has the SDK has manifest evidence, and `uncertain` when that side has only class names, which a change in minification can make appear or vanish.
+- `sdk_evidence_changed` lists the `source:rule` pairs gained and lost.
+
+Counts and DEX placement are not compared, because a rebuild changes them without changing what the app contains.
+
+Exit codes: 0 when the report or diff is printed; 1 when an input, the catalogue or the Exodus file cannot be read or parsed, or when a report given to `diff` does not have `schema_version` 1.
+
+### JSON (`schema_version` 1, independent of the analysis report's)
+
+```json
+{
+  "schema_version": 1,
+  "package": "app.fixture",
+  "version_code": "2",
+  "version_name": "1.2",
+  "dex_count": 1,
+  "class_count": 5,
+  "catalogue_size": 25,
+  "skipped_signatures": 0,
+  "attribution": null,
+  "matches": [
+    {
+      "id": "sentry",
+      "name": "Sentry",
+      "category": "crash-reporting",
+      "origin": "catalogue",
+      "evidence": [
+        { "source": "dex_class", "rule": "io.sentry", "count": 2,
+          "examples": ["io.sentry.Sentry", "io.sentry.android.core.SentryAndroid"], "dex_indexes": [0] },
+        { "source": "manifest_meta", "rule": "io.sentry.dsn", "count": 1,
+          "examples": ["io.sentry.dsn"], "dex_indexes": [] }
+      ]
+    }
+  ]
+}
+```
+
+- `version_code` and `version_name` are text. A resource reference is printed as `@0x7f...` because `resources.arsc` is not read.
+- `matches` is sorted by id. `evidence` is sorted by source, then rule, and keeps at most 3 `examples`. `skipped_signatures` counts Exodus signatures that were empty or were not valid regexes.
+- The diff document is `{"schema_version": 1, "old": {package, version_code, version_name}, "new": {...}, "events": [...]}`; each event has an `event` tag (`sdk_added`, `sdk_removed`, `sdk_evidence_changed`). The full examples are the golden files in `tests/golden/`.
 
 Licensed under MIT OR Apache-2.0.

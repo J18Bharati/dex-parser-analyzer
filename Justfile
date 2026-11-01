@@ -1,3 +1,4 @@
+# Modified by Zero (2026-11-01): sdk-fixtures recipe (fork M5). See NOTICE.
 # dex-parser-analyzer recipes, from products/templates/Justfile. Run them inside `nix develop`
 # (the toolchain is pinned in rust-toolchain.toml). `just ci` is the one local gate.
 
@@ -76,4 +77,24 @@ fixtures:
         cp "$out/$kind-dex/classes.dex" "dex-analysis/tests/data/rules-$kind.dex"
     done
     echo "fixtures written to dex-analysis/tests/data (scratch: $out)"
+
+# (fork) Rebuild dex-sdk/tests/data/sdk-{positive,negative}.dex from dex-sdk/tests/fixtures-src
+# (inside `nix develop .#fixtures`): classes in real SDK packages, and near-misses that must not
+# match. The stubs (FacebookSdk) are on the classpath only: referenced, never defined.
+sdk-fixtures:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    src=dex-sdk/tests/fixtures-src
+    out=$(mktemp -d)
+    mkdir -p dex-sdk/tests/data
+    javac --release 17 -d "$out/stubs" $(find "$src/stubs" -name '*.java' | sort)
+    for kind in positive negative; do
+        javac --release 17 -cp "$out/stubs" -d "$out/$kind" $(find "$src/sdk-$kind" -name '*.java' | sort)
+        mkdir -p "$out/$kind-dex"
+        java -cp "$R8_JAR" com.android.tools.r8.D8 --release --min-api 26 \
+            --lib "$JAVA_HOME" --classpath "$out/stubs" --output "$out/$kind-dex" \
+            $(find "$out/$kind" -name '*.class' | sort)
+        cp "$out/$kind-dex/classes.dex" "dex-sdk/tests/data/sdk-$kind.dex"
+    done
+    echo "fixtures written to dex-sdk/tests/data (scratch: $out)"
 

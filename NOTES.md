@@ -68,3 +68,19 @@ From the 2026-11-01 eng review of the plan. They are recorded here before any AP
 - Moved ahead of the F-Droid milestone, so the tool is complete offline even if M6's network budget fails.
 - **Rule:** compare which SDKs are present and the kinds of evidence (`source:rule`), never counts or DEX placement. A rebuild moves classes between `classesN.dex` files and changes counts without changing what the app contains.
 - **Mutation check:** 4 mutants, 4 killed. Two of them target the "no event" tests, which had passed trivially against the empty stub, so those tests do carry weight.
+
+## 2026-11-01: the CLI (M5)
+
+- **`dexpa sdks <FILE>` and `dexpa sdks diff OLD NEW`, with `dexpa <FILE>` unchanged.** clap's `args_conflicts_with_subcommands` and `subcommand_negates_reqs` make the positional `FILE` and the subcommand mutually exclusive. `dex-cli/tests/cli.rs` passes unmodified. A file named `sdks` needs a path (`dexpa ./sdks`).
+- **Deviation from the plan: `dexpa-sdk` is now publishable.** The plan kept it `publish = false` so upstream's release rehearsal would not change. But the CLI depends on it, and `cargo publish` cannot package a crate that depends on an unpublished one. The choice was between publishing `dexpa-sdk`, unpublishing `dexpa-cli`, or shipping a second binary. I published `dexpa-sdk`: it joins `CRATES` in release.yml. `cargo publish --dry-run --workspace` packages and verifies all four crates; nothing was uploaded.
+- **Fixtures with known positives**, compiled from Java sources by `just sdk-fixtures` (JDK 21, D8 9.5.28). A second build was byte-identical. Which SDKs they contain is fixed by the sources, not by this tool's output, so the golden files are checked against something independent:
+  - **positive:** `FirebaseAnalytics`, `Sentry`, `SentryAndroid`, `MobileAds`, and an app class.
+  - **negative:** near-misses on package boundaries (`com.google.firebase.analyticsx`, `io.sentryx`, `com.example.firebase_like`).
+  - **Both** call a Facebook class that is only on the classpath (referenced, never defined). It never matches, which is the defined-versus-referenced rule end to end.
+- **The test APKs are assembled in the test** from a fixture DEX and a manifest built with M1's AXML builder. That builder is shared through `#[path]`, not copied. The v2 manifest declares Firebase Messaging's service with no Firebase Messaging classes in the DEX: the minified-app case. The diff reports it `strong`, while Mobile Ads, which has class names only, is `uncertain`.
+- **A manifest that is absent is fine; a manifest that is present and broken is exit 1.** An APK without `AndroidManifest.xml` (upstream's `multidex.apk`) is read as DEX only. The alternative, skipping the manifest whenever it fails to parse, would silently turn every manifest-only SDK into "not found", which is exactly the evidence M3 added.
+- **Mutation check:** 10 mutants, all killed in the end, but 2 only after I added a test:
+  - **"Skip every manifest error" survived at first.** No test had a broken manifest. Added `malformed_manifest_exits_1_instead_of_being_skipped`.
+  - **Turning off `args_conflicts_with_subcommands` survived at first.** `dexpa --fail-on high sdks app.apk` then parsed, and `--fail-on` was silently ignored. Added `analysis_options_are_rejected_before_the_sdks_command`, which expects a usage error (exit 2).
+  - **The other 8 were killed by the first version of the tests:** the manifest dropped, the schema check removed, `--catalogue` or `--exodus` ignored, no attribution, the skipped count lost, hex versionCodes printed in hex, and the diff's `+` marker removed.
+- `just ci` green: 158 tests (137 before; 16 CLI and 5 report tests added).

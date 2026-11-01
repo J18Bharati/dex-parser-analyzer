@@ -1,4 +1,4 @@
-<!-- Modified by Zero (2026-11-01): axml.rs and manifest.rs rows, multidex.rs entry rules (fork). See NOTICE. -->
+<!-- Modified by Zero (2026-11-01): axml.rs and manifest.rs rows, multidex.rs entry rules, dex-sdk, `dexpa sdks` (fork). See NOTICE. -->
 # Architecture
 
 What exists in the workspace as of 2026-10-21. The documents in `docs/research/` are design surveys written before the code; where they describe something not listed here (for example a full OWASP static-analysis engine, CHA call graphs, or disassembly and hex views in the GUI), it is not built.
@@ -51,19 +51,19 @@ The engine sorts the findings by severity, most severe first (a stable sort, so 
 
 ## dex-sdk (fork)
 
-Unpublished (`publish = false`). It depends on `dex-core` only; `dex-gui` does not depend on it.
+Published with the other crates since M5, because `dexpa-cli` depends on it. It depends on `dex-core` only; `dex-gui` does not depend on it. Its DEX fixtures (`tests/data/sdk-{positive,negative}.dex`) are compiled from `tests/fixtures-src` by `just sdk-fixtures`.
 
 | Module | Role |
 |---|---|
 | `catalogue.rs` | SDK definitions: this project's TOML list (`dex-sdk/catalogue/sdks.toml`, compiled in; package prefixes of at least two segments and exact meta-data keys) and an importer for Exodus tracker files supplied at run time (signatures anchored at the class name's start; invalid ones skipped and counted). |
 | `matcher.rs` | Matches a catalogue against an inventory and a manifest. Evidence per SDK: defined classes (binary search in the sorted class list), manifest components (qualified the way Android does), and meta-data keys, each with counts, examples and DEX indexes. |
-| `report.rs` | `SdkReport`, the JSON `dexpa sdks` prints (`schema_version` 1, ODbL attribution when Exodus data was used). |
+| `report.rs` | `SdkReport`, the JSON `dexpa sdks` prints (`schema_version` 1, ODbL attribution when Exodus data was used), and `build_report`, which runs the inventory and the matcher over an app's DEX buffers and manifest. |
 | `diff.rs` | SDK changes between two reports: added, removed (with `strong` or `uncertain` confidence) and evidence changed. Counts and DEX placement are deliberately ignored. |
 | `inventory.rs` | The classes an app defines, one pass over each DEX file's `class_defs` (no `MultiDex` index, and no merely referenced types), with per-DEX totals and per-prefix class and method counts at depths 2 to 4. |
 
 ## dex-cli
 
-A single `main.rs`: clap arguments (a `.dex` or APK path, `--format`, `--max-findings`, `--fail-on`), then `read_dex_buffers_from_bytes` for APKs, and `parse_dex`, `dex_to_overview` and `analyze_dex` per DEX file, printed as text or as one JSON document. [dex-cli/README.md](../dex-cli/README.md) documents the JSON schema and the exit codes.
+`main.rs`: clap arguments (a `.dex` or APK path, `--format`, `--max-findings`, `--fail-on`), then `read_dex_buffers_from_bytes` for APKs, and `parse_dex`, `dex_to_overview` and `analyze_dex` per DEX file, printed as text or as one JSON document. (fork) `sdks.rs`: the `dexpa sdks` subcommand (`args_conflicts_with_subcommands`, so `dexpa <FILE>` is unchanged), which reads the DEX files and the manifest, calls `dexpa_sdk::report::build_report`, and diffs two saved reports. [dex-cli/README.md](../dex-cli/README.md) documents the JSON schema and the exit codes.
 
 ## dex-gui
 

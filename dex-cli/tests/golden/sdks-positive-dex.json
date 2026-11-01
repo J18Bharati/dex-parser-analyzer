@@ -1,0 +1,90 @@
+{
+  "attribution": null,
+  "catalogue_size": 25,
+  "class_count": 5,
+  "dex_count": 1,
+  "matches": [
+    {
+      "category": "analytics",
+      "evidence": [
+        {
+          "count": 1,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "com.google.firebase.analytics.FirebaseAnalytics"
+          ],
+          "rule": "com.google.firebase.analytics",
+          "source": "dex_class"
+        }
+      ],
+      "id": "firebase-analytics",
+      "name": "Google Firebase Analytics",
+      "origin": "catalogue"
+    },
+    {
+      "category": "ads",
+      "evidence": [
+        {
+          "count": 1,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "com.google.android.gms.ads.MobileAds"
+          ],
+          "rule": "com.google.android.gms.ads",
+          "source": "dex_class"
+        }
+      ],
+      "id": "google-mobile-ads",
+      "name": "Google Mobile Ads",
+      "origin": "catalogue"
+    },
+    {
+      "category": "platform",
+      "evidence": [
+        {
+          "count": 1,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "com.google.android.gms.ads.MobileAds"
+          ],
+          "rule": "com.google.android.gms",
+          "source": "dex_class"
+        }
+      ],
+      "id": "google-play-services",
+      "name": "Google Play Services (client libraries)",
+      "origin": "catalogue"
+    },
+    {
+      "category": "crash-reporting",
+      "evidence": [
+        {
+          "count": 2,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "io.sentry.Sentry",
+            "io.sentry.android.core.SentryAndroid"
+          ],
+          "rule": "io.sentry",
+          "source": "dex_class"
+        }
+      ],
+      "id": "sentry",
+      "name": "Sentry",
+      "origin": "catalogue"
+    }
+  ],
+  "package": null,
+  "schema_version": 1,
+  "skipped_signatures": 0,
+  "version_code": null,
+  "version_name": null
+}

@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M3). See NOTICE.
+// Modified by Zero (2026-11-01): new module (fork M3); Source::as_str (M5). See NOTICE.
 //! Matching a catalogue against an inventory and a manifest, with the evidence for each match.
 
 use dexpa_core::manifest::Manifest;
@@ -18,6 +18,17 @@ pub enum Source {
     ManifestComponent,
     /// A `<meta-data>` key in the manifest.
     ManifestMeta,
+}
+
+impl Source {
+    /// The name used in JSON and in `source:rule` labels.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Source::DexClass => "dex_class",
+            Source::ManifestComponent => "manifest_component",
+            Source::ManifestMeta => "manifest_meta",
+        }
+    }
 }
 
 /// One piece of evidence: everything one rule matched from one source.

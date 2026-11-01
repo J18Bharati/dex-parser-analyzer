@@ -1,0 +1,125 @@
+{
+  "attribution": null,
+  "catalogue_size": 25,
+  "class_count": 5,
+  "dex_count": 1,
+  "matches": [
+    {
+      "category": "analytics",
+      "evidence": [
+        {
+          "count": 1,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "com.google.firebase.analytics.FirebaseAnalytics"
+          ],
+          "rule": "com.google.firebase.analytics",
+          "source": "dex_class"
+        }
+      ],
+      "id": "firebase-analytics",
+      "name": "Google Firebase Analytics",
+      "origin": "catalogue"
+    },
+    {
+      "category": "push",
+      "evidence": [
+        {
+          "count": 1,
+          "dex_indexes": [],
+          "examples": [
+            "com.google.firebase.messaging.FirebaseMessagingService"
+          ],
+          "rule": "com.google.firebase.messaging",
+          "source": "manifest_component"
+        }
+      ],
+      "id": "firebase-messaging",
+      "name": "Firebase Cloud Messaging",
+      "origin": "catalogue"
+    },
+    {
+      "category": "ads",
+      "evidence": [
+        {
+          "count": 1,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "com.google.android.gms.ads.MobileAds"
+          ],
+          "rule": "com.google.android.gms.ads",
+          "source": "dex_class"
+        }
+      ],
+      "id": "google-mobile-ads",
+      "name": "Google Mobile Ads",
+      "origin": "catalogue"
+    },
+    {
+      "category": "platform",
+      "evidence": [
+        {
+          "count": 1,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "com.google.android.gms.ads.MobileAds"
+          ],
+          "rule": "com.google.android.gms",
+          "source": "dex_class"
+        },
+        {
+          "count": 1,
+          "dex_indexes": [],
+          "examples": [
+            "com.google.android.gms.version"
+          ],
+          "rule": "com.google.android.gms.version",
+          "source": "manifest_meta"
+        }
+      ],
+      "id": "google-play-services",
+      "name": "Google Play Services (client libraries)",
+      "origin": "catalogue"
+    },
+    {
+      "category": "crash-reporting",
+      "evidence": [
+        {
+          "count": 2,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "io.sentry.Sentry",
+            "io.sentry.android.core.SentryAndroid"
+          ],
+          "rule": "io.sentry",
+          "source": "dex_class"
+        },
+        {
+          "count": 1,
+          "dex_indexes": [],
+          "examples": [
+            "io.sentry.dsn"
+          ],
+          "rule": "io.sentry.dsn",
+          "source": "manifest_meta"
+        }
+      ],
+      "id": "sentry",
+      "name": "Sentry",
+      "origin": "catalogue"
+    }
+  ],
+  "package": "app.fixture",
+  "schema_version": 1,
+  "skipped_signatures": 0,
+  "version_code": "2",
+  "version_name": "1.2"
+}

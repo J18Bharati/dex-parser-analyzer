@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M4). See NOTICE.
+// Modified by Zero (2026-11-01): new module (fork M4); uses Source::as_str (M5). See NOTICE.
 //! SDK changes between two versions of an app.
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -62,14 +62,7 @@ fn confidence(m: &SdkMatch) -> Confidence {
 fn kinds(m: &SdkMatch) -> BTreeSet<String> {
     m.evidence
         .iter()
-        .map(|e| {
-            let source = match e.source {
-                Source::DexClass => "dex_class",
-                Source::ManifestComponent => "manifest_component",
-                Source::ManifestMeta => "manifest_meta",
-            };
-            format!("{source}:{}", e.rule)
-        })
+        .map(|e| format!("{}:{}", e.source.as_str(), e.rule))
         .collect()
 }
 

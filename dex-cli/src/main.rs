@@ -1,9 +1,10 @@
+// Modified by Zero (2026-11-01): `dexpa sdks` subcommand (fork M5); `dexpa <FILE>` unchanged. See NOTICE.
 //! `dexpa`: the summary and static-analysis findings of an Android DEX file or APK.
 
 use std::{cmp::Reverse, fs, path::PathBuf, process::ExitCode};
 
 use anyhow::{Context, Result, bail};
-use clap::{Parser, ValueEnum};
+use clap::{Parser, Subcommand, ValueEnum};
 use dexpa_analysis::{
     config::AnalysisConfig,
     engine::analyze_dex,
@@ -11,6 +12,8 @@ use dexpa_analysis::{
 };
 use dexpa_core::{dto::dex_to_overview, multidex::read_dex_buffers_from_bytes, parse_dex};
 use serde::Serialize;
+
+mod sdks;
 
 /// The version of the `--format json` output; it changes only with a breaking change to its shape.
 const SCHEMA_VERSION: u32 = 1;
@@ -23,12 +26,19 @@ const TOP_CLASSES: usize = 10;
     name = "dexpa",
     author,
     version,
-    about = "Summarise and statically analyse an Android DEX file or APK"
+    about = "Summarise and statically analyse an Android DEX file or APK",
+    // `dexpa <FILE>` stays the default; `dexpa sdks ...` is the only subcommand. A file named
+    // `sdks` in the working directory needs a path: `dexpa ./sdks`.
+    args_conflicts_with_subcommands = true,
+    subcommand_negates_reqs = true
 )]
 struct Args {
-    /// A `.dex` file, or an `.apk`/zip whose `classes*.dex` entries are analysed in name order.
-    #[arg(value_name = "FILE")]
-    input: PathBuf,
+    #[command(subcommand)]
+    command: Option<Command>,
+
+    /// A `.dex` file, or an `.apk`/zip whose `classes*.dex` entries are analysed in load order.
+    #[arg(value_name = "FILE", required = true)]
+    input: Option<PathBuf>,
 
     /// Output format.
     #[arg(long, value_enum, default_value_t = Format::Text)]
@@ -41,6 +51,15 @@ struct Args {
     /// Exit with status 2 when any finding is at or above this severity.
     #[arg(long, value_enum, value_name = "SEVERITY")]
     fail_on: Option<Threshold>,
+}
+
+#[derive(Debug, Subcommand)]
+enum Command {
+    /// Find third-party SDKs in a DEX file or APK, or compare two reports (`dexpa sdks diff`).
+    ///
+    /// SDKs (analytics, ads, crash reporting, ...) are found by the classes the app defines and,
+    /// for an APK, by its manifest's components and meta-data keys.
+    Sdks(sdks::SdksArgs),
 }
 
 #[derive(Clone, Copy, Debug, ValueEnum)]
@@ -111,6 +130,12 @@ struct TopClass {
 
 fn main() -> ExitCode {
     let args = Args::parse();
+    if let Some(Command::Sdks(sdks_args)) = &args.command {
+        return match sdks::run(sdks_args) {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(err) => fail(&err),
+        };
+    }
     match run(&args) {
         Ok(output) => {
             let tripped = args.fail_on.is_some_and(|threshold| {
@@ -145,12 +170,12 @@ fn fail(err: &anyhow::Error) -> ExitCode {
 }
 
 fn run(args: &Args) -> Result<Output> {
-    let bytes = fs::read(&args.input)
-        .with_context(|| format!("failed to read {}", args.input.display()))?;
+    let input = args.input.as_deref().context("an input file is required")?;
+    let bytes = fs::read(input).with_context(|| format!("failed to read {}", input.display()))?;
     let buffers = if bytes.starts_with(b"PK\x03\x04") {
         let buffers = read_dex_buffers_from_bytes(&bytes).context("failed to read the APK")?;
         if buffers.is_empty() {
-            bail!("{} contains no classes*.dex entry", args.input.display());
+            bail!("{} contains no classes*.dex entry", input.display());
         }
         buffers
     } else {
@@ -168,7 +193,7 @@ fn run(args: &Args) -> Result<Output> {
         .collect::<Result<Vec<_>>>()?;
     Ok(Output {
         schema_version: SCHEMA_VERSION,
-        input: args.input.display().to_string(),
+        input: input.display().to_string(),
         dex_files,
     })
 }

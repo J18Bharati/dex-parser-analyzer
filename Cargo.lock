@@ -446,8 +446,10 @@ dependencies = [
  "clap",
  "dexpa-analysis",
  "dexpa-core",
+ "dexpa-sdk",
  "serde",
  "serde_json",
+ "zip",
 ]
 
 [[package]]

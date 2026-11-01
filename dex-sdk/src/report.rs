@@ -1,9 +1,12 @@
-// Modified by Zero (2026-11-01): new module (fork M4). See NOTICE.
+// Modified by Zero (2026-11-01): new module (fork M4); build_report and value_text (M5). See NOTICE.
 //! The SDK report: what `dexpa sdks` prints as JSON, and what `diff` reads back.
 
+use dexpa_core::{DexResult, axml::XmlValue, manifest::Manifest};
 use serde::{Deserialize, Serialize};
 
-use crate::matcher::SdkMatch;
+use crate::catalogue::{Catalogue, Origin};
+use crate::inventory::inventory_from_buffers;
+use crate::matcher::{SdkMatch, match_sdks};
 
 /// Version of the report's JSON shape. Independent of the main `dexpa` report's version.
 pub const SCHEMA_VERSION: u32 = 1;
@@ -34,4 +37,42 @@ pub struct SdkReport {
     pub attribution: Option<String>,
     /// SDKs found, sorted by id.
     pub matches: Vec<SdkMatch>,
+}
+
+/// Builds the report for one app: the DEX files in load order and, for an APK, its manifest.
+/// Fails only when a DEX file does not parse.
+pub fn build_report(
+    catalogue: &Catalogue,
+    dex_buffers: &[Vec<u8>],
+    manifest: Option<&Manifest>,
+) -> DexResult<SdkReport> {
+    let inventory = inventory_from_buffers(dex_buffers)?;
+    let exodus = catalogue.sdks.iter().any(|s| s.origin == Origin::Exodus);
+    Ok(SdkReport {
+        schema_version: SCHEMA_VERSION,
+        package: manifest.and_then(|m| m.package.clone()),
+        version_code: manifest.and_then(|m| m.version_code.as_ref().and_then(value_text)),
+        version_name: manifest.and_then(|m| m.version_name.as_ref().and_then(value_text)),
+        dex_count: dex_buffers.len(),
+        class_count: inventory.classes.len(),
+        catalogue_size: catalogue.sdks.len(),
+        skipped_signatures: catalogue.skipped.len(),
+        attribution: exodus.then(|| EXODUS_ATTRIBUTION.to_string()),
+        matches: match_sdks(catalogue, &inventory, manifest),
+    })
+}
+
+/// A manifest value as text: numbers in decimal, references as `@0x...` (resolving them needs
+/// `resources.arsc`, which is not read), other typed values with their type. `Null` gives `None`.
+pub fn value_text(value: &XmlValue) -> Option<String> {
+    Some(match value {
+        XmlValue::Null => return None,
+        XmlValue::String(s) => s.clone(),
+        XmlValue::Int(n) => n.to_string(),
+        XmlValue::Hex(n) => n.to_string(),
+        XmlValue::Bool(b) => b.to_string(),
+        XmlValue::Reference(id) => format!("@0x{id:08x}"),
+        XmlValue::AttributeRef(id) => format!("?0x{id:08x}"),
+        XmlValue::Other { data_type, data } => format!("type 0x{data_type:02x}: 0x{data:08x}"),
+    })
 }

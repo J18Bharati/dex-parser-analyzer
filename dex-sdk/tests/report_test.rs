@@ -1,0 +1,101 @@
+// Modified by Zero (2026-11-01): new test file (fork M5). See NOTICE.
+//! Building an [`SdkReport`] from DEX buffers, a manifest and a catalogue.
+
+use std::fs;
+
+use dexpa_core::axml::XmlValue;
+use dexpa_core::manifest::Manifest;
+use dexpa_sdk::catalogue::{bundled, load_exodus_json};
+use dexpa_sdk::report::{EXODUS_ATTRIBUTION, SCHEMA_VERSION, build_report, value_text};
+
+fn positive() -> Vec<Vec<u8>> {
+    vec![
+        fs::read(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/data/sdk-positive.dex"
+        ))
+        .unwrap(),
+    ]
+}
+
+#[test]
+fn report_counts_and_matches_without_a_manifest() {
+    let catalogue = bundled();
+    let report = build_report(&catalogue, &positive(), None).unwrap();
+    assert_eq!(report.schema_version, SCHEMA_VERSION);
+    assert_eq!(report.dex_count, 1);
+    assert_eq!(report.class_count, 5);
+    assert_eq!(report.catalogue_size, catalogue.sdks.len());
+    assert_eq!(report.package, None);
+    assert_eq!(report.attribution, None);
+    let ids: Vec<&str> = report.matches.iter().map(|m| m.id.as_str()).collect();
+    assert_eq!(
+        ids,
+        [
+            "firebase-analytics",
+            "google-mobile-ads",
+            "google-play-services",
+            "sentry"
+        ]
+    );
+}
+
+#[test]
+fn report_takes_package_and_versions_from_the_manifest() {
+    let manifest = Manifest {
+        package: Some("app.fixture".into()),
+        version_code: Some(XmlValue::Int(7)),
+        version_name: Some(XmlValue::Reference(0x7f0f_0001)),
+        ..Manifest::default()
+    };
+    let report = build_report(&bundled(), &positive(), Some(&manifest)).unwrap();
+    assert_eq!(report.package.as_deref(), Some("app.fixture"));
+    assert_eq!(report.version_code.as_deref(), Some("7"));
+    assert_eq!(report.version_name.as_deref(), Some("@0x7f0f0001"));
+}
+
+#[test]
+fn exodus_entries_bring_the_attribution_and_skipped_count() {
+    let exodus = load_exodus_json(
+        r#"{"trackers": {"1": {"name": "S", "code_signature": "io.sentry.", "categories": []},
+                         "2": {"name": "B", "code_signature": "(", "categories": []}}}"#,
+    )
+    .unwrap();
+    let catalogue = bundled().merge(exodus).unwrap();
+    let report = build_report(&catalogue, &positive(), None).unwrap();
+    assert_eq!(report.attribution.as_deref(), Some(EXODUS_ATTRIBUTION));
+    assert_eq!(report.skipped_signatures, 1);
+}
+
+#[test]
+fn value_text_renders_each_value_type() {
+    assert_eq!(value_text(&XmlValue::Int(-3)).as_deref(), Some("-3"));
+    assert_eq!(value_text(&XmlValue::Hex(0x10)).as_deref(), Some("16"));
+    assert_eq!(
+        value_text(&XmlValue::String("1.0".into())).as_deref(),
+        Some("1.0")
+    );
+    assert_eq!(value_text(&XmlValue::Bool(true)).as_deref(), Some("true"));
+    assert_eq!(
+        value_text(&XmlValue::Reference(0x7f01_0002)).as_deref(),
+        Some("@0x7f010002")
+    );
+    assert_eq!(
+        value_text(&XmlValue::AttributeRef(0x0101_0000)).as_deref(),
+        Some("?0x01010000")
+    );
+    assert_eq!(value_text(&XmlValue::Null), None);
+    assert_eq!(
+        value_text(&XmlValue::Other {
+            data_type: 4,
+            data: 1
+        })
+        .as_deref(),
+        Some("type 0x04: 0x00000001")
+    );
+}
+
+#[test]
+fn unreadable_dex_is_an_error() {
+    assert!(build_report(&bundled(), &[b"dex\n035\0".to_vec()], None).is_err());
+}

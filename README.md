@@ -1,4 +1,5 @@
-Status: alpha, unreleased (every crate is 0.1.0). The parser and analyzer run on the bundled fixtures; v0.2.0 will be the first crates.io release of `dexpa-core`, `dexpa-analysis` and `dexpa-cli` (binary `dexpa`).
+<!-- Modified by Zero (2026-11-01): dexpa-sdk and `dexpa sdks` rows (fork M5). See NOTICE. -->
+Status: alpha, unreleased (every crate is 0.1.0). The parser and analyzer run on the bundled fixtures; v0.2.0 will be the first crates.io release of `dexpa-core`, `dexpa-analysis` and `dexpa-cli` (binary `dexpa`). This fork adds `dexpa-sdk`, which `dexpa-cli` depends on.
 
 # dex-parser-analyzer
 
@@ -12,7 +13,8 @@ In-browser demo: https://dhilipsiva.github.io/dex-parser-analyzer/
 |---|---|
 | [`dexpa-core`](dex-core/) | Zero-copy DEX parser: header and sections, classes, methods, Dalvik bytecode decoding, control-flow and call graphs, cross-references, serde DTOs, and multi-dex/APK input. |
 | [`dexpa-analysis`](dex-analysis/) | Static-analysis passes over a parsed file (pattern, structural and intraprocedural taint), producing serde-serializable findings. The rules are listed in [docs/rules.md](docs/rules.md). |
-| [`dexpa-cli`](dex-cli/) | The `dexpa` command: a summary and the findings of a DEX file or APK, as text or JSON, with CI-friendly exit codes. |
+| [`dexpa-sdk`](dex-sdk/) | (fork) Which third-party SDKs an app contains, with the evidence for each: classes the app defines, manifest components and meta-data keys. Reports and version-to-version diffs. |
+| [`dexpa-cli`](dex-cli/) | The `dexpa` command: a summary and the findings of a DEX file or APK, as text or JSON, with CI-friendly exit codes; `dexpa sdks` (fork) for SDK detection and diffs. |
 | `dex-gui` | The Leptos and WebAssembly GUI behind the demo (not published to crates.io). |
 
 How the crates fit together is described in [docs/architecture.md](docs/architecture.md).

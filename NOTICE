@@ -32,7 +32,7 @@ Each changed file carries a "Modified by" note. Changes so far:
   tests in dex-core/tests/manifest_test.rs with a test-side AXML builder in
   dex-core/tests/common/axml_builder.rs; fuzz/fuzz_targets/parse_manifest.rs, its fuzz/Cargo.toml
   entry and the .github/workflows/fuzz.yml matrix; docs/architecture.md rows; CHANGELOG.md.
-- M2: new crate dex-sdk/ (package dexpa-sdk, publish = false) with src/inventory.rs, tests in
+- M2: new crate dex-sdk/ (package dexpa-sdk, publish = false until M5) with src/inventory.rs, tests in
   dex-sdk/tests/inventory_test.rs and a golden file; added to the workspace members (Cargo.toml,
   Cargo.lock) and to the flake's source fileset (flake.nix); docs/architecture.md; CHANGELOG.md.
 - M3: dex-sdk/src/catalogue.rs, dex-sdk/src/matcher.rs, dex-sdk/catalogue/sdks.toml (this
@@ -41,5 +41,16 @@ Each changed file carries a "Modified by" note. Changes so far:
   (Cargo.lock); docs/architecture.md; CHANGELOG.md.
 - M4: dex-sdk/src/report.rs, dex-sdk/src/diff.rs and dex-sdk/tests/diff_test.rs; Deserialize on
   the match types; docs/architecture.md; CHANGELOG.md.
+- M5: the `dexpa sdks` subcommand: dex-cli/src/main.rs (clap subcommand; `dexpa <FILE>`
+  unchanged) and dex-cli/src/sdks.rs (new); dex-cli depends on dexpa-sdk and zip
+  (dex-cli/Cargo.toml, Cargo.lock); new tests dex-cli/tests/sdks.rs with golden files in
+  dex-cli/tests/golden/. dex-sdk/src/report.rs gains build_report and value_text
+  (dex-sdk/tests/report_test.rs); dex-sdk/src/matcher.rs gains Source::as_str, used by
+  dex-sdk/src/diff.rs. dexpa-sdk is no longer publish = false (dex-sdk/Cargo.toml), because a
+  published dexpa-cli cannot depend on an unpublished crate; it joins CRATES in
+  .github/workflows/release.yml and the list in RELEASING.md. New fixture sources in
+  dex-sdk/tests/fixtures-src and the compiled dex-sdk/tests/data/sdk-{positive,negative}.dex, with
+  a `sdk-fixtures` recipe in the Justfile. README.md, AGENTS.md, dex-cli/README.md,
+  docs/architecture.md, CHANGELOG.md.
 
 Upstream tests edited: none.
