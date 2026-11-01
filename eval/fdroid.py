@@ -161,6 +161,16 @@ def check_entry_jar(path, expected_sha256: str, runner=_runner) -> None:
         raise VerifyError(f"signer {fps[0]} is not the pinned F-Droid key")
 
 
+def read_entry_json(jar) -> dict:
+    """entry.json from a jar that check_entry_jar verified. A duplicated name is refused: Java
+    and Python zip readers may pick different copies, so the verified one might not be read."""
+    with zipfile.ZipFile(jar) as z:
+        names = z.namelist()
+        if len(names) != len(set(names)):
+            raise VerifyError(f"{jar} has duplicate entry names")
+        return json.loads(z.read("entry.json"))
+
+
 def _order(seed: str, package: str) -> str:
     return hashlib.sha256(f"{seed}\0{package}".encode()).hexdigest()
 
@@ -258,8 +268,7 @@ def cmd_select(args) -> None:
     jar = CACHE / "entry.jar"
     jar.write_bytes(_get(f"{REPO}/entry.jar", 1_000_000))
     check_entry_jar(jar, FDROID_SIGNER_SHA256)
-    with zipfile.ZipFile(jar) as z:
-        entry = json.loads(z.read("entry.json"))
+    entry = read_entry_json(jar)
     pin = entry["index"]
     raw = _get(f"{REPO}{pin['name']}", 200_000_000)
     if len(raw) != pin["size"] or hashlib.sha256(raw).hexdigest() != pin["sha256"]:

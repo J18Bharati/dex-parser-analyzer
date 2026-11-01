@@ -7,7 +7,10 @@
 
 use std::io::{Cursor, Write};
 
-use dexpa_core::multidex::{read_dex_buffers_from_bytes, read_dex_buffers_from_bytes_with_limit};
+use dexpa_core::multidex::{
+    MAX_TOTAL_DEX_BYTES, read_dex_buffers_from_bytes, read_dex_buffers_from_bytes_with_limit,
+    read_dex_buffers_from_bytes_with_limits,
+};
 use zip::write::{SimpleFileOptions, ZipWriter};
 
 fn fixture(name: &str) -> Vec<u8> {
@@ -74,3 +77,34 @@ fn an_entry_over_the_limit_is_refused() {
         "one byte over the limit must fail, not truncate"
     );
 }
+
+/// /cso CSO-1 (2026-11-02): each entry was capped, but not their sum, so many small deflated
+/// entries could inflate to many GiB. The total is capped too.
+#[test]
+fn the_sum_of_entries_is_capped_as_well() {
+    let one = fixture("classes.dex");
+    let n = one.len() as u64;
+    let apk = zip_of(&[
+        ("classes.dex", &one),
+        ("classes2.dex", &one),
+        ("classes3.dex", &one),
+    ]);
+    assert_eq!(
+        read_dex_buffers_from_bytes_with_limits(&apk, n, 3 * n)
+            .unwrap()
+            .len(),
+        3,
+        "exactly at the total is fine"
+    );
+    assert!(
+        read_dex_buffers_from_bytes_with_limits(&apk, n, 3 * n - 1).is_err(),
+        "one byte over the total must fail"
+    );
+    assert!(
+        read_dex_buffers_from_bytes_with_limits(&apk, n, 2 * n).is_err(),
+        "the third entry passes the per-entry limit but not the total"
+    );
+}
+
+// Room for several full-size DEX files: checked at compile time.
+const _: () = assert!(MAX_TOTAL_DEX_BYTES >= 4 * (1 << 28));

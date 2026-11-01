@@ -242,6 +242,31 @@ class EntryJarTest(unittest.TestCase):
             self.check("jar verified.\n", f"\t SHA256: {self.FP}\n\t SHA256: {self.FP}\n")
 
 
+class EntryJsonTest(unittest.TestCase):
+    """/cso gap (2026-11-02): jarsigner (Java) and zipfile (Python) may pick different copies of a
+    duplicated name, so a jar with duplicate entry names is refused outright."""
+
+    def jar(self, entries):
+        import warnings
+        import zipfile
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        path = Path(d.name) / "entry.jar"
+        with warnings.catch_warnings(), zipfile.ZipFile(path, "w") as z:
+            warnings.simplefilter("ignore")
+            for name, data in entries:
+                z.writestr(name, data)
+        return path
+
+    def test_reads_entry_json(self):
+        self.assertEqual(fdroid.read_entry_json(self.jar([("META-INF/MANIFEST.MF", "x"), ("entry.json", '{"a": 1}')])), {"a": 1})
+
+    def test_duplicate_names_are_refused(self):
+        path = self.jar([("entry.json", '{"a": 1}'), ("entry.json", '{"a": 2}')])
+        with self.assertRaises(fdroid.VerifyError):
+            fdroid.read_entry_json(path)
+
+
 class CrossCheckTest(unittest.TestCase):
     def entry(self, **over):
         e = {"package": "org.x", "version_code": 7, "version_name": "1.7", "min_sdk": 21, "target_sdk": 34, "permissions": ["a.B", "c.D"]}

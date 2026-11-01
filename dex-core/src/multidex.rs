@@ -1,5 +1,5 @@
 // Modified by Zero (2026-11-01): app DEX entries are top-level classes(N).dex in numeric order,
-// and each entry read is size-limited. See NOTICE.
+// and each entry read is size-limited; their sum is capped too (2026-11-02, /cso). See NOTICE.
 //! Helpers for coordinating multiple DEX files (e.g., multi-dex APKs).
 
 use std::{
@@ -232,9 +232,19 @@ pub fn read_dex_buffers_from_bytes(bytes: &[u8]) -> DexResult<Vec<Vec<u8>>> {
 
 /// Like [`read_dex_buffers_from_bytes`], with a per-entry size limit in bytes.
 pub fn read_dex_buffers_from_bytes_with_limit(bytes: &[u8], limit: u64) -> DexResult<Vec<Vec<u8>>> {
+    read_dex_buffers_from_bytes_with_limits(bytes, limit, MAX_TOTAL_DEX_BYTES)
+}
+
+/// Like [`read_dex_buffers_from_bytes`], with a per-entry limit and a limit on the sum of all
+/// entries, in bytes.
+pub fn read_dex_buffers_from_bytes_with_limits(
+    bytes: &[u8],
+    per_entry: u64,
+    total: u64,
+) -> DexResult<Vec<Vec<u8>>> {
     let cursor = Cursor::new(bytes);
     let mut archive = ZipArchive::new(cursor)?;
-    read_dex_entries_limited(&mut archive, limit)
+    read_dex_entries_limited(&mut archive, per_entry, total)
 }
 
 fn method_descriptor(dex: &DexFile<'_>, idx: MethodIdx) -> Option<String> {
@@ -260,8 +270,12 @@ fn method_descriptor(dex: &DexFile<'_>, idx: MethodIdx) -> Option<String> {
 /// smaller (method and field ids are 16-bit), so this bounds memory on hostile archives.
 pub const MAX_DEX_ENTRY_BYTES: u64 = 256 * 1024 * 1024;
 
+/// Default limit on the sum of an archive's DEX entries: 1 GiB. Without it, many small deflated
+/// entries, each under [`MAX_DEX_ENTRY_BYTES`], could inflate to many GiB.
+pub const MAX_TOTAL_DEX_BYTES: u64 = 1024 * 1024 * 1024;
+
 fn read_dex_entries<R: Read + Seek>(archive: &mut ZipArchive<R>) -> DexResult<Vec<Vec<u8>>> {
-    read_dex_entries_limited(archive, MAX_DEX_ENTRY_BYTES)
+    read_dex_entries_limited(archive, MAX_DEX_ENTRY_BYTES, MAX_TOTAL_DEX_BYTES)
 }
 
 /// The position of an app DEX entry in load order: `classes.dex` is 1, `classesN.dex` is N
@@ -280,24 +294,28 @@ fn classes_dex_index(name: &str) -> Option<u32> {
 
 fn read_dex_entries_limited<R: Read + Seek>(
     archive: &mut ZipArchive<R>,
-    limit: u64,
+    per_entry: u64,
+    total: u64,
 ) -> DexResult<Vec<Vec<u8>>> {
     let mut entries = Vec::new();
+    let mut remaining = total;
     for i in 0..archive.len() {
         let file = archive.by_index(i)?;
         let name = file.name()?.into_owned();
         let Some(index) = classes_dex_index(&name) else {
             continue;
         };
+        let limit = per_entry.min(remaining);
         if file.size() > limit {
-            return Err(DexError::Message("zip entry exceeds the size limit"));
+            return Err(DexError::Message("zip entries exceed the size limit"));
         }
         // The declared size can lie; bound the read itself too.
         let mut buf = Vec::new();
         file.take(limit + 1).read_to_end(&mut buf)?;
         if buf.len() as u64 > limit {
-            return Err(DexError::Message("zip entry exceeds the size limit"));
+            return Err(DexError::Message("zip entries exceed the size limit"));
         }
+        remaining -= buf.len() as u64;
         if buf.starts_with(b"dex\n") {
             entries.push((index, buf));
         }

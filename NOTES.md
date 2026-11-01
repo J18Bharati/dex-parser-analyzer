@@ -115,3 +115,16 @@ From the 2026-11-01 eng review of the plan. They are recorded here before any AP
 - **Two tooling bugs found on the way:**
   - The recipe's `cargo build --example manifest_json` built only the example, never `dexpa`. Fixed, and a preflight now checks for both tools before any download.
   - The `.#eval` shell lacked Rust, so cargo fell back to the host's rustup. The shell now carries the pinned toolchain.
+
+## 2026-11-02: /cso on the evaluation scripts and the APK readers
+
+- **Status: partial.** The scope was `eval`, `dex-core/src`, `dex-cli/src`, the Justfile and `flake.nix`. The helper refuses symlinks, so it ran on a clone of `7830f55` in which upstream's 7 licence and NOTICE symlinks were replaced by copies. Git history coverage is partial (the helper's own record). Report: `~/.gstack/security/cso/4db7fdf72ceaa1e19215bad1/1793558252193-ae2a6cff5df25b8b/`.
+- **CSO-1, low severity, high confidence, supported by static trace: no limit on the sum of DEX entries.** M1a capped each `classesN.dex` at 256 MiB but nothing capped their sum. A few-MB APK with dozens of deflated entries could drive `dexpa`, `dexpa sdks` or the F-Droid run to many GiB. **Fixed:** `MAX_TOTAL_DEX_BYTES` is 1 GiB, and each read is bounded by the smaller of the per-entry limit and what remains. A test failed first, and removing the cap makes it fail again.
+- **Gap closed: a jar parser differential.** `jarsigner` (Java) verifies `entry.jar`, then Python's `zipfile` reads `entry.json`. If a name were duplicated, the two readers could pick different copies. Rather than establish which copy each picks, `select` now refuses any jar with duplicate entry names. Tested, and mutation-checked. Extra unsigned entries were already refused, through the "unsigned" check on jarsigner's output.
+- **Checked and found sound:**
+  - every subprocess call takes a list of arguments, with no shell;
+  - downloaded file names are anchored by `NAME_RE` before being joined to the destination;
+  - redirects can't bypass the sha256 and size check, which runs before `os.replace`;
+  - partial downloads are removed in `finally`;
+  - the AXML parser bounds depth and decoded strings, and the manifest is capped at 16 MiB.
+- **No independent reviewer:** the challenge was a sequential pass, labelled as such in the report.

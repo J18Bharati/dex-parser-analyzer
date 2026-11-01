@@ -64,5 +64,8 @@ Each changed file carries a "Modified by" note. Changes so far:
   recipe builds `dexpa` explicitly; the `.#eval` shell carries the pinned Rust toolchain. The
   `facebook` catalogue entry is narrowed to the SDK's own packages
   (dex-sdk/catalogue/sdks.toml), with a test in dex-sdk/tests/matcher_test.rs.
+- /cso fixes (2026-11-02): dex-core/src/multidex.rs caps the sum of DEX entries
+  (MAX_TOTAL_DEX_BYTES, read_dex_buffers_from_bytes_with_limits), tested in
+  dex-core/tests/apk_entries_test.rs; eval/fdroid.py refuses a jar with duplicate entry names.
 
 Upstream tests edited: none.
