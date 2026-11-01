@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M1b); review fixes (2026-11-02). See NOTICE.
+// Modified by Zero (2026-11-01): new module (fork M1b); review fixes (2026-11-02); uses-permission-sdk-m (re-review). See NOTICE.
 //! The parts of `AndroidManifest.xml` that identify an app and the SDKs it declares.
 
 use serde::Serialize;
@@ -198,7 +198,7 @@ pub fn manifest_from_element(root: &XmlElement) -> DexResult<Manifest> {
                 m.target_sdk =
                     android(child, attr::TARGET_SDK_VERSION, "targetSdkVersion").cloned();
             }
-            "uses-permission" | "uses-permission-sdk-23" => {
+            "uses-permission" | "uses-permission-sdk-23" | "uses-permission-sdk-m" => {
                 if let Some(name) = string(android(child, attr::NAME, "name")) {
                     m.uses_permissions.push(name);
                 }

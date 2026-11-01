@@ -122,6 +122,7 @@
   "package": "app.fixture",
   "schema_version": 1,
   "skipped_signatures": 0,
+  "unreadable_classes": 0,
   "version_code": "2",
   "version_name": "1.2"
 }

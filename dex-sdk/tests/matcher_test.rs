@@ -292,3 +292,22 @@ fn each_signature_hit_belongs_to_the_rule_that_matched() {
     let ids: Vec<&str> = found.iter().map(|m| m.id.as_str()).collect();
     assert_eq!(ids, vec!["exodus:2"]);
 }
+
+/// Re-review (2026-11-02): an `<activity-alias>` name is a label Android never instantiates, so
+/// an app can name one after any SDK. It is not evidence; its target activity is a normal
+/// `<activity>` elsewhere in the manifest.
+#[test]
+fn activity_aliases_are_not_evidence() {
+    let cat = load_toml(TOML).unwrap();
+    let manifest = Manifest {
+        package: Some("org.app".into()),
+        components: vec![Component {
+            kind: ComponentKind::ActivityAlias,
+            name: Some("com.foo.Launcher".into()),
+            exported: None,
+            authorities: None,
+        }],
+        ..Manifest::default()
+    };
+    assert!(match_sdks(&cat, &inv(&[("a.b.c", 0)]), Some(&manifest)).is_empty());
+}

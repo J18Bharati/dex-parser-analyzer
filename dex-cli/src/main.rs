@@ -1,4 +1,5 @@
-// Modified by Zero (2026-11-01): `dexpa sdks` subcommand (fork M5); `dexpa <FILE>` unchanged. See NOTICE.
+// Modified by Zero (2026-11-01): `dexpa sdks` subcommand (fork M5); `dexpa <FILE>` unchanged; errors
+// escaped like other output (2026-11-02, re-review). See NOTICE.
 //! `dexpa`: the summary and static-analysis findings of an Android DEX file or APK.
 
 use std::{cmp::Reverse, fs, path::PathBuf, process::ExitCode};
@@ -165,7 +166,11 @@ fn main() -> ExitCode {
 }
 
 fn fail(err: &anyhow::Error) -> ExitCode {
-    eprintln!("Error: {err:?}");
+    // An error can quote its input (a report's fields, a path), so each line is escaped like
+    // the rest of the output; the line breaks of the cause chain stay.
+    let text = format!("{err:?}");
+    let lines: Vec<String> = text.lines().map(sdks::shown).collect();
+    eprintln!("Error: {}", lines.join("\n"));
     ExitCode::from(1)
 }
 

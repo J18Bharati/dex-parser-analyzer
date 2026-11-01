@@ -438,9 +438,10 @@ fn a_u64_max_manifest_limit_means_no_limit() {
     check_sample(&read_manifest_from_apk_bytes_with_limit(&apk, u64::MAX).unwrap());
 }
 
-/// /review (2026-11-02): Android reads a string attribute through its raw string index (AOSP
-/// `ResXMLParser::getAttributeStringValue`, which `getAttributeValue(null, "package")` uses), not
-/// through the typed value. A manifest whose two indexes disagree must show what Android sees.
+/// /review (2026-11-02): an attribute without a resource id, such as `package`, is read the way
+/// `XmlPullParser.getAttributeValue(null, "package")` reads it: through its raw string index
+/// (AOSP `ResXMLParser::getAttributeStringValue`), not the typed value. A manifest whose two
+/// indexes disagree must show what Android sees.
 #[test]
 fn a_string_attribute_reads_its_raw_value_like_android() {
     let mut root = sample();
@@ -450,6 +451,58 @@ fn a_string_attribute_reads_its_raw_value_like_android() {
     );
     let m = parse_manifest(&build(&root, &Opts::default())).unwrap();
     assert_eq!(m.package.as_deref(), Some("org.example.real"));
+}
+
+/// Re-review (2026-11-02): `android:` attributes are read through `TypedArray`
+/// (`obtainAttributes`, matched by resource id), which uses the typed value's string index. A
+/// decoy raw value must not hide the name or key Android actually sees.
+#[test]
+fn a_framework_attribute_reads_its_typed_value_like_android() {
+    let mut root = sample();
+    root.attrs[2] = aa(
+        "versionName",
+        VERSION_NAME,
+        V::StrSplit("0.0-decoy".into(), "1.4.2".into()),
+    );
+    root.children.push(el(
+        "uses-permission",
+        vec![aa(
+            "name",
+            NAME,
+            V::StrSplit(
+                "android.permission.VIBRATE".into(),
+                "android.permission.READ_CONTACTS".into(),
+            ),
+        )],
+        vec![],
+    ));
+    let m = parse_manifest(&build(&root, &Opts::default())).unwrap();
+    assert_eq!(m.version_name, Some(XmlValue::String("1.4.2".into())));
+    assert!(
+        m.uses_permissions
+            .contains(&"android.permission.READ_CONTACTS".to_string())
+    );
+    assert!(
+        !m.uses_permissions
+            .contains(&"android.permission.VIBRATE".to_string())
+    );
+}
+
+/// Re-review (2026-11-02): `<uses-permission-sdk-m>` is Android's other name for
+/// `<uses-permission-sdk-23>`.
+#[test]
+fn uses_permission_sdk_m_is_a_permission() {
+    let mut root = sample();
+    root.children.push(el(
+        "uses-permission-sdk-m",
+        vec![aa("name", NAME, s("android.permission.BODY_SENSORS"))],
+        vec![],
+    ));
+    let m = parse_manifest(&build(&root, &Opts::default())).unwrap();
+    assert!(
+        m.uses_permissions
+            .contains(&"android.permission.BODY_SENSORS".to_string())
+    );
 }
 
 /// /review (2026-11-02): one root element only; a second one is an error, not a replacement.

@@ -1,9 +1,10 @@
-// Modified by Zero (2026-11-01): new module (fork M2). See NOTICE.
+// Modified by Zero (2026-11-01): new module (fork M2); DEX v041 containers refused (2026-11-02,
+// re-review). See NOTICE.
 //! Defined classes and package-prefix counts across an app's DEX files.
 
 use std::collections::BTreeMap;
 
-use dexpa_core::{DexFile, DexResult, parse_dex};
+use dexpa_core::{DexError, DexFile, DexResult, parse_dex};
 use serde::Serialize;
 
 /// Package prefixes are counted at these depths (`com.google` is depth 2).
@@ -142,6 +143,16 @@ pub fn inventory_from_buffers(buffers: &[Vec<u8>]) -> DexResult<Inventory> {
         .iter()
         .map(|b| parse_dex(b))
         .collect::<DexResult<Vec<_>>>()?;
+    // A v041 file can hold several DEX files back to back; only the first is parsed, so the
+    // rest of the app's classes would be missing without a word.
+    for (dex, buffer) in dexes.iter().zip(buffers) {
+        let header = dex.header();
+        if header.version >= 41 && (header.file_size as usize) < buffer.len() {
+            return Err(DexError::Message(
+                "a DEX v041 container holding more than one DEX file is not supported",
+            ));
+        }
+    }
     Ok(inventory(&dexes))
 }
 

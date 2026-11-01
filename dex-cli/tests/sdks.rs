@@ -334,6 +334,28 @@ fn text_output_escapes_control_characters() {
     );
 }
 
+/// Re-review (2026-11-02): report JSON can come from anyone. Its text reaches stderr through
+/// errors and warnings too, and is escaped there as on stdout.
+#[test]
+fn error_output_escapes_report_text() {
+    let apk = write_apk("errtext.apk", 2, "positive");
+    let mut a = json(&dexpa(&["sdks", &apk, "--format", "json"]));
+    let mut b = a.clone();
+    a["catalogue_fingerprint"] = Value::from("x\u{1b}]0;title\u{7}");
+    b["catalogue_fingerprint"] = Value::from("y\u{202e}");
+    let (pa_, pb) = (scratch("errtext-a.json"), scratch("errtext-b.json"));
+    fs::write(&pa_, a.to_string()).unwrap();
+    fs::write(&pb, b.to_string()).unwrap();
+    let output = dexpa(&["sdks", "diff", pa_.to_str().unwrap(), pb.to_str().unwrap()]);
+    assert_eq!(output.status.code(), Some(1));
+    let err = stderr(&output);
+    assert!(
+        !err.contains('\u{1b}') && !err.contains('\u{7}') && !err.contains('\u{202e}'),
+        "{err:?}"
+    );
+    assert!(err.contains("x\\u{1b}]0;title"), "{err}");
+}
+
 /// /review (2026-11-02): reports made with different catalogues cannot be diffed: every SDK the
 /// other catalogue lacks would show up as added or removed. Different packages only warn.
 #[test]

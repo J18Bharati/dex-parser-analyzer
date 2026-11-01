@@ -1,4 +1,5 @@
-// Modified by Zero (2026-11-01): new module (fork M1b); raw string index first (2026-11-02, /review). See NOTICE.
+// Modified by Zero (2026-11-01): new module (fork M1b); raw string index first (2026-11-02, /review); typed index first
+// for attributes with a resource id (re-review). See NOTICE.
 //! Android binary XML (AXML), as stored in an APK's `AndroidManifest.xml`.
 
 use serde::Serialize;
@@ -318,13 +319,21 @@ fn start_element(
             .get(a + 15)
             .ok_or_else(|| malformed("truncated attribute"))?;
         let data = u32_at(chunk, a + 16)?;
+        let resource_id = resource_map.get(name_index as usize).copied();
+        // Android reads an attribute with a resource id (every `android:` one) through
+        // `TypedArray`, which takes the typed value's string index; it reads one without (such
+        // as `package`) through `XmlPullParser.getAttributeValue`, which takes the raw index
+        // (`ResXMLParser::getAttributeStringValue`). The other index is the fallback.
+        let (first, second) = if resource_id.is_some() {
+            (data, raw)
+        } else {
+            (raw, data)
+        };
         let value = match data_type {
             0x00 => XmlValue::Null,
             0x01 => XmlValue::Reference(data),
             0x02 => XmlValue::AttributeRef(data),
-            // Android reads string attributes through the raw index
-            // (`ResXMLParser::getAttributeStringValue`); the typed index is the fallback.
-            0x03 => match budget.take(pool.get(raw).or_else(|| pool.get(data)))? {
+            0x03 => match budget.take(pool.get(first).or_else(|| pool.get(second)))? {
                 Some(v) => XmlValue::String(v),
                 None => XmlValue::Other { data_type, data },
             },
@@ -336,7 +345,7 @@ fn start_element(
         attributes.push(XmlAttribute {
             namespace: budget.take(pool.get(u32_at(chunk, a)?))?,
             name: budget.take(pool.get(name_index))?.unwrap_or_default(),
-            resource_id: resource_map.get(name_index as usize).copied(),
+            resource_id,
             value,
         });
     }

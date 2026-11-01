@@ -1,5 +1,6 @@
 // Modified by Zero (2026-11-01): new module (fork M5); manifest_error, diff catalogue check and
-// escaped text output (2026-11-02, /review); unread-manifest warning, Cf escapes (re-review). See NOTICE.
+// escaped text output (2026-11-02, /review); unread-manifest warning, Cf escapes,
+// escaped warnings, unreadable count (re-review). See NOTICE.
 //! `dexpa sdks`: which third-party SDKs an app contains, and `dexpa sdks diff`: what changed.
 
 use std::{fs, path::Path, path::PathBuf};
@@ -145,8 +146,9 @@ fn scan(input: &Path, catalogue: &Catalogue) -> Result<SdkReport> {
             Err(DexError::Zip(zip::result::ZipError::FileNotFound)) => None,
             Err(err) => {
                 eprintln!(
-                    "warning: {}: AndroidManifest.xml not read ({err}); the report has DEX evidence only",
-                    input.display()
+                    "warning: {}: AndroidManifest.xml not read ({}); the report has DEX evidence only",
+                    shown(&input.display().to_string()),
+                    shown(&err.to_string())
                 );
                 manifest_error = Some(err.to_string());
                 None
@@ -239,7 +241,7 @@ fn print_json<T: Serialize>(value: &T) -> Result<()> {
 /// `s` with control and invisible characters escaped (`\u{1b}`): text from an APK must not be
 /// able to move the cursor, recolour or reorder the analyst's terminal, or make one name look
 /// like another.
-fn shown(s: &str) -> String {
+pub(crate) fn shown(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     for c in s.chars() {
         if c.is_control() || is_format_or_separator(c) {
@@ -293,6 +295,12 @@ fn print_report(input: &Path, r: &SdkReport) {
         "Read:           {} DEX file(s), {} defined classes",
         r.dex_count, r.class_count
     );
+    if r.unreadable_classes > 0 {
+        println!(
+            "Unreadable:     {} class definitions without a class descriptor, not matched",
+            r.unreadable_classes
+        );
+    }
     println!(
         "Catalogue:      {} SDKs ({} Exodus signatures skipped)",
         r.catalogue_size, r.skipped_signatures

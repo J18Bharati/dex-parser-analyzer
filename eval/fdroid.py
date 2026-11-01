@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Modified by Zero (2026-11-01): new file (fork M6); run-loop fixes (2026-11-02, /review); reports
-# cleared before a run, tool errors per APK, UTF-8 lockfile (re-review). See NOTICE.
+# cleared before a run, tool errors per APK, UTF-8 lockfile, HTTP errors per APK (re-review).
+# See NOTICE.
 """The F-Droid evaluation of `dexpa sdks`: select apps, fetch them under a budget, analyse them.
 
   select  Verify F-Droid's signed entry.jar against the pinned key, fetch index-v2.json (its
@@ -20,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import http.client
 import io
 import json
 import os
@@ -542,8 +544,10 @@ def cmd_run(args) -> None:
         except BudgetError as err:
             aborted = str(err)
             break
-        except (VerifyError, OSError) as err:  # a 404, a timeout, a hash that does not match
-            failures[k] = f"fetch: {err}"
+        # A 404, a timeout, a hash that does not match, or a broken response (http.client's
+        # IncompleteRead and BadStatusLine are not OSError).
+        except (VerifyError, OSError, http.client.HTTPException) as err:
+            failures[k] = f"fetch: {type(err).__name__}: {err}"
             print(f"{k}: not fetched: {err}", flush=True)
             continue
         try:

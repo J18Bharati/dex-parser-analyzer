@@ -32,6 +32,7 @@ fn report(matches: Vec<SdkMatch>) -> SdkReport {
         version_name: None,
         dex_count: 1,
         class_count: 10,
+        unreadable_classes: 0,
         catalogue_size: 25,
         skipped_signatures: 0,
         attribution: None,
@@ -161,4 +162,35 @@ fn an_unread_manifest_makes_added_and_removed_uncertain() {
             }]
         );
     }
+}
+
+/// Re-review (2026-11-02): an SDK in both reports whose manifest evidence is missing only
+/// because one manifest was not read has not changed: only class evidence is compared.
+#[test]
+fn an_unread_manifest_compares_class_evidence_only() {
+    let old = report(vec![m(
+        "both",
+        vec![
+            ev(Source::DexClass, "com.b", 3, &[0]),
+            ev(Source::ManifestComponent, "com.b", 1, &[]),
+        ],
+    )]);
+    let mut new = report(vec![m(
+        "both",
+        vec![ev(Source::DexClass, "com.b", 3, &[0])],
+    )]);
+    new.manifest_error = Some("binary XML is malformed".into());
+    assert!(diff(&old, &new).is_empty(), "{:?}", diff(&old, &new));
+    assert!(diff(&new, &old).is_empty());
+
+    // A class change still shows.
+    new.matches[0].evidence[0].rule = "com.b.x".into();
+    assert_eq!(
+        diff(&old, &new),
+        vec![DiffEvent::SdkEvidenceChanged {
+            id: "both".into(),
+            gained: vec!["dex_class:com.b.x".into()],
+            lost: vec!["dex_class:com.b".into()],
+        }]
+    );
 }

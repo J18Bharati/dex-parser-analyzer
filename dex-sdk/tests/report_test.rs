@@ -131,3 +131,25 @@ fn the_report_fingerprints_its_catalogue() {
     .unwrap();
     assert_ne!(bundled().merge(exodus).unwrap().fingerprint(), fp);
 }
+
+/// Re-review (2026-11-02): a class definition whose descriptor is not a class (here, `V`) is not
+/// counted, and the report says how many there were instead of dropping them silently.
+#[test]
+fn the_report_counts_unreadable_classes() {
+    use dexpa_core::format::TypeIdx;
+    use dexpa_core::parser::parse_dex;
+    let mut bytes = positive().remove(0);
+    let (void, defs_off) = {
+        let dex = parse_dex(&bytes).unwrap();
+        let void = (0..dex.type_count() as u32)
+            .find(|&i| dex.type_descriptor(TypeIdx::new(i)) == Some("V"))
+            .expect("the fixture uses void");
+        (void, dex.header().class_defs_off as usize)
+    };
+    let before = build_report(&bundled(), &[bytes.clone()], None).unwrap();
+    assert_eq!(before.unreadable_classes, 0);
+    bytes[defs_off..defs_off + 4].copy_from_slice(&void.to_le_bytes()); // first class_def's class_idx
+    let after = build_report(&bundled(), &[bytes], None).unwrap();
+    assert_eq!(after.unreadable_classes, 1);
+    assert_eq!(after.class_count, before.class_count - 1);
+}

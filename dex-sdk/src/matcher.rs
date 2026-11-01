@@ -1,8 +1,9 @@
 // Modified by Zero (2026-11-01): new module (fork M3); Source::as_str (M5); one RegexSet pass
-// for Exodus signatures (2026-11-02, /review). See NOTICE.
+// for Exodus signatures (2026-11-02, /review); activity aliases are not evidence (re-review).
+// See NOTICE.
 //! Matching a catalogue against an inventory and a manifest, with the evidence for each match.
 
-use dexpa_core::manifest::Manifest;
+use dexpa_core::manifest::{ComponentKind, Manifest};
 use serde::{Deserialize, Serialize};
 
 use std::collections::HashMap;
@@ -124,8 +125,11 @@ pub fn match_sdks(
     let classes = &inventory.classes; // sorted by name
     let components: Vec<String> = manifest
         .map(|m| {
+            // An activity-alias name is a label, never instantiated: an app can name one after
+            // any SDK. Its target is an ordinary <activity>.
             m.components
                 .iter()
+                .filter(|c| c.kind != ComponentKind::ActivityAlias)
                 .filter_map(|c| c.qualified_name(m.package.as_deref()))
                 .collect()
         })

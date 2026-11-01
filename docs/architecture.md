@@ -28,7 +28,7 @@ Parsing borrows from the input buffer (`DexFile<'a>`), so nothing is copied unti
 | `graphs.rs` | 449 | Basic-block CFGs with fallthrough, branch, switch and exception edges; a direct-edge call graph (one edge per resolved `invoke-*` target, without class-hierarchy resolution); cross-references (strings, fields, types, protos, call sites, method handles). Built on `petgraph`. |
 | `dto.rs` | 248 | Serializable overviews (`DexOverviewDto`, ...) that the CLI and GUI print. |
 | `multidex.rs` | 330 | Reading an APK's app DEX entries (`zip`): archive-root `classes.dex`, `classes2.dex`, ... in numeric load order up to the first missing number (ART's rule), duplicate entry names refused, a numbered entry that is not DEX an error, each read capped (`MAX_DEX_ENTRY_BYTES`) and their sum capped (`MAX_TOTAL_DEX_BYTES`); and `MultiDex`, which builds shared class, method, string and type indexes across files. |
-| `axml.rs` | 349 | (fork) Android binary XML: string pools (UTF-8 and UTF-16, decoded lazily under a byte budget), the resource map, and the element tree; attribute values stay typed, references unresolved. Depth-limited, never panics. |
+| `axml.rs` | 358 | (fork) Android binary XML: string pools (UTF-8 and UTF-16, decoded lazily under a byte budget), the resource map, and the element tree; attribute values stay typed, references unresolved, and a string attribute is read through the index Android uses (typed for attributes with a resource id, raw otherwise). Depth-limited, never panics. |
 | `manifest.rs` | 275 | (fork) The `AndroidManifest.xml` model: package, version, SDK levels, permissions, components and meta-data. `android:` attributes resolve by framework resource id first, so names removed by resource shrinking still resolve. |
 | `semantics.rs` | 67 | Small helpers layered on `DexFile`. |
 | `error.rs` | 84 | `DexError`, the crate's single error type. |
@@ -56,10 +56,10 @@ Published with the other crates since M5, because `dexpa-cli` depends on it. It 
 | Module | Role |
 |---|---|
 | `catalogue.rs` | SDK definitions: this project's TOML list (`dex-sdk/catalogue/sdks.toml`, compiled in; package prefixes of at least two segments and exact meta-data keys) and an importer for Exodus tracker files supplied at run time (each signature must compile on its own, then is anchored at the class name's start; invalid ones skipped and counted), and `Catalogue::fingerprint`, which reports carry so `diff` can refuse a mismatch. |
-| `matcher.rs` | Matches a catalogue against an inventory and a manifest. Evidence per SDK: defined classes (binary search in the sorted class list; Exodus signatures in one `RegexSet` pass), manifest components (qualified the way Android does), and meta-data keys, each with counts, examples and DEX indexes. |
+| `matcher.rs` | Matches a catalogue against an inventory and a manifest. Evidence per SDK: defined classes (binary search in the sorted class list; Exodus signatures in one `RegexSet` pass), manifest components (qualified the way Android does; activity aliases excluded), and meta-data keys, each with counts, examples and DEX indexes. |
 | `report.rs` | `SdkReport`, the JSON `dexpa sdks` prints (`schema_version` 1, ODbL attribution when Exodus data was used), and `build_report`, which runs the inventory and the matcher over an app's DEX buffers and manifest. |
 | `diff.rs` | SDK changes between two reports: added, removed (with `strong` or `uncertain` confidence; `uncertain` too when the other side's manifest was not read) and evidence changed. Counts and DEX placement are deliberately ignored. |
-| `inventory.rs` | The classes an app defines, one pass over each DEX file's `class_defs` (no `MultiDex` index, and no merely referenced types), with per-DEX totals and per-prefix class and method counts at depths 2 to 4. |
+| `inventory.rs` | The classes an app defines, one pass over each DEX file's `class_defs` (no `MultiDex` index, and no merely referenced types), with per-DEX totals and per-prefix class and method counts at depths 2 to 4. A DEX v041 container holding more than one DEX file is refused. |
 
 ## dex-cli
 

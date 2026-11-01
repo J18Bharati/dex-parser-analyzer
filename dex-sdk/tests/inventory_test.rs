@@ -1,4 +1,5 @@
-// Modified by Zero (2026-11-01): new test file (fork M2). See NOTICE.
+// Modified by Zero (2026-11-01): new test file (fork M2); DEX v041 containers (2026-11-02, re-review).
+// See NOTICE.
 use dexpa_core::multidex::read_dex_buffers_from_apk;
 use dexpa_core::parse_dex;
 use dexpa_sdk::inventory::{
@@ -144,4 +145,17 @@ fn multidex_apk_golden() {
         json, expected,
         "golden mismatch; regenerate with UPDATE_GOLDEN=1 if intended"
     );
+}
+
+/// Re-review (2026-11-02): a DEX v041 file can be a container of several DEX files, and only
+/// the first is parsed. Rather than count part of the app's classes without a word, a v041
+/// buffer longer than its first file's `file_size` is refused. A lone v041 file still reads.
+#[test]
+fn a_dex_v041_container_is_refused_not_undercounted() {
+    let mut one = std::fs::read(format!("{DATA}/classes.dex")).unwrap();
+    one[4..7].copy_from_slice(b"041");
+    assert!(inventory_from_buffers(std::slice::from_ref(&one)).is_ok());
+    let mut container = one.clone();
+    container.extend_from_slice(&one); // a second DEX after the first
+    assert!(inventory_from_buffers(&[container]).is_err());
 }

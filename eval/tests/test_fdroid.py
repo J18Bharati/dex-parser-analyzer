@@ -5,11 +5,13 @@ Run: python3 -m unittest discover -s eval/tests   (or `just eval-test`).
 """
 
 import hashlib
+import http.client
 import json
 import sys
 import tempfile
 import tomllib
 import unittest
+import unittest.mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -484,6 +486,23 @@ class RunLoopTest(unittest.TestCase):
         e = self.r.add("/org.example_1.apk", b"A" * 10)
         self.assertEqual(self.run_main([e], manifest=NO_INTERPRETER), 0)
         self.assertIn("org.example_1", self.results()["failures"])
+
+    def test_a_broken_http_response_is_that_apks_failure(self):
+        """Re-review (2026-11-02): http.client errors such as IncompleteRead are not OSError."""
+        a = self.r.add("/org.example_1.apk", b"A" * 10, version_code=1)
+        b = self.r.add("/org.example_2.apk", b"B" * 10, version_code=2)
+        real = fdroid.ensure
+
+        def flaky(e, *args):
+            if e["version_code"] == 1:
+                raise http.client.IncompleteRead(b"partial")
+            return real(e, *args)
+
+        with unittest.mock.patch.object(fdroid, "ensure", flaky):
+            self.assertEqual(self.run_main([a, b]), 0)
+        res = self.results()
+        self.assertIn("IncompleteRead", res["failures"]["org.example_1"])
+        self.assertEqual(res["strata"]["control"]["analysed"], 1)
 
     def test_a_hung_tool_times_out_as_that_apks_failure(self):
         e = self.r.add("/org.example_1.apk", b"A" * 10)

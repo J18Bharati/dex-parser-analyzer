@@ -1,5 +1,5 @@
 // Modified by Zero (2026-11-01): new module (fork M4); uses Source::as_str (M5); unread manifests
-// are uncertain (2026-11-02, /review). See NOTICE.
+// are uncertain, and only class evidence is compared (2026-11-02, /review). See NOTICE.
 //! SDK changes between two versions of an app.
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -69,9 +69,11 @@ pub fn manifest_read(r: &SdkReport) -> bool {
     r.package.is_some() && r.manifest_error.is_none()
 }
 
-fn kinds(m: &SdkMatch) -> BTreeSet<String> {
+/// The `source:rule` pairs of `m`; class evidence only when `classes_only`.
+fn kinds(m: &SdkMatch, classes_only: bool) -> BTreeSet<String> {
     m.evidence
         .iter()
+        .filter(|e| !classes_only || e.source == Source::DexClass)
         .map(|e| format!("{}:{}", e.source.as_str(), e.rule))
         .collect()
 }
@@ -84,6 +86,8 @@ pub fn diff(old: &SdkReport, new: &SdkReport) -> Vec<DiffEvent> {
         old.matches.iter().map(|m| (m.id.as_str(), m)).collect();
     let after: BTreeMap<&str, &SdkMatch> = new.matches.iter().map(|m| (m.id.as_str(), m)).collect();
     let ids: BTreeSet<&str> = before.keys().chain(after.keys()).copied().collect();
+    // With a manifest unread on either side, its evidence is missing there, not gone.
+    let classes_only = !(manifest_read(old) && manifest_read(new));
     let mut events = Vec::new();
     for id in ids {
         match (before.get(id), after.get(id)) {
@@ -98,7 +102,7 @@ pub fn diff(old: &SdkReport, new: &SdkReport) -> Vec<DiffEvent> {
                 confidence: confidence(o, new),
             }),
             (Some(o), Some(n)) => {
-                let (ko, kn) = (kinds(o), kinds(n));
+                let (ko, kn) = (kinds(o, classes_only), kinds(n, classes_only));
                 if ko != kn {
                     events.push(DiffEvent::SdkEvidenceChanged {
                         id: id.into(),

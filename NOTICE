@@ -86,7 +86,16 @@ Each changed file carries a "Modified by" note. Changes so far:
   escaped), dex-core/src/multidex.rs (a numbered entry that is not DEX is an error), with tests in
   dex-sdk/tests/diff_test.rs, dex-cli/tests/sdks.rs and dex-core/tests/apk_entries_test.rs.
   eval/fdroid.py (reports cleared before a run, tool start and JSON errors per APK, UTF-8
-  lockfile) and eval/tests/test_fdroid.py. RELEASING.md (four crates), dex-cli/README.md,
+  lockfile) and eval/tests/test_fdroid.py. RELEASING.md (four crates), eval/README.md, dex-cli/README.md,
   docs/architecture.md, CHANGELOG.md.
+- /review third pass (2026-11-02): dex-core/src/axml.rs (typed string index for attributes with a
+  resource id), dex-core/src/manifest.rs (uses-permission-sdk-m), dex-sdk/src/matcher.rs (activity
+  aliases are not evidence), dex-sdk/src/diff.rs (class evidence only under an unread manifest),
+  dex-sdk/src/report.rs (unreadable_classes), dex-sdk/src/inventory.rs (DEX v041 containers
+  refused), dex-cli/src/main.rs and dex-cli/src/sdks.rs (errors and warnings escaped,
+  unreadable count printed), regenerated dex-cli/tests/golden/sdks-positive-*.json, eval/fdroid.py
+  (HTTP errors per APK); tests in dex-core/tests/manifest_test.rs, dex-sdk/tests/{matcher,diff,
+  report,inventory}_test.rs, dex-cli/tests/sdks.rs and eval/tests/test_fdroid.py. NOTICE and
+  eval/README.md corrections; dex-cli/README.md, docs/architecture.md, CHANGELOG.md.
 
 Upstream tests edited: none.

@@ -1,5 +1,6 @@
 // Modified by Zero (2026-11-01): new module (fork M4); build_report and value_text (M5);
-// catalogue_fingerprint and manifest_error (2026-11-02, /review). See NOTICE.
+// catalogue_fingerprint and manifest_error (2026-11-02, /review); unreadable_classes (re-review).
+// See NOTICE.
 //! The SDK report: what `dexpa sdks` prints as JSON, and what `diff` reads back.
 
 use dexpa_core::{DexResult, axml::XmlValue, manifest::Manifest};
@@ -30,6 +31,10 @@ pub struct SdkReport {
     pub dex_count: usize,
     /// Classes the app defines.
     pub class_count: usize,
+    /// Class definitions whose descriptor is not a class, left out of `class_count` and of
+    /// matching. Absent (0) in reports made before it existed.
+    #[serde(default)]
+    pub unreadable_classes: usize,
     /// SDK definitions consulted.
     pub catalogue_size: usize,
     /// Exodus signatures that could not be used.
@@ -64,6 +69,7 @@ pub fn build_report(
         version_name: manifest.and_then(|m| m.version_name.as_ref().and_then(value_text)),
         dex_count: dex_buffers.len(),
         class_count: inventory.classes.len(),
+        unreadable_classes: inventory.unreadable_classes,
         catalogue_size: catalogue.sdks.len(),
         skipped_signatures: catalogue.skipped.len(),
         attribution: exodus.then(|| EXODUS_ATTRIBUTION.to_string()),
