@@ -31,3 +31,7 @@ fuzz/coverage/
 
 # (fork M6) F-Droid evaluation downloads: index, entry.jar, APKs. Never committed.
 .cache/
+
+# (fork M6) Python bytecode from eval/.
+__pycache__/
+*.pyc
