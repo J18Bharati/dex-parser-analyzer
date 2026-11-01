@@ -1,0 +1,21 @@
+# Modified by Zero (2026-11-01): new crate (fork M2). See NOTICE.
+[package]
+name = "dexpa-sdk"
+description = "Class-prefix inventory, SDK catalogue matching and version diffs over DEX files and APK manifests"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+keywords.workspace = true
+categories.workspace = true
+# Not part of upstream's crates.io release (`cargo publish --workspace` in `just release-dry-run`).
+publish = false
+
+[dependencies]
+dexpa-core = { path = "../dex-core", version = "0.1.0" }
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = "1.0"

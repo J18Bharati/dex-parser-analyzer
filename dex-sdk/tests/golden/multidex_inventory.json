@@ -1,0 +1,42 @@
+{
+  "class_count": 2,
+  "dexes": [
+    {
+      "classes": 1,
+      "dex_index": 0,
+      "methods": 2
+    },
+    {
+      "classes": 1,
+      "dex_index": 1,
+      "methods": 2
+    }
+  ],
+  "prefixes": [
+    {
+      "classes": 1,
+      "depth": 2,
+      "methods": 2,
+      "prefix": "com.blafoo"
+    },
+    {
+      "classes": 1,
+      "depth": 2,
+      "methods": 2,
+      "prefix": "com.foobar"
+    },
+    {
+      "classes": 1,
+      "depth": 3,
+      "methods": 2,
+      "prefix": "com.blafoo.bar"
+    },
+    {
+      "classes": 1,
+      "depth": 3,
+      "methods": 2,
+      "prefix": "com.foobar.foo"
+    }
+  ],
+  "unreadable_classes": 0
+}

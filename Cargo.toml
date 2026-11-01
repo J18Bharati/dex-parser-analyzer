@@ -1,8 +1,10 @@
+# Modified by Zero (2026-11-01): the dex-sdk member (fork). See NOTICE.
 [workspace]
 members = [
     "dex-analysis", "dex-cli",
     "dex-core",
     "dex-gui",
+    "dex-sdk",
 ]
 resolver = "3"
 

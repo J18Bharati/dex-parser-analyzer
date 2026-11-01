@@ -49,6 +49,14 @@ Known gaps (PROGRESS.md "Next Steps" 1-2): the checksum, signature, `file_size` 
 
 The engine sorts the findings by severity, most severe first (a stable sort, so pass order breaks ties), drops exact duplicates, and only then applies `max_findings`, so a cap keeps the most severe findings. `tests/rules_test.rs` holds a positive and a negative test per rule id, run against DEX fixtures compiled from `tests/fixtures-src`.
 
+## dex-sdk (fork)
+
+Unpublished (`publish = false`). It depends on `dex-core` only; `dex-gui` does not depend on it.
+
+| Module | Role |
+|---|---|
+| `inventory.rs` | The classes an app defines, one pass over each DEX file's `class_defs` (no `MultiDex` index, and no merely referenced types), with per-DEX totals and per-prefix class and method counts at depths 2 to 4. |
+
 ## dex-cli
 
 A single `main.rs`: clap arguments (a `.dex` or APK path, `--format`, `--max-findings`, `--fail-on`), then `read_dex_buffers_from_bytes` for APKs, and `parse_dex`, `dex_to_overview` and `analyze_dex` per DEX file, printed as text or as one JSON document. [dex-cli/README.md](../dex-cli/README.md) documents the JSON schema and the exit codes.

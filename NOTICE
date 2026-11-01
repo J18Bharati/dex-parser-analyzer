@@ -32,5 +32,8 @@ Each changed file carries a "Modified by" note. Changes so far:
   tests in dex-core/tests/manifest_test.rs with a test-side AXML builder in
   dex-core/tests/common/axml_builder.rs; fuzz/fuzz_targets/parse_manifest.rs, its fuzz/Cargo.toml
   entry and the .github/workflows/fuzz.yml matrix; docs/architecture.md rows; CHANGELOG.md.
+- M2: new crate dex-sdk/ (package dexpa-sdk, publish = false) with src/inventory.rs, tests in
+  dex-sdk/tests/inventory_test.rs and a golden file; added to the workspace members (Cargo.toml,
+  Cargo.lock) and to the flake's source fileset (flake.nix); docs/architecture.md; CHANGELOG.md.
 
 Upstream tests edited: none.

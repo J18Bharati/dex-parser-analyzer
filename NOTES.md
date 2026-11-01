@@ -39,3 +39,10 @@ From the 2026-11-01 eng review of the plan. They are recorded here before any AP
   - DEX entries not sorted numerically.
 - **The survivor is the post-read size check in `read_manifest_entry`.** The declared-size check before it refuses the same oversized input. The second check only matters for a header that understates the entry's size, and the test-side zip writer can't produce one. It stays as defence in depth, without a test.
 - **A number that looked wrong, in my own test.** The string-budget test first "passed" against the real parser by accident. Its 65,536-byte string can't be encoded in a UTF-8 pool, where length prefixes stop at 0x7fff, so the builder wrote a garbled length and the parser read a short string. The builder now asserts the limit, and the test uses 30,000 bytes × 5,000 references, which would be 150 MB if decoded.
+
+## 2026-11-01: the inventory (M2)
+
+- **The fixtures are thin for this.** `multidex.apk` defines 2 classes, one per DEX file (`com.foobar.foo...` and `com.blafoo.bar...`), and most single-DEX fixtures use the default package. So the depth-4 prefix logic is covered by a unit test with synthetic names, not by a fixture. Real depth arrives with the M5 fixtures and the M6 APKs.
+- **Mutation check:** 5 mutants, 3 killed (array descriptors, method counts, sort order).
+  - `prefix_past_package` was equivalent, because the depth filter was redundant (`nth` already stops at the last dot). The filter is deleted.
+  - `drop_unreadable_count` survived, because no fixture has a class whose descriptor fails to read. The invariant test would catch it on such an input.

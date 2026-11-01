@@ -1,3 +1,4 @@
+# Modified by Zero (2026-11-01): dex-sdk in the source fileset (fork). See NOTICE.
 {
   description = "dex-parser-analyzer development flake";
 
@@ -31,6 +32,7 @@
             ./dex-core
             ./dex-analysis
             ./dex-cli
+            ./dex-sdk
             (lib.fileset.difference ./dex-gui (lib.fileset.maybeMissing ./dex-gui/dist))
           ];
         };
