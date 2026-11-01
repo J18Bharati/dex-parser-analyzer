@@ -1,3 +1,4 @@
+<!-- Modified by Zero (2026-11-01): axml.rs and manifest.rs rows, multidex.rs entry rules (fork). See NOTICE. -->
 # Architecture
 
 What exists in the workspace as of 2026-10-21. The documents in `docs/research/` are design surveys written before the code; where they describe something not listed here (for example a full OWASP static-analysis engine, CHA call graphs, or disassembly and hex views in the GUI), it is not built.
@@ -26,7 +27,9 @@ Parsing borrows from the input buffer (`DexFile<'a>`), so nothing is copied unti
 | `bytecode.rs` | 2,925 | The Dalvik opcode table and decoder: registers, literals, references, switch and fill-array payloads, and the ART/odex quickened forms. |
 | `graphs.rs` | 449 | Basic-block CFGs with fallthrough, branch, switch and exception edges; a direct-edge call graph (one edge per resolved `invoke-*` target, without class-hierarchy resolution); cross-references (strings, fields, types, protos, call sites, method handles). Built on `petgraph`. |
 | `dto.rs` | 248 | Serializable overviews (`DexOverviewDto`, ...) that the CLI and GUI print. |
-| `multidex.rs` | 266 | Reading the `classes*.dex` entries of an APK (`zip`), and `MultiDex`, which builds shared class, method, string and type indexes across files. |
+| `multidex.rs` | 307 | Reading an APK's app DEX entries (`zip`): archive-root `classes.dex`, `classes2.dex`, ... in numeric load order, each read capped (`MAX_DEX_ENTRY_BYTES`); and `MultiDex`, which builds shared class, method, string and type indexes across files. |
+| `axml.rs` | 297 | (fork) Android binary XML: string pools (UTF-8 and UTF-16, decoded lazily under a byte budget), the resource map, and the element tree; attribute values stay typed, references unresolved. Depth-limited, never panics. |
+| `manifest.rs` | 251 | (fork) The `AndroidManifest.xml` model: package, version, SDK levels, permissions, components and meta-data. `android:` attributes resolve by framework resource id first, so names removed by resource shrinking still resolve. |
 | `semantics.rs` | 67 | Small helpers layered on `DexFile`. |
 | `error.rs` | 84 | `DexError`, the crate's single error type. |
 

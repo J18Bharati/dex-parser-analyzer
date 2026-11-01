@@ -1,3 +1,4 @@
+# Modified by Zero (2026-11-01): parse_manifest in the matrix (fork). See NOTICE.
 # A weekly fuzz campaign: each target for 20 minutes (an hour in all), on the pinned nightly from
 # the flake's fuzz dev shell. A crash fails the job and keeps its input as an artifact.
 name: Fuzz
@@ -22,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [parse_dex, decode_instructions, analyze_dex_bytes]
+        target: [parse_dex, decode_instructions, analyze_dex_bytes, parse_manifest]
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

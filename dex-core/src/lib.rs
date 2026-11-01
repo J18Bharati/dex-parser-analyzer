@@ -1,3 +1,4 @@
+// Modified by Zero (2026-11-01): the axml and manifest modules (fork M1b). See NOTICE.
 #![deny(unsafe_op_in_unsafe_fn)]
 #![deny(unused_must_use)]
 
@@ -5,10 +6,12 @@
 //! `dex-parser-analyzer` workspace. Higher-level analyzers live in the sibling
 //! `dex-analysis` crate.
 
+pub mod axml;
 pub mod bytecode;
 pub mod dto;
 pub mod format;
 pub mod graphs;
+pub mod manifest;
 pub mod model;
 pub mod multidex;
 pub mod parser;

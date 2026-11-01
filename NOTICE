@@ -28,5 +28,9 @@ Each changed file carries a "Modified by" note. Changes so far:
   entry read (MAX_DEX_ENTRY_BYTES, read_dex_buffers_from_bytes_with_limit). New test file
   dex-core/tests/apk_entries_test.rs; zip added as a dev-dependency of dex-core (same version).
   CHANGELOG.md [Unreleased].
+- M1b: dex-core/src/axml.rs and dex-core/src/manifest.rs (new), exported from dex-core/src/lib.rs;
+  tests in dex-core/tests/manifest_test.rs with a test-side AXML builder in
+  dex-core/tests/common/axml_builder.rs; fuzz/fuzz_targets/parse_manifest.rs, its fuzz/Cargo.toml
+  entry and the .github/workflows/fuzz.yml matrix; docs/architecture.md rows; CHANGELOG.md.
 
 Upstream tests edited: none.

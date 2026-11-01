@@ -24,3 +24,18 @@ From the 2026-11-01 eng review of the plan. They are recorded here before any AP
 6. **Fewer than 3 versions are found per app.** The main repo keeps few; the archive repo is the fallback.
 7. **The manifest version doesn't match the index**, because `versionName` is a resource reference.
 8. **Downloaded bytes differ from the lockfile sizes.** This should be impossible; the sha256 check would catch it.
+
+## 2026-11-01: the manifest parser (M1)
+
+- **Two upstream behaviours changed (M1a).** Each was first shown by a test failing on upstream's own code:
+  - `classes10.dex` was read before `classes2.dex`, because entry names were sorted as text;
+  - any `*.dex` at any path counted as app code: 6 entries were read where Android loads 1.
+- **No AXML fixture exists, and no third-party APK is committed.** So the tests build their documents with `tests/common/axml_builder.rs`, which is written from the chunk layout in AOSP's `ResourceTypes.h`. The builder and the parser share one author, so they could share a misreading. M6 checks the parser against an independent source: F-Droid's index-v2 `manifest` fields, over every fetched APK.
+- **Mutation check, run serially:** 6 mutants, 5 killed:
+  - no depth limit;
+  - no string budget;
+  - attributes looked up by name only;
+  - relative component names not resolved;
+  - DEX entries not sorted numerically.
+- **The survivor is the post-read size check in `read_manifest_entry`.** The declared-size check before it refuses the same oversized input. The second check only matters for a header that understates the entry's size, and the test-side zip writer can't produce one. It stays as defence in depth, without a test.
+- **A number that looked wrong, in my own test.** The string-budget test first "passed" against the real parser by accident. Its 65,536-byte string can't be encoded in a UTF-8 pool, where length prefixes stop at 0x7fff, so the builder wrote a garbled length and the parser read a short string. The builder now asserts the limit, and the test uses 30,000 bytes × 5,000 references, which would be 150 MB if decoded.

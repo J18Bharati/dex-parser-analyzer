@@ -1,3 +1,4 @@
+# Modified by Zero (2026-11-01): the parse_manifest target (fork). See NOTICE.
 [package]
 name = "dex-fuzz"
 version = "0.0.0"
@@ -27,6 +28,13 @@ bench = false
 [[bin]]
 name = "decode_instructions"
 path = "fuzz_targets/decode_instructions.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "parse_manifest"
+path = "fuzz_targets/parse_manifest.rs"
 test = false
 doc = false
 bench = false
