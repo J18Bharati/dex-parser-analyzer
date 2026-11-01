@@ -329,6 +329,31 @@ def cross_check(manifest: dict, entry: dict) -> dict:
     return diffs
 
 
+READ = "android.permission.READ_EXTERNAL_STORAGE"
+WRITE = "android.permission.WRITE_EXTERNAL_STORAGE"
+
+
+def classify(diff: dict, entry: dict) -> list[str]:
+    """Names the kind of each cross_check difference. Two are additions the index makes, not
+    parser errors (both checked on the APK bytes, NOTES.md 2026-11-01):
+    - index_implied_read_permission: the APK declares only WRITE_EXTERNAL_STORAGE, and the index
+      adds READ_EXTERNAL_STORAGE, which Android grants implicitly with it;
+    - index_version_name_not_in_apk: the manifest has no versionName; the index's comes from
+      F-Droid's build metadata."""
+    out = []
+    for field_name, (ours, theirs) in sorted(diff.items()):
+        if field_name == "permissions" and ours == [] and theirs == [READ] and WRITE in entry["permissions"]:
+            out.append("index_implied_read_permission")
+        elif field_name == "version_name" and ours is None and entry["version_name"]:
+            out.append("index_version_name_not_in_apk")
+        else:
+            out.append(field_name)
+    return out
+
+
+INDEX_ADDITIONS = {"index_implied_read_permission", "index_version_name_not_in_apk"}
+
+
 def _key(e: dict) -> str:
     return f"{e['package']}_{e['version_code']}"
 
@@ -368,10 +393,17 @@ def summarize(entries: list[dict], reports: dict, diffs: dict, checks: dict, fai
             "diff_events": dict(sorted(events.items())),
             "versions_found": dict(sorted(Counter(Counter(e["package"] for e in es).values()).items())),
         }
-    field_mismatch = Counter(f for c in checks.values() for f in c)
+    by_key = {_key(e): e for e in entries}
+    kinds = {k: classify(c, by_key[k]) for k, c in checks.items()}
+    field_mismatch = Counter(f for ks in kinds.values() for f in ks)
     return {
         "strata": strata,
-        "manifest_cross_check": {"apks": len(checks), "all_fields_equal": sum(1 for c in checks.values() if not c), "mismatches_by_field": dict(sorted(field_mismatch.items()))},
+        "manifest_cross_check": {
+            "apks": len(checks),
+            "all_fields_equal": sum(1 for ks in kinds.values() if not ks),
+            "parser_disagrees": sum(1 for ks in kinds.values() if set(ks) - INDEX_ADDITIONS),
+            "mismatches_by_field": dict(sorted(field_mismatch.items())),
+        },
         "failures": failures,
     }
 
@@ -406,7 +438,14 @@ def table_md(results: dict, lock_source: dict) -> str:
     for i in ids:
         lines.append(f"| `{i}` | " + " | ".join(str(st[c]["apps_by_sdk"].get(i, 0)) for c in cols) + " |")
     cc = results["manifest_cross_check"]
-    lines += ["", "## Manifest parser against index-v2", "", f"{cc['all_fields_equal']} of {cc['apks']} APKs agree on every field (package, versionCode, versionName, min/target SDK, permissions).", ""]
+    lines += [
+        "",
+        "## Manifest parser against index-v2",
+        "",
+        f"{cc['all_fields_equal']} of {cc['apks']} APKs agree on every field (package, versionCode, versionName, min/target SDK, permissions). "
+        f"On {cc['parser_disagrees']} the parser disagrees with the index for a reason other than the index's own additions (`index_*` below).",
+        "",
+    ]
     for f, n in cc["mismatches_by_field"].items():
         lines.append(f"- `{f}`: {n}")
     if results["failures"]:
@@ -440,7 +479,15 @@ def cmd_fetch(args) -> None:
     print(f"{len(lock['apk'])} APKs verified in {args.dest}; downloaded {state.downloaded} bytes")
 
 
+def check_tools(*paths) -> None:
+    """Fail before downloading anything if an analysis tool is missing."""
+    for p in paths:
+        if not (Path(p).is_file() and os.access(p, os.X_OK)):
+            raise VerifyError(f"{p} is not an executable file; build it first (just fdroid-eval does)")
+
+
 def cmd_run(args) -> None:
+    check_tools(args.dexpa, args.manifest_tool)
     lock = load_lock(args.lock)
     out = Path(args.out)
     reports_dir = out / "reports"

@@ -120,10 +120,11 @@
             };
           };
 
-          # (fork M6) The F-Droid evaluation, eval/fdroid.py: Python with ssl and tomllib, and the
-          # JDK's jarsigner and keytool to verify the signed entry.jar. `just eval-test` runs offline.
+          # (fork M6) The F-Droid evaluation, eval/fdroid.py: Python with ssl and tomllib, the JDK's
+          # jarsigner and keytool to verify the signed entry.jar, and the pinned toolchain that
+          # `just fdroid-eval` builds dexpa with. `just eval-test` runs offline.
           devShells.eval = pkgs.mkShell {
-            packages = with pkgs; [ python3 jdk21_headless just ];
+            packages = [ rustToolchain pkgs.python3 pkgs.jdk21_headless pkgs.just ];
           };
 
           # cargo-fuzz needs nightly (-Zsanitizer); pinned so a run is reproducible. Used by fuzz.yml.

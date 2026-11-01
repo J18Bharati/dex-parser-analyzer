@@ -1,0 +1,44 @@
+{
+  "attribution": null,
+  "catalogue_size": 25,
+  "class_count": 14559,
+  "dex_count": 3,
+  "matches": [
+    {
+      "category": "crash-reporting",
+      "evidence": [
+        {
+          "count": 620,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "io.sentry.Attachment",
+            "io.sentry.Baggage",
+            "io.sentry.Baggage$DSCKeys"
+          ],
+          "rule": "io.sentry",
+          "source": "dex_class"
+        },
+        {
+          "count": 2,
+          "dex_indexes": [],
+          "examples": [
+            "io.sentry.android.core.SentryInitProvider",
+            "io.sentry.android.core.SentryPerformanceProvider"
+          ],
+          "rule": "io.sentry",
+          "source": "manifest_component"
+        }
+      ],
+      "id": "sentry",
+      "name": "Sentry",
+      "origin": "catalogue"
+    }
+  ],
+  "package": "io.github.landwarderer.futon",
+  "schema_version": 1,
+  "skipped_signatures": 0,
+  "version_code": "90900",
+  "version_name": "9.9"
+}

@@ -1,0 +1,34 @@
+{
+  "attribution": null,
+  "catalogue_size": 25,
+  "class_count": 152,
+  "dex_count": 1,
+  "matches": [
+    {
+      "category": "crash-reporting",
+      "evidence": [
+        {
+          "count": 56,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "org.acra.ACRA",
+            "org.acra.ACRA$1",
+            "org.acra.ACRA$2"
+          ],
+          "rule": "org.acra",
+          "source": "dex_class"
+        }
+      ],
+      "id": "acra",
+      "name": "ACRA",
+      "origin": "catalogue"
+    }
+  ],
+  "package": "org.navitproject.navit",
+  "schema_version": 1,
+  "skipped_signatures": 0,
+  "version_code": "6382",
+  "version_name": "navit 0.5.0-6382"
+}

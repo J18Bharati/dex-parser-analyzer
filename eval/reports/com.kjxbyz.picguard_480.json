@@ -1,0 +1,61 @@
+{
+  "attribution": null,
+  "catalogue_size": 25,
+  "class_count": 4736,
+  "dex_count": 1,
+  "matches": [
+    {
+      "category": "platform",
+      "evidence": [
+        {
+          "count": 1,
+          "dex_indexes": [],
+          "examples": [
+            "com.google.android.gms.metadata.ModuleDependencies"
+          ],
+          "rule": "com.google.android.gms",
+          "source": "manifest_component"
+        }
+      ],
+      "id": "google-play-services",
+      "name": "Google Play Services (client libraries)",
+      "origin": "catalogue"
+    },
+    {
+      "category": "crash-reporting",
+      "evidence": [
+        {
+          "count": 1509,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "io.sentry.A",
+            "io.sentry.A0",
+            "io.sentry.AsyncHttpTransportFactory"
+          ],
+          "rule": "io.sentry",
+          "source": "dex_class"
+        },
+        {
+          "count": 2,
+          "dex_indexes": [],
+          "examples": [
+            "io.sentry.android.core.SentryPerformanceProvider",
+            "io.sentry.ndk.SentryNdkPreloadProvider"
+          ],
+          "rule": "io.sentry",
+          "source": "manifest_component"
+        }
+      ],
+      "id": "sentry",
+      "name": "Sentry",
+      "origin": "catalogue"
+    }
+  ],
+  "package": "com.kjxbyz.picguard",
+  "schema_version": 1,
+  "skipped_signatures": 0,
+  "version_code": "480",
+  "version_name": "5.7.1"
+}

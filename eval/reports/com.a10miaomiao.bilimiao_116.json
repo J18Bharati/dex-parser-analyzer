@@ -1,0 +1,34 @@
+{
+  "attribution": null,
+  "catalogue_size": 25,
+  "class_count": 80323,
+  "dex_count": 10,
+  "matches": [
+    {
+      "category": "platform",
+      "evidence": [
+        {
+          "count": 13,
+          "dex_indexes": [
+            7
+          ],
+          "examples": [
+            "org.microg.safeparcel.AutoSafeParcelable",
+            "org.microg.safeparcel.AutoSafeParcelable$AutoCreator",
+            "org.microg.safeparcel.BuildConfig"
+          ],
+          "rule": "org.microg",
+          "source": "dex_class"
+        }
+      ],
+      "id": "microg",
+      "name": "microG client libraries",
+      "origin": "catalogue"
+    }
+  ],
+  "package": "com.a10miaomiao.bilimiao",
+  "schema_version": 1,
+  "skipped_signatures": 0,
+  "version_code": "116",
+  "version_name": "2.4.8"
+}

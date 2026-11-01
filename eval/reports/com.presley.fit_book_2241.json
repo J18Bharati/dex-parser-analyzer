@@ -1,0 +1,30 @@
+{
+  "attribution": null,
+  "catalogue_size": 25,
+  "class_count": 3466,
+  "dex_count": 2,
+  "matches": [
+    {
+      "category": "platform",
+      "evidence": [
+        {
+          "count": 1,
+          "dex_indexes": [],
+          "examples": [
+            "com.google.android.gms.metadata.ModuleDependencies"
+          ],
+          "rule": "com.google.android.gms",
+          "source": "manifest_component"
+        }
+      ],
+      "id": "google-play-services",
+      "name": "Google Play Services (client libraries)",
+      "origin": "catalogue"
+    }
+  ],
+  "package": "com.presley.fit_book",
+  "schema_version": 1,
+  "skipped_signatures": 0,
+  "version_code": "2241",
+  "version_name": "2.0.106"
+}

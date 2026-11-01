@@ -1,0 +1,175 @@
+{
+  "aborted": null,
+  "diffs": {
+    "org.navitproject.navit": [
+      [
+        {
+          "event": "sdk_evidence_changed",
+          "gained": [
+            "manifest_component:org.acra"
+          ],
+          "id": "acra",
+          "lost": []
+        }
+      ],
+      []
+    ]
+  },
+  "downloaded_bytes": 1368909611,
+  "failures": {},
+  "manifest_cross_check": {
+    "all_fields_equal": 81,
+    "apks": 90,
+    "mismatches_by_field": {
+      "index_implied_read_permission": 9,
+      "index_version_name_not_in_apk": 1
+    },
+    "parser_disagrees": 0
+  },
+  "manifest_mismatches": {
+    "com.kjxbyz.picguard_479": {
+      "permissions": [
+        [],
+        [
+          "android.permission.READ_EXTERNAL_STORAGE"
+        ]
+      ]
+    },
+    "com.kjxbyz.picguard_480": {
+      "permissions": [
+        [],
+        [
+          "android.permission.READ_EXTERNAL_STORAGE"
+        ]
+      ]
+    },
+    "com.kjxbyz.picguard_481": {
+      "permissions": [
+        [],
+        [
+          "android.permission.READ_EXTERNAL_STORAGE"
+        ]
+      ]
+    },
+    "io.github.landwarderer.futon_90801": {
+      "permissions": [
+        [],
+        [
+          "android.permission.READ_EXTERNAL_STORAGE"
+        ]
+      ]
+    },
+    "io.github.landwarderer.futon_90802": {
+      "permissions": [
+        [],
+        [
+          "android.permission.READ_EXTERNAL_STORAGE"
+        ]
+      ]
+    },
+    "io.github.landwarderer.futon_90900": {
+      "permissions": [
+        [],
+        [
+          "android.permission.READ_EXTERNAL_STORAGE"
+        ]
+      ]
+    },
+    "org.navitproject.navit_2021030660": {
+      "permissions": [
+        [],
+        [
+          "android.permission.READ_EXTERNAL_STORAGE"
+        ]
+      ]
+    },
+    "org.navitproject.navit_2026020887": {
+      "permissions": [
+        [],
+        [
+          "android.permission.READ_EXTERNAL_STORAGE"
+        ]
+      ],
+      "version_name": [
+        null,
+        "v0.5.7"
+      ]
+    },
+    "org.navitproject.navit_6382": {
+      "permissions": [
+        [],
+        [
+          "android.permission.READ_EXTERNAL_STORAGE"
+        ]
+      ]
+    }
+  },
+  "strata": {
+    "NonFreeNet": {
+      "analysed": 30,
+      "apks": 30,
+      "apps": 10,
+      "apps_by_evidence_source": {
+        "dex_class": 3,
+        "manifest_component": 2
+      },
+      "apps_by_sdk": {
+        "microg": 2,
+        "sentry": 1
+      },
+      "apps_with_any_sdk": 3,
+      "diff_events": {},
+      "failed": 0,
+      "median_classes": 9958,
+      "versions_found": {
+        "3": 10
+      }
+    },
+    "Tracking": {
+      "analysed": 30,
+      "apks": 30,
+      "apps": 10,
+      "apps_by_evidence_source": {
+        "dex_class": 3,
+        "manifest_component": 2,
+        "manifest_meta": 1
+      },
+      "apps_by_sdk": {
+        "acra": 1,
+        "countly": 1,
+        "google-mobile-ads": 1,
+        "google-play-services": 1,
+        "sentry": 1
+      },
+      "apps_with_any_sdk": 4,
+      "diff_events": {},
+      "failed": 0,
+      "median_classes": 6571,
+      "versions_found": {
+        "3": 10
+      }
+    },
+    "control": {
+      "analysed": 30,
+      "apks": 30,
+      "apps": 10,
+      "apps_by_evidence_source": {
+        "dex_class": 1,
+        "manifest_component": 2
+      },
+      "apps_by_sdk": {
+        "acra": 1,
+        "google-play-services": 1
+      },
+      "apps_with_any_sdk": 2,
+      "diff_events": {
+        "sdk_evidence_changed:-": 1
+      },
+      "failed": 0,
+      "median_classes": 2642,
+      "versions_found": {
+        "3": 10
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-# Modified by Zero (2026-11-01): new file (fork M3). See NOTICE.
+# Modified by Zero (2026-11-01): new file (fork M3); facebook narrowed (M6). See NOTICE.
 # This project's SDK catalogue, written by hand from each SDK's public package names and
 # documented manifest keys. It is not derived from Exodus data. Entries are unverified until
 # they are checked against real APKs in the F-Droid evaluation (NOTES.md).
@@ -44,7 +44,11 @@ packages = ["com.google.firebase.messaging"]
 id = "facebook"
 name = "Facebook SDK"
 category = "social, analytics, ads"
-packages = ["com.facebook"]
+# Not the whole `com.facebook` namespace: Fresco, React Native, Yoga and SoLoader live there too
+# and are open-source libraries (the M6 F-Droid run matched Fresco alone; NOTES.md). The SDK's
+# own classes at the namespace root (com.facebook.FacebookSdk) are not covered by a package
+# rule, so an app using only those is found by its meta-data keys.
+packages = ["com.facebook.appevents", "com.facebook.login", "com.facebook.share", "com.facebook.ads", "com.facebook.gamingservices", "com.facebook.applinks"]
 meta_data_keys = ["com.facebook.sdk.ApplicationId", "com.facebook.sdk.ClientToken"]
 
 [[sdk]]

@@ -58,5 +58,11 @@ Each changed file carries a "Modified by" note. Changes so far:
   no APK and no Exodus data). dex-core/examples/manifest_json.rs (new). A `.#eval` dev shell in
   flake.nix; eval-test, fdroid-select and fdroid-eval recipes in the Justfile; `.cache/` in
   .gitignore.
+- M6b: the F-Droid run: eval/results.json, eval/TABLE.md, eval/reports/ (this tool's output
+  over the locked APKs; no APK and no Exodus data), eval/README.md. eval/fdroid.py classifies
+  index-side manifest differences and checks for its tools before downloading; the fdroid-eval
+  recipe builds `dexpa` explicitly; the `.#eval` shell carries the pinned Rust toolchain. The
+  `facebook` catalogue entry is narrowed to the SDK's own packages
+  (dex-sdk/catalogue/sdks.toml), with a test in dex-sdk/tests/matcher_test.rs.
 
 Upstream tests edited: none.

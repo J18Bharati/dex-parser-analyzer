@@ -1,0 +1,34 @@
+{
+  "attribution": null,
+  "catalogue_size": 25,
+  "class_count": 1922,
+  "dex_count": 1,
+  "matches": [
+    {
+      "category": "analytics",
+      "evidence": [
+        {
+          "count": 33,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "ly.count.android.sdk.AdvertisingIdAdapter",
+            "ly.count.android.sdk.AdvertisingIdAdapter$1",
+            "ly.count.android.sdk.AdvertisingIdAdapter$2"
+          ],
+          "rule": "ly.count.android",
+          "source": "dex_class"
+        }
+      ],
+      "id": "countly",
+      "name": "Countly",
+      "origin": "catalogue"
+    }
+  ],
+  "package": "com.orpheusdroid.screenrecorder",
+  "schema_version": 1,
+  "skipped_signatures": 0,
+  "version_code": "31",
+  "version_name": "2.0.1-fdroid"
+}

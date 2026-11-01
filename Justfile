@@ -109,5 +109,6 @@ fdroid-select *args:
 # (fork M6) Fetch the locked APKs, analyse each, delete it, and write eval/results.json and
 # eval/TABLE.md (network; budgets in eval/fdroid.py; `nix develop .#eval`).
 fdroid-eval *args:
-    cargo build --release -p dexpa-cli -p dexpa-core --example manifest_json
+    cargo build --release -p dexpa-cli --bin dexpa
+    cargo build --release -p dexpa-core --example manifest_json
     python3 eval/fdroid.py run --dexpa target/release/dexpa --manifest-tool target/release/examples/manifest_json {{args}}

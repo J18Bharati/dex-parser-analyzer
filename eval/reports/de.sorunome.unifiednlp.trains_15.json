@@ -1,0 +1,43 @@
+{
+  "attribution": null,
+  "catalogue_size": 25,
+  "class_count": 84,
+  "dex_count": 1,
+  "matches": [
+    {
+      "category": "platform",
+      "evidence": [
+        {
+          "count": 42,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "org.microg.nlp.api.AbstractBackendHelper",
+            "org.microg.nlp.api.AbstractBackendHelper$State",
+            "org.microg.nlp.api.AbstractBackendService"
+          ],
+          "rule": "org.microg",
+          "source": "dex_class"
+        },
+        {
+          "count": 1,
+          "dex_indexes": [],
+          "examples": [
+            "org.microg.nlp.api.MPermissionHelperActivity"
+          ],
+          "rule": "org.microg",
+          "source": "manifest_component"
+        }
+      ],
+      "id": "microg",
+      "name": "microG client libraries",
+      "origin": "catalogue"
+    }
+  ],
+  "package": "de.sorunome.unifiednlp.trains",
+  "schema_version": 1,
+  "skipped_signatures": 0,
+  "version_code": "15",
+  "version_name": "v1.3.0"
+}

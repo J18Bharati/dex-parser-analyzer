@@ -1,0 +1,44 @@
+{
+  "attribution": null,
+  "catalogue_size": 25,
+  "class_count": 1446,
+  "dex_count": 1,
+  "matches": [
+    {
+      "category": "crash-reporting",
+      "evidence": [
+        {
+          "count": 143,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "org.acra.ACRA",
+            "org.acra.ACRA$1",
+            "org.acra.ACRAConstants"
+          ],
+          "rule": "org.acra",
+          "source": "dex_class"
+        },
+        {
+          "count": 2,
+          "dex_indexes": [],
+          "examples": [
+            "org.acra.dialog.CrashReportDialog",
+            "org.acra.sender.SenderService"
+          ],
+          "rule": "org.acra",
+          "source": "manifest_component"
+        }
+      ],
+      "id": "acra",
+      "name": "ACRA",
+      "origin": "catalogue"
+    }
+  ],
+  "package": "org.navitproject.navit",
+  "schema_version": 1,
+  "skipped_signatures": 0,
+  "version_code": "2026020887",
+  "version_name": null
+}

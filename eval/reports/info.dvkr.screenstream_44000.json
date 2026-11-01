@@ -1,0 +1,30 @@
+{
+  "attribution": null,
+  "catalogue_size": 25,
+  "class_count": 6553,
+  "dex_count": 2,
+  "matches": [
+    {
+      "category": "ads",
+      "evidence": [
+        {
+          "count": 1,
+          "dex_indexes": [],
+          "examples": [
+            "com.google.android.gms.ads.APPLICATION_ID"
+          ],
+          "rule": "com.google.android.gms.ads.APPLICATION_ID",
+          "source": "manifest_meta"
+        }
+      ],
+      "id": "google-mobile-ads",
+      "name": "Google Mobile Ads",
+      "origin": "catalogue"
+    }
+  ],
+  "package": "info.dvkr.screenstream",
+  "schema_version": 1,
+  "skipped_signatures": 0,
+  "version_code": "44000",
+  "version_name": "4.4.0"
+}

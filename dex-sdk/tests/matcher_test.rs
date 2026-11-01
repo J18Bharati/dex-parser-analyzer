@@ -225,3 +225,38 @@ fn bundled_catalogue_loads_and_follows_its_rules() {
     assert!(cat.sdks.len() >= 20, "{} entries", cat.sdks.len());
     assert!(cat.sdks.iter().all(|s| s.origin == Origin::Catalogue));
 }
+
+/// Found in the F-Droid evaluation (NOTES.md, M6): an app with Fresco (React Native's image
+/// library) matched `facebook` through the old `com.facebook` prefix. Fresco, React Native and
+/// Yoga live under `com.facebook` but are open-source libraries that send nothing to Facebook.
+#[test]
+fn facebook_open_source_libraries_are_not_the_facebook_sdk() {
+    let cat = bundled();
+    let ids = |names: &[(&str, usize)]| -> Vec<String> {
+        match_sdks(&cat, &inv(names), None)
+            .into_iter()
+            .map(|m| m.id)
+            .collect()
+    };
+    for library in [
+        "com.facebook.animated.gif.GifImage",
+        "com.facebook.drawee.view.SimpleDraweeView",
+        "com.facebook.imagepipeline.core.ImagePipeline",
+        "com.facebook.react.ReactActivity",
+        "com.facebook.soloader.SoLoader",
+        "com.facebook.yoga.YogaNode",
+    ] {
+        assert!(
+            !ids(&[(library, 0)]).contains(&"facebook".to_string()),
+            "{library} is not the Facebook SDK"
+        );
+    }
+    for sdk in [
+        "com.facebook.appevents.AppEventsLogger",
+        "com.facebook.login.LoginManager",
+        "com.facebook.share.widget.ShareButton",
+        "com.facebook.ads.AdView",
+    ] {
+        assert!(ids(&[(sdk, 0)]).contains(&"facebook".to_string()), "{sdk}");
+    }
+}

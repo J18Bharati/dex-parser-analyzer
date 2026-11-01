@@ -99,3 +99,19 @@ From the 2026-11-01 eng review of the plan. They are recorded here before any AP
   - **They were written before the module but had only failed at import.** So the weight check is the mutation pass.
   - **Mutation check: 21 mutants, 21 killed.** They removed each fetch guard (sha256, size, read cut-off, partial cleanup, resume, total, per-file, disk and time budgets, file-name and URL-scheme checks); broke selection (anti-feature strata, smallest APK per code, newest versions, seed); weakened the signer checks (two signers, fingerprint); and broke the cross-check and summary (permissions, reference category, SDK-23 permissions, newest version).
   - My script mislabelled the test that killed one mutant ("reference not separated"). Rerun by hand, the expected test, `test_reference_version_name_is_its_own_category`, fails.
+
+## 2026-11-02: the F-Droid run (M6b)
+
+- **Run:** 90 of 90 APKs analysed, with 0 failures. 1,368,909,611 bytes were downloaded, exactly the lockfile's total, and every APK was deleted after analysis. The full results, the "looked wrong" list and the hypothesis verdicts are in `eval/README.md`.
+- **Two runs; the first was discarded.** The first run matched `facebook` in one Tracking app through Fresco (`com.facebook.animated.gif.*`). The catalogue entry was narrowed, with a failing test first, and the whole run was repeated from the same lockfile. Only that one count changed (Tracking apps with any SDK, 5 → 4).
+- **Three cross-check differences, all checked on the APK bytes before being classified:**
+  - **READ_EXTERNAL_STORAGE (9 APKs, 3 apps).** I re-fetched two of the APKs against the lockfile. Neither manifest contains the string `READ_EXTERNAL_STORAGE`, in UTF-16 or UTF-8; both contain `WRITE_EXTERNAL_STORAGE`. The index adds the implied READ.
+  - **Navit's version name.** Its manifest contains neither `versionName` nor `0.5.7`.
+  - **How they are counted now.** Both are tallied as `index_*` additions, and the table counts parser disagreements separately: 0.
+  - **An aside:** that probe first hit the free-disk guard, because the scratchpad is a 7.5 GB tmpfs. The guard behaved as designed.
+- **Not fixed: manifest evidence can be a leftover.** One app declares `com.google.android.gms.ads.APPLICATION_ID`, and two declare the `ModuleDependencies` component, while defining no `com.google.android.gms` class. M4's `strong` rests on the assumption that manifest evidence is reliable, which these cases contradict. The next step is a `manifest_only` flag, which would change the report schema; it is left for a decision.
+- **Exodus unreachable.** `reports.exodus-privacy.eu.org` and `exodus-privacy.eu.org` timed out over IPv4 and IPv6, so hypothesis 1 is untested rather than answered from memory.
+- **Mutation check, classifier:** 4 mutants, 4 killed (WRITE not required; any permission difference treated as implied; any version-name difference treated as metadata; index additions counted as parser errors).
+- **Two tooling bugs found on the way:**
+  - The recipe's `cargo build --example manifest_json` built only the example, never `dexpa`. Fixed, and a preflight now checks for both tools before any download.
+  - The `.#eval` shell lacked Rust, so cargo fell back to the host's rustup. The shell now carries the pinned toolchain.

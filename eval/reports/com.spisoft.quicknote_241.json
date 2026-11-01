@@ -1,0 +1,45 @@
+{
+  "attribution": null,
+  "catalogue_size": 25,
+  "class_count": 4118,
+  "dex_count": 1,
+  "matches": [
+    {
+      "category": "crash-reporting",
+      "evidence": [
+        {
+          "count": 163,
+          "dex_indexes": [
+            0
+          ],
+          "examples": [
+            "org.acra.ACRA",
+            "org.acra.ACRAConstants",
+            "org.acra.ErrorReporter"
+          ],
+          "rule": "org.acra",
+          "source": "dex_class"
+        },
+        {
+          "count": 4,
+          "dex_indexes": [],
+          "examples": [
+            "org.acra.dialog.CrashReportDialog",
+            "org.acra.receiver.NotificationBroadcastReceiver",
+            "org.acra.sender.SenderService"
+          ],
+          "rule": "org.acra",
+          "source": "manifest_component"
+        }
+      ],
+      "id": "acra",
+      "name": "ACRA",
+      "origin": "catalogue"
+    }
+  ],
+  "package": "com.spisoft.quicknote",
+  "schema_version": 1,
+  "skipped_signatures": 0,
+  "version_code": "241",
+  "version_name": "0.24.1"
+}

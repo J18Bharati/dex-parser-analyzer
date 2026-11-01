@@ -1,0 +1,12 @@
+{
+  "attribution": null,
+  "catalogue_size": 25,
+  "class_count": 6917,
+  "dex_count": 1,
+  "matches": [],
+  "package": "org.ntust.app.tigerduck.fdroid",
+  "schema_version": 1,
+  "skipped_signatures": 0,
+  "version_code": "29",
+  "version_name": "2.3.1-fdroid"
+}

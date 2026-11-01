@@ -280,6 +280,35 @@ class CrossCheckTest(unittest.TestCase):
 
 
 
+class ClassifyTest(unittest.TestCase):
+    E = {"permissions": ["android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE"], "version_name": "v0.5.7"}
+
+    def test_read_implied_by_write_is_an_index_addition(self):
+        diff = {"permissions": [[], ["android.permission.READ_EXTERNAL_STORAGE"]]}
+        self.assertEqual(fdroid.classify(diff, self.E), ["index_implied_read_permission"])
+
+    def test_read_missing_without_write_is_still_a_mismatch(self):
+        e = {"permissions": ["android.permission.READ_EXTERNAL_STORAGE"], "version_name": ""}
+        diff = {"permissions": [[], ["android.permission.READ_EXTERNAL_STORAGE"]]}
+        self.assertEqual(fdroid.classify(diff, e), ["permissions"])
+
+    def test_other_permission_differences_stay_mismatches(self):
+        diff = {"permissions": [["a.X"], ["android.permission.READ_EXTERNAL_STORAGE"]]}
+        self.assertEqual(fdroid.classify(diff, self.E), ["permissions"])
+
+    def test_version_name_absent_from_the_apk(self):
+        self.assertEqual(fdroid.classify({"version_name": [None, "v0.5.7"]}, self.E), ["index_version_name_not_in_apk"])
+        self.assertEqual(fdroid.classify({"version_name": ["1.0", "v0.5.7"]}, self.E), ["version_name"])
+
+    def test_summary_counts_parser_mismatches_apart_from_index_additions(self):
+        entries = [{"package": "p", "stratum": "control", "version_code": 1, **self.E}]
+        checks = {"p_1": {"permissions": [[], ["android.permission.READ_EXTERNAL_STORAGE"]]}}
+        cc = fdroid.summarize(entries, {}, {}, checks, {})["manifest_cross_check"]
+        self.assertEqual(cc["all_fields_equal"], 0)
+        self.assertEqual(cc["parser_disagrees"], 0)
+        self.assertEqual(cc["mismatches_by_field"], {"index_implied_read_permission": 1})
+
+
 class SummarizeTest(unittest.TestCase):
     def test_counts_use_the_newest_version_and_every_diff(self):
         def e(pkg, stratum, code):
@@ -307,10 +336,25 @@ class SummarizeTest(unittest.TestCase):
         self.assertEqual(t["versions_found"], {2: 1})
         self.assertEqual((c["analysed"], c["failed"], c["apps_with_any_sdk"]), (1, 1, 0))
         self.assertEqual(r["strata"]["NonFreeNet"]["apps"], 0)
-        self.assertEqual(r["manifest_cross_check"], {"apks": 3, "all_fields_equal": 2, "mismatches_by_field": {"version_name_reference": 1}})
+        self.assertEqual(r["manifest_cross_check"], {"apks": 3, "all_fields_equal": 2, "parser_disagrees": 1, "mismatches_by_field": {"version_name_reference": 1}})
         md = fdroid.table_md(r, {"index_sha256": "ab" * 32, "entry_timestamp": 1, "seed": "s"})
         self.assertIn("| apps with any SDK | 1 | 0 | 0 |", md)
         self.assertIn("| `sentry` | 1 | 0 | 0 |", md)
+
+
+class RunTest(unittest.TestCase):
+    def test_missing_tools_fail_before_any_download(self):
+        with tempfile.TemporaryDirectory() as d:
+            tool = Path(d) / "tool"
+            with self.assertRaises(fdroid.VerifyError):
+                fdroid.check_tools(str(tool))
+            tool.write_text("#!/bin/sh\n")
+            with self.assertRaises(fdroid.VerifyError, msg="not executable"):
+                fdroid.check_tools(str(tool))
+            tool.chmod(0o755)
+            fdroid.check_tools(str(tool))
+            rc = fdroid.main(["run", "--dexpa", str(Path(d) / "nope"), "--manifest-tool", str(tool), "--dest", d])
+            self.assertEqual(rc, 1)
 
 if __name__ == "__main__":
     unittest.main()
