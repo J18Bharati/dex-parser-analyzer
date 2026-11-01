@@ -1,0 +1,167 @@
+# Modified by Zero (2026-11-01): new file (fork M3). See NOTICE.
+# This project's SDK catalogue, written by hand from each SDK's public package names and
+# documented manifest keys. It is not derived from Exodus data. Entries are unverified until
+# they are checked against real APKs in the F-Droid evaluation (NOTES.md).
+#
+# Rules (enforced at load): unique ids; at least one package or meta-data key; every package
+# prefix has at least two segments; packages match on package boundaries (`com.foo` matches
+# `com.foo.X` and `com.foo.sub.Y`, never `com.foobar.X`); meta-data keys match exactly.
+# Overlapping entries (Firebase inside Google's namespace) are intentional: all are reported.
+
+[[sdk]]
+id = "google-play-services"
+name = "Google Play Services (client libraries)"
+category = "platform"
+packages = ["com.google.android.gms"]
+meta_data_keys = ["com.google.android.gms.version"]
+
+[[sdk]]
+id = "google-mobile-ads"
+name = "Google Mobile Ads"
+category = "ads"
+packages = ["com.google.android.gms.ads"]
+meta_data_keys = ["com.google.android.gms.ads.APPLICATION_ID"]
+
+[[sdk]]
+id = "firebase-analytics"
+name = "Google Firebase Analytics"
+category = "analytics"
+packages = ["com.google.firebase.analytics", "com.google.android.gms.measurement"]
+
+[[sdk]]
+id = "firebase-crashlytics"
+name = "Firebase Crashlytics"
+category = "crash-reporting"
+packages = ["com.google.firebase.crashlytics"]
+
+[[sdk]]
+id = "firebase-messaging"
+name = "Firebase Cloud Messaging"
+category = "push"
+packages = ["com.google.firebase.messaging"]
+
+[[sdk]]
+id = "facebook"
+name = "Facebook SDK"
+category = "social, analytics, ads"
+packages = ["com.facebook"]
+meta_data_keys = ["com.facebook.sdk.ApplicationId", "com.facebook.sdk.ClientToken"]
+
+[[sdk]]
+id = "appsflyer"
+name = "AppsFlyer"
+category = "attribution"
+packages = ["com.appsflyer"]
+
+[[sdk]]
+id = "adjust"
+name = "Adjust"
+category = "attribution"
+packages = ["com.adjust.sdk"]
+
+[[sdk]]
+id = "branch"
+name = "Branch"
+category = "attribution"
+packages = ["io.branch"]
+meta_data_keys = ["io.branch.sdk.BranchKey"]
+
+[[sdk]]
+id = "sentry"
+name = "Sentry"
+category = "crash-reporting"
+packages = ["io.sentry"]
+meta_data_keys = ["io.sentry.dsn"]
+
+[[sdk]]
+id = "bugsnag"
+name = "Bugsnag"
+category = "crash-reporting"
+packages = ["com.bugsnag"]
+meta_data_keys = ["com.bugsnag.android.API_KEY"]
+
+[[sdk]]
+id = "acra"
+name = "ACRA"
+category = "crash-reporting"
+packages = ["org.acra"]
+
+[[sdk]]
+id = "mixpanel"
+name = "Mixpanel"
+category = "analytics"
+packages = ["com.mixpanel"]
+
+[[sdk]]
+id = "amplitude"
+name = "Amplitude"
+category = "analytics"
+packages = ["com.amplitude"]
+
+[[sdk]]
+id = "segment"
+name = "Segment"
+category = "analytics"
+packages = ["com.segment.analytics"]
+
+[[sdk]]
+id = "matomo"
+name = "Matomo (Piwik)"
+category = "analytics"
+packages = ["org.matomo", "org.piwik"]
+
+[[sdk]]
+id = "countly"
+name = "Countly"
+category = "analytics"
+packages = ["ly.count.android"]
+
+[[sdk]]
+id = "onesignal"
+name = "OneSignal"
+category = "push"
+packages = ["com.onesignal"]
+meta_data_keys = ["onesignal_app_id"]
+
+[[sdk]]
+id = "braze"
+name = "Braze (Appboy)"
+category = "push, analytics"
+packages = ["com.braze", "com.appboy"]
+
+[[sdk]]
+id = "unity-ads"
+name = "Unity Ads"
+category = "ads"
+packages = ["com.unity3d.ads", "com.unity3d.services"]
+
+[[sdk]]
+id = "applovin"
+name = "AppLovin"
+category = "ads"
+packages = ["com.applovin"]
+meta_data_keys = ["applovin.sdk.key"]
+
+[[sdk]]
+id = "ironsource"
+name = "ironSource"
+category = "ads"
+packages = ["com.ironsource"]
+
+[[sdk]]
+id = "mapbox"
+name = "Mapbox"
+category = "maps"
+packages = ["com.mapbox"]
+
+[[sdk]]
+id = "microg"
+name = "microG client libraries"
+category = "platform"
+packages = ["org.microg"]
+
+[[sdk]]
+id = "unifiedpush"
+name = "UnifiedPush connector"
+category = "push"
+packages = ["org.unifiedpush"]

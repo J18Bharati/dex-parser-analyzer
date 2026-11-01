@@ -46,3 +46,19 @@ From the 2026-11-01 eng review of the plan. They are recorded here before any AP
 - **Mutation check:** 5 mutants, 3 killed (array descriptors, method counts, sort order).
   - `prefix_past_package` was equivalent, because the depth filter was redundant (`nth` already stops at the last dot). The filter is deleted.
   - `drop_unreadable_count` survived, because no fixture has a class whose descriptor fails to read. The invariant test would catch it on such an input.
+
+## 2026-11-01: the SDK matcher (M3), and a fuzz run
+
+- **Two semantics were decided by failing tests, and are now pinned:**
+  - **`com.foo$C` is not under the package prefix `com.foo`.** It is an inner class of the class `com.foo`, in package `com`. My first `under()` accepted it; the test expected the package-boundary rule.
+  - **Exodus signatures are regexes, so `.` matches any character.** `com.bar.` matches `com.barn.W` in Exodus too. My first test assumed a literal dot. The importer keeps Exodus's regex semantics and differs only in anchoring: a signature must match at the start of the class name, so `com.foo` does not match `x.com.foo.Bar`. M6 has to measure how many hits that difference costs or saves.
+- **Mutation check:** 7 mutants, 7 killed:
+  - no package boundary;
+  - unanchored Exodus signatures;
+  - no two-segment rule;
+  - no duplicate check;
+  - no manifest-component evidence;
+  - component names not qualified;
+  - a bad regex made fatal.
+- **Fuzzing `parse_manifest` for 60 s (M1 follow-up):** 6.7 million inputs, 210 edges covered, no crash and no panic. The nightly fuzz shell took 2 GB of disk; 29 GB free after.
+- **The bundled catalogue (25 SDKs) is written from memory of public package names and documented manifest keys.** Every entry is a hypothesis until M6 sees it in a real APK. The table there should report, per entry, whether it matched anything at all.

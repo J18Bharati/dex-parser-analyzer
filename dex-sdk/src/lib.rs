@@ -7,4 +7,6 @@
 //! [`inventory`] counts the classes an app *defines*, grouped by package prefix. Classes that are
 //! only referenced (`java.lang.Object`, a Play Services API stub the app calls) are not counted.
 
+pub mod catalogue;
 pub mod inventory;
+pub mod matcher;

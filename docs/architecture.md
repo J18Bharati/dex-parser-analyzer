@@ -55,6 +55,8 @@ Unpublished (`publish = false`). It depends on `dex-core` only; `dex-gui` does n
 
 | Module | Role |
 |---|---|
+| `catalogue.rs` | SDK definitions: this project's TOML list (`dex-sdk/catalogue/sdks.toml`, compiled in; package prefixes of at least two segments and exact meta-data keys) and an importer for Exodus tracker files supplied at run time (signatures anchored at the class name's start; invalid ones skipped and counted). |
+| `matcher.rs` | Matches a catalogue against an inventory and a manifest. Evidence per SDK: defined classes (binary search in the sorted class list), manifest components (qualified the way Android does), and meta-data keys, each with counts, examples and DEX indexes. |
 | `inventory.rs` | The classes an app defines, one pass over each DEX file's `class_defs` (no `MultiDex` index, and no merely referenced types), with per-DEX totals and per-prefix class and method counts at depths 2 to 4. |
 
 ## dex-cli

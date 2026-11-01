@@ -35,5 +35,9 @@ Each changed file carries a "Modified by" note. Changes so far:
 - M2: new crate dex-sdk/ (package dexpa-sdk, publish = false) with src/inventory.rs, tests in
   dex-sdk/tests/inventory_test.rs and a golden file; added to the workspace members (Cargo.toml,
   Cargo.lock) and to the flake's source fileset (flake.nix); docs/architecture.md; CHANGELOG.md.
+- M3: dex-sdk/src/catalogue.rs, dex-sdk/src/matcher.rs, dex-sdk/catalogue/sdks.toml (this
+  project's own SDK list, written by hand; no Exodus data is included), and
+  dex-sdk/tests/matcher_test.rs; dex-sdk depends on regex, serde_json, thiserror and toml
+  (Cargo.lock); docs/architecture.md; CHANGELOG.md.
 
 Upstream tests edited: none.
