@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new test file (fork M3). See NOTICE.
+// Modified by Zero (2026-11-01): new test file (fork M3); review fixes (2026-11-02). See NOTICE.
 use dexpa_core::axml::XmlValue;
 use dexpa_core::manifest::{Component, ComponentKind, Manifest, MetaData};
 use dexpa_sdk::catalogue::{Origin, bundled, load_exodus_json, load_toml};
@@ -259,4 +259,36 @@ fn facebook_open_source_libraries_are_not_the_facebook_sdk() {
     ] {
         assert!(ids(&[(sdk, 0)]).contains(&"facebook".to_string()), "{sdk}");
     }
+}
+
+/// /review (2026-11-02): a signature was wrapped as `^(?:SIG)` before it was checked. An
+/// unbalanced `a)|(b` then compiled as `^(?:a)|(b)`, whose second branch is not anchored.
+#[test]
+fn an_unbalanced_exodus_signature_cannot_escape_the_anchor() {
+    let cat = load_exodus_json(
+        r#"{"trackers": {"1": {"name": "Esc", "code_signature": "com.bar)|(evil", "categories": []}}}"#,
+    )
+    .unwrap();
+    assert!(
+        cat.sdks.is_empty(),
+        "the raw signature is not a valid regex"
+    );
+    assert_eq!(cat.skipped.len(), 1);
+    assert!(match_sdks(&cat, &inv(&[("x.evil.Y", 0)]), None).is_empty());
+}
+
+/// /review (2026-11-02): signature rules are matched in one `RegexSet` pass, whose hits are
+/// indices into the rule list. A hit must land on the SDK whose rule matched, not on another.
+#[test]
+fn each_signature_hit_belongs_to_the_rule_that_matched() {
+    let cat = load_exodus_json(
+        r#"{"trackers": {
+  "1": {"name": "A", "code_signature": "com.aaa.", "categories": []},
+  "2": {"name": "B", "code_signature": "org.bbb.", "categories": []}
+}}"#,
+    )
+    .unwrap();
+    let found = match_sdks(&cat, &inv(&[("org.bbb.Y", 0)]), None);
+    let ids: Vec<&str> = found.iter().map(|m| m.id.as_str()).collect();
+    assert_eq!(ids, vec!["exodus:2"]);
 }

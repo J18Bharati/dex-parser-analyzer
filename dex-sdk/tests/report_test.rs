@@ -1,11 +1,11 @@
-// Modified by Zero (2026-11-01): new test file (fork M5). See NOTICE.
+// Modified by Zero (2026-11-01): new test file (fork M5); review fixes (2026-11-02). See NOTICE.
 //! Building an [`SdkReport`] from DEX buffers, a manifest and a catalogue.
 
 use std::fs;
 
 use dexpa_core::axml::XmlValue;
 use dexpa_core::manifest::Manifest;
-use dexpa_sdk::catalogue::{bundled, load_exodus_json};
+use dexpa_sdk::catalogue::{bundled, load_exodus_json, load_toml};
 use dexpa_sdk::report::{EXODUS_ATTRIBUTION, SCHEMA_VERSION, build_report, value_text};
 
 fn positive() -> Vec<Vec<u8>> {
@@ -98,4 +98,36 @@ fn value_text_renders_each_value_type() {
 #[test]
 fn unreadable_dex_is_an_error() {
     assert!(build_report(&bundled(), &[b"dex\n035\0".to_vec()], None).is_err());
+}
+
+/// /review (2026-11-02): `sdks diff` must tell a catalogue change from an app change, so a
+/// report names the catalogue that made it. Same rules, same fingerprint; any rule change
+/// (a prefix, a key, an Exodus file added) gives another.
+#[test]
+fn the_report_fingerprints_its_catalogue() {
+    let report = build_report(&bundled(), &positive(), None).unwrap();
+    let fp = report.catalogue_fingerprint.clone().expect("fingerprint");
+    assert_eq!(fp, bundled().fingerprint(), "deterministic");
+    assert_eq!(report.manifest_error, None);
+    let toml = |prefix: &str| {
+        load_toml(&format!(
+            "[[sdk]]\nid = \"x\"\nname = \"X\"\ncategory = \"c\"\npackages = [\"{prefix}\"]\n"
+        ))
+        .unwrap()
+        .fingerprint()
+    };
+    assert_eq!(toml("com.x"), toml("com.x"));
+    assert_ne!(toml("com.x"), toml("com.y"), "a changed prefix changes it");
+    let with_key = load_toml(
+        "[[sdk]]\nid = \"x\"\nname = \"X\"\ncategory = \"c\"\npackages = [\"com.x\"]\n\
+         meta_data_keys = [\"com.x.KEY\"]\n",
+    )
+    .unwrap()
+    .fingerprint();
+    assert_ne!(toml("com.x"), with_key, "a meta-data key changes it");
+    let exodus = load_exodus_json(
+        r#"{"trackers": {"1": {"name": "S", "code_signature": "io.sentry.", "categories": []}}}"#,
+    )
+    .unwrap();
+    assert_ne!(bundled().merge(exodus).unwrap().fingerprint(), fp);
 }

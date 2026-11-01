@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new test file (fork M5). See NOTICE.
+// Modified by Zero (2026-11-01): new test file (fork M5); review fixes (2026-11-02). See NOTICE.
 //! `dexpa sdks` and `dexpa sdks diff`, driven through the built binary.
 //!
 //! The DEX fixtures (`dex-sdk/tests/data/sdk-{positive,negative}.dex`) are compiled from
@@ -246,17 +246,128 @@ fn apk_without_a_manifest_is_read_as_dex_only() {
     assert_eq!(report["dex_count"], 2);
 }
 
+/// /review (2026-11-02): a manifest this parser rejects may still install on Android, so failing
+/// the whole scan would hide the DEX evidence. The report keeps the DEX matches and says, in
+/// `manifest_error` and on stderr, that the manifest was not read.
 #[test]
-fn malformed_manifest_exits_1_instead_of_being_skipped() {
-    // Absent is fine (DEX only); present and broken must not silently drop manifest evidence.
+fn malformed_manifest_still_reports_the_dex_and_names_the_error() {
     let apk = write_apk_with_manifest("broken.apk", b"\x03\x00\x08\x00junk".to_vec(), "positive");
     let output = dexpa(&["sdks", &apk, "--format", "json"]);
-    assert_eq!(output.status.code(), Some(1), "stdout: {}", stdout(&output));
+    let report = json(&output);
+    assert!(
+        ids(&report).contains(&"sentry".to_string()),
+        "DEX evidence kept"
+    );
+    assert_eq!(report["package"], Value::Null);
+    assert!(
+        report["manifest_error"]
+            .as_str()
+            .is_some_and(|e| !e.is_empty()),
+        "{report}"
+    );
     assert!(
         stderr(&output).contains("AndroidManifest.xml"),
         "{}",
         stderr(&output)
     );
+    let text = dexpa(&["sdks", &apk]);
+    assert_eq!(text.status.code(), Some(0));
+    assert!(
+        stdout(&text).contains("AndroidManifest.xml"),
+        "{}",
+        stdout(&text)
+    );
+}
+
+/// No app DEX entry at all (only a DEX outside the archive root) is an error, not an empty report.
+#[test]
+fn apk_without_an_app_dex_exits_1() {
+    let dex = fs::read(sdk_fixture("positive")).unwrap();
+    let mut zip = ZipWriter::new(Cursor::new(Vec::new()));
+    let opts = SimpleFileOptions::default();
+    for (entry, data) in [
+        ("AndroidManifest.xml", manifest(1)),
+        ("assets/plugin.dex", dex),
+    ] {
+        zip.start_file(entry, opts).unwrap();
+        zip.write_all(&data).unwrap();
+    }
+    let path = scratch("nodex.apk");
+    fs::write(&path, zip.finish().unwrap().into_inner()).unwrap();
+    let output = dexpa(&["sdks", path.to_str().unwrap()]);
+    assert_eq!(output.status.code(), Some(1));
+    assert!(
+        stderr(&output).contains("classes*.dex"),
+        "{}",
+        stderr(&output)
+    );
+}
+
+/// /review (2026-11-02): APK strings go to the analyst's terminal. Control characters (escape
+/// sequences that could rewrite or hide lines) are printed escaped in text mode.
+#[test]
+fn text_output_escapes_control_characters() {
+    let root = el(
+        "manifest",
+        vec![
+            pa("package", s("app.fix\u{1b}[2Kture\u{202e}")),
+            aa("versionCode", VERSION_CODE, V::Int(1)),
+        ],
+        vec![el("application", vec![], vec![])],
+    );
+    let apk = write_apk_with_manifest("escape.apk", build(&root, &Opts::default()), "positive");
+    let output = dexpa(&["sdks", &apk]);
+    assert_eq!(output.status.code(), Some(0), "stderr: {}", stderr(&output));
+    let text = stdout(&output);
+    assert!(
+        !text.contains('\u{1b}') && !text.contains('\u{202e}'),
+        "{text:?}"
+    );
+    assert!(text.contains("app.fix\\u{1b}[2Kture\\u{202e}"), "{text}");
+}
+
+/// /review (2026-11-02): reports made with different catalogues cannot be diffed: every SDK the
+/// other catalogue lacks would show up as added or removed. Different packages only warn.
+#[test]
+fn diff_refuses_reports_from_different_catalogues() {
+    let toml = scratch("only-sentry.toml");
+    fs::write(
+        &toml,
+        "[[sdk]]\nid = \"sentry\"\nname = \"Sentry\"\ncategory = \"crash\"\npackages = [\"io.sentry\"]\n",
+    )
+    .unwrap();
+    let apk = write_apk("cat.apk", 2, "positive");
+    let bundled = json(&dexpa(&["sdks", &apk, "--format", "json"]));
+    let custom = json(&dexpa(&[
+        "sdks",
+        &apk,
+        "--catalogue",
+        toml.to_str().unwrap(),
+        "--format",
+        "json",
+    ]));
+    let (a, b) = (scratch("cat-bundled.json"), scratch("cat-custom.json"));
+    fs::write(&a, bundled.to_string()).unwrap();
+    fs::write(&b, custom.to_string()).unwrap();
+    let output = dexpa(&["sdks", "diff", a.to_str().unwrap(), b.to_str().unwrap()]);
+    assert_eq!(output.status.code(), Some(1), "stdout: {}", stdout(&output));
+    assert!(stderr(&output).contains("catalogue"), "{}", stderr(&output));
+
+    // Another package: the diff runs, with a warning.
+    let mut other = bundled.clone();
+    other["package"] = Value::from("other.app");
+    fs::write(&b, other.to_string()).unwrap();
+    let output = dexpa(&["sdks", "diff", a.to_str().unwrap(), b.to_str().unwrap()]);
+    assert_eq!(output.status.code(), Some(0), "stderr: {}", stderr(&output));
+    assert!(stderr(&output).contains("package"), "{}", stderr(&output));
+
+    // Reports without a fingerprint (made before it existed): the diff runs, with a warning.
+    let mut old = bundled.clone();
+    old.as_object_mut().unwrap().remove("catalogue_fingerprint");
+    fs::write(&b, old.to_string()).unwrap();
+    let output = dexpa(&["sdks", "diff", a.to_str().unwrap(), b.to_str().unwrap()]);
+    assert_eq!(output.status.code(), Some(0), "stderr: {}", stderr(&output));
+    assert!(stderr(&output).contains("catalogue"), "{}", stderr(&output));
 }
 
 #[test]

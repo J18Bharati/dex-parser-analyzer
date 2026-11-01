@@ -1,8 +1,13 @@
-// Modified by Zero (2026-11-01): new module (fork M3); Source::as_str (M5). See NOTICE.
+// Modified by Zero (2026-11-01): new module (fork M3); Source::as_str (M5); one RegexSet pass
+// for Exodus signatures (2026-11-02, /review). See NOTICE.
 //! Matching a catalogue against an inventory and a manifest, with the evidence for each match.
 
 use dexpa_core::manifest::Manifest;
 use serde::{Deserialize, Serialize};
+
+use std::collections::HashMap;
+
+use regex::{Regex, RegexSet};
 
 use crate::catalogue::{Catalogue, Origin, Rule};
 use crate::inventory::Inventory;
@@ -72,6 +77,7 @@ fn under(name: &str, prefix: &str) -> bool {
         .is_some_and(|rest| rest.starts_with('.'))
 }
 
+#[derive(Default)]
 struct Collect {
     count: usize,
     examples: Vec<String>,
@@ -79,14 +85,6 @@ struct Collect {
 }
 
 impl Collect {
-    fn new() -> Self {
-        Self {
-            count: 0,
-            examples: Vec::new(),
-            dex_indexes: Vec::new(),
-        }
-    }
-
     fn add(&mut self, name: &str, dex_index: Option<usize>) {
         self.count += 1;
         if self.examples.len() < MAX_EXAMPLES && !self.examples.iter().any(|e| e == name) {
@@ -132,13 +130,14 @@ pub fn match_sdks(
                 .collect()
         })
         .unwrap_or_default();
+    let mut signatures = signature_hits(catalogue, classes, &components);
     let mut out = Vec::new();
-    for sdk in &catalogue.sdks {
+    for (sdk_index, sdk) in catalogue.sdks.iter().enumerate() {
         let mut evidence = Vec::new();
         match &sdk.rule {
             Rule::Packages(prefixes) => {
                 for prefix in prefixes {
-                    let mut dex = Collect::new();
+                    let mut dex = Collect::default();
                     // Every class under `prefix` sorts at or after `prefix` itself.
                     let start = classes.partition_point(|c| c.name.as_str() < prefix.as_str());
                     for c in classes[start..]
@@ -150,29 +149,22 @@ pub fn match_sdks(
                         }
                     }
                     evidence.extend(dex.into_evidence(Source::DexClass, prefix));
-                    let mut man = Collect::new();
+                    let mut man = Collect::default();
                     for name in components.iter().filter(|n| under(n, prefix)) {
                         man.add(name, None);
                     }
                     evidence.extend(man.into_evidence(Source::ManifestComponent, prefix));
                 }
             }
-            Rule::Signature(re) => {
-                let mut dex = Collect::new();
-                for c in classes.iter().filter(|c| re.is_match(&c.name)) {
-                    dex.add(&c.name, Some(c.dex_index));
-                }
+            Rule::Signature(_) => {
+                let (dex, man) = signatures.remove(&sdk_index).unwrap_or_default();
                 evidence.extend(dex.into_evidence(Source::DexClass, "signature"));
-                let mut man = Collect::new();
-                for name in components.iter().filter(|n| re.is_match(n)) {
-                    man.add(name, None);
-                }
                 evidence.extend(man.into_evidence(Source::ManifestComponent, "signature"));
             }
         }
         if let Some(m) = manifest {
             for key in &sdk.meta_data_keys {
-                let mut meta = Collect::new();
+                let mut meta = Collect::default();
                 for _ in m
                     .meta_data
                     .iter()
@@ -195,4 +187,50 @@ pub fn match_sdks(
         }
     }
     out
+}
+
+/// Class and component hits for every signature rule, keyed by SDK index. One `RegexSet` pass
+/// per name instead of one regex per signature per name: with about 430 Exodus signatures and
+/// 100k classes that is 100k passes, not 43 million `is_match` calls. If the set is too large
+/// to compile, each regex runs on its own, with the same result.
+fn signature_hits(
+    catalogue: &Catalogue,
+    classes: &[crate::inventory::DefinedClass],
+    components: &[String],
+) -> HashMap<usize, (Collect, Collect)> {
+    let rules: Vec<(usize, &Regex)> = catalogue
+        .sdks
+        .iter()
+        .enumerate()
+        .filter_map(|(i, sdk)| match &sdk.rule {
+            Rule::Signature(re) => Some((i, re)),
+            Rule::Packages(_) => None,
+        })
+        .collect();
+    let mut hits: HashMap<usize, (Collect, Collect)> = HashMap::new();
+    if rules.is_empty() {
+        return hits;
+    }
+    let set = RegexSet::new(rules.iter().map(|(_, re)| re.as_str())).ok();
+    let matched = |name: &str| -> Vec<usize> {
+        match &set {
+            Some(set) => set.matches(name).into_iter().map(|k| rules[k].0).collect(),
+            None => rules
+                .iter()
+                .filter(|(_, re)| re.is_match(name))
+                .map(|(i, _)| *i)
+                .collect(),
+        }
+    };
+    for c in classes {
+        for i in matched(&c.name) {
+            hits.entry(i).or_default().0.add(&c.name, Some(c.dex_index));
+        }
+    }
+    for name in components {
+        for i in matched(name) {
+            hits.entry(i).or_default().1.add(name, None);
+        }
+    }
+    hits
 }

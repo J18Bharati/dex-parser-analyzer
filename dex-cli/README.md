@@ -1,4 +1,4 @@
-<!-- Modified by Zero (2026-11-01): `dexpa sdks` and `dexpa sdks diff` (fork M5); APK entries in load order (fork M1a). See NOTICE. -->
+<!-- Modified by Zero (2026-11-01): `dexpa sdks` and `dexpa sdks diff` (fork M5); APK entries in load order (fork M1a); manifest_error, catalogue_fingerprint, diff refusal (2026-11-02, /review). See NOTICE. -->
 # dexpa-cli
 
 `dexpa`, the command-line front end of [dex-parser-analyzer](../README.md). It parses a `.dex` file, or every `classes*.dex` in an APK, with [`dexpa-core`](../dex-core/), runs every [`dexpa-analysis`](../dex-analysis/) pass with the default configuration, and prints the results.
@@ -111,16 +111,16 @@ dexpa sdks diff [--format text|json] <OLD.json> <NEW.json>
 
 The bundled catalogue lists 25 SDKs (`dex-sdk/catalogue/sdks.toml`). `--catalogue` replaces it with your own TOML in the same shape. `--exodus` adds the trackers from an [Exodus Privacy](https://exodus-privacy.eu.org/) JSON file you supply; that data is ODbL 1.0, is never bundled, and when it is used the report carries an `attribution`.
 
-An APK without `AndroidManifest.xml` is read as DEX only (`package` is `null`). A manifest that is present but malformed is an error.
+An APK without `AndroidManifest.xml` is read as DEX only (`package` is `null`). A manifest that is present but malformed is reported on stderr and in `manifest_error`, and the report has DEX evidence only. The app's DEX files are `classes.dex`, `classes2.dex`, ... up to the first missing number, as Android loads them; an APK with two entries of the same name is refused. Text output escapes control and bidirectional-override characters.
 
-`dexpa sdks diff` compares two reports from `dexpa sdks --format json`:
+`dexpa sdks diff` compares two reports from `dexpa sdks --format json`. It refuses reports whose `catalogue_fingerprint`s differ, since a different catalogue would show up as SDKs added and removed, and warns when a report has no fingerprint (one made before the field existed) or the packages differ.
 
 - `sdk_added` and `sdk_removed` have a `confidence`. It is `strong` when the side that has the SDK has manifest evidence, and `uncertain` when that side has only class names, which a change in minification can make appear or vanish.
 - `sdk_evidence_changed` lists the `source:rule` pairs gained and lost.
 
 Counts and DEX placement are not compared, because a rebuild changes them without changing what the app contains.
 
-Exit codes: 0 when the report or diff is printed; 1 when an input, the catalogue or the Exodus file cannot be read or parsed, or when a report given to `diff` does not have `schema_version` 1.
+Exit codes: 0 when the report or diff is printed, including a DEX-only report after a malformed manifest; 1 when an input, the catalogue or the Exodus file cannot be read or parsed, when an APK has no `classes.dex`, when a report given to `diff` does not have `schema_version` 1, or when the two reports were made with different catalogues.
 
 ### JSON (`schema_version` 1, independent of the analysis report's)
 
@@ -133,7 +133,9 @@ Exit codes: 0 when the report or diff is printed; 1 when an input, the catalogue
   "dex_count": 1,
   "class_count": 5,
   "catalogue_size": 25,
+  "catalogue_fingerprint": "fnv1a64:608ed0e5cc895aec",
   "skipped_signatures": 0,
+  "manifest_error": null,
   "attribution": null,
   "matches": [
     {
@@ -153,7 +155,7 @@ Exit codes: 0 when the report or diff is printed; 1 when an input, the catalogue
 ```
 
 - `version_code` and `version_name` are text. A resource reference is printed as `@0x7f...` because `resources.arsc` is not read.
-- `matches` is sorted by id. `evidence` is sorted by source, then rule, and keeps at most 3 `examples`. `skipped_signatures` counts Exodus signatures that were empty or were not valid regexes.
+- `matches` is sorted by id. `evidence` is sorted by source, then rule, and keeps at most 3 `examples`. `skipped_signatures` counts Exodus signatures that were empty or were not valid regexes. `catalogue_fingerprint` identifies the catalogue (ids, rules and meta-data keys; names and categories are left out). `manifest_error` is the reason a present manifest was not read, else `null`. Both are absent from reports made before they existed and then load as `null`.
 - The diff document is `{"schema_version": 1, "old": {package, version_code, version_name}, "new": {...}, "events": [...]}`; each event has an `event` tag (`sdk_added`, `sdk_removed`, `sdk_evidence_changed`). The full examples are the golden files in `tests/golden/`.
 
 Licensed under MIT OR Apache-2.0.

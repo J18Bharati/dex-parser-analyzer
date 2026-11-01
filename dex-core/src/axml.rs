@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M1b). See NOTICE.
+// Modified by Zero (2026-11-01): new module (fork M1b); raw string index first (2026-11-02, /review). See NOTICE.
 //! Android binary XML (AXML), as stored in an APK's `AndroidManifest.xml`.
 
 use serde::Serialize;
@@ -322,7 +322,9 @@ fn start_element(
             0x00 => XmlValue::Null,
             0x01 => XmlValue::Reference(data),
             0x02 => XmlValue::AttributeRef(data),
-            0x03 => match budget.take(pool.get(data).or_else(|| pool.get(raw)))? {
+            // Android reads string attributes through the raw index
+            // (`ResXMLParser::getAttributeStringValue`); the typed index is the fallback.
+            0x03 => match budget.take(pool.get(raw).or_else(|| pool.get(data)))? {
                 Some(v) => XmlValue::String(v),
                 None => XmlValue::Other { data_type, data },
             },

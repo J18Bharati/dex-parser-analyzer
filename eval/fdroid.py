@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Modified by Zero (2026-11-01): new file (fork M6). See NOTICE.
+# Modified by Zero (2026-11-01): new file (fork M6); run-loop fixes (2026-11-02, /review). See NOTICE.
 """The F-Droid evaluation of `dexpa sdks`: select apps, fetch them under a budget, analyse them.
 
   select  Verify F-Droid's signed entry.jar against the pinned key, fetch index-v2.json (its
@@ -9,7 +9,8 @@
           against the pinned sha256 and size, under per-file, total, time and free-disk budgets.
   run     fetch, then `dexpa sdks` and the manifest cross-check per APK, `dexpa sdks diff` between
           versions of an app; APKs are deleted after analysis unless --keep. Writes
-          eval/results.json and eval/TABLE.md.
+          eval/results.json and eval/TABLE.md. An APK that cannot be fetched or verified, or whose
+          analysis fails or passes --tool-timeout, is recorded in `failures` and the run goes on.
 
 Standard library only. Exit codes: 0 ok, 1 verification or analysis setup failure, 3 a budget ran out.
 """
@@ -41,6 +42,14 @@ STRATA = ("Tracking", "NonFreeNet", "control")
 NAME_RE = re.compile(r"^/[A-Za-z0-9][A-Za-z0-9._-]*\.apk$")
 CHUNK = 1 << 16
 
+# Budgets: the defaults of both the Budget dataclass and the command-line options.
+MAX_FILE_BYTES = 60_000_000
+MAX_TOTAL_BYTES = 3_000_000_000
+MAX_MINUTES = 45
+MIN_FREE_BYTES = 15_000_000_000
+PAUSE_SECONDS = 1.0
+TOOL_TIMEOUT_SECONDS = 600
+
 ROOT = Path(__file__).resolve().parents[1]
 CACHE = ROOT / ".cache" / "fdroid"
 
@@ -58,11 +67,11 @@ class BudgetError(Exception):
 
 @dataclass
 class Budget:
-    max_file: int = 60_000_000
-    max_total: int = 3_000_000_000
-    seconds: float = 45 * 60
-    min_free: int = 15_000_000_000
-    pause: float = 1.0
+    max_file: int = MAX_FILE_BYTES
+    max_total: int = MAX_TOTAL_BYTES
+    seconds: float = MAX_MINUTES * 60
+    min_free: int = MIN_FREE_BYTES
+    pause: float = PAUSE_SECONDS
 
 
 @dataclass
@@ -78,15 +87,17 @@ class FetchState:
 
 
 def _sha256_file(path: Path) -> str:
-    h = hashlib.sha256()
     with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(CHUNK), b""):
-            h.update(chunk)
-    return h.hexdigest()
+        return hashlib.file_digest(f, "sha256").hexdigest()
 
 
 def _matches(path: Path, entry: dict) -> bool:
     return path.stat().st_size == entry["size"] and _sha256_file(path) == entry["sha256"]
+
+
+def check_base_url(base_url: str) -> None:
+    if not (base_url.startswith("https://") or base_url.startswith("file://")):
+        raise VerifyError(f"refusing base URL {base_url!r}: https or file only")
 
 
 def ensure(entry: dict, dest: Path, base_url: str, state: FetchState) -> Path:
@@ -94,8 +105,7 @@ def ensure(entry: dict, dest: Path, base_url: str, state: FetchState) -> Path:
     name = entry["name"]
     if not NAME_RE.match(name):
         raise VerifyError(f"refusing file name {name!r}")
-    if not (base_url.startswith("https://") or base_url.startswith("file://")):
-        raise VerifyError(f"refusing base URL {base_url!r}: https or file only")
+    check_base_url(base_url)
     state.check_time()
     dest.mkdir(parents=True, exist_ok=True)
     final = dest / name[1:]
@@ -462,8 +472,11 @@ def table_md(results: dict, lock_source: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
-def _json_cmd(cmd: list[str]) -> dict:
-    r = subprocess.run(cmd, capture_output=True, text=True)
+def _json_cmd(cmd: list[str], timeout: float = TOOL_TIMEOUT_SECONDS) -> dict:
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        raise RuntimeError(f"{Path(cmd[0]).name} timed out after {timeout} s") from None
     if r.returncode != 0:
         raise RuntimeError(f"{Path(cmd[0]).name} exited {r.returncode}: {r.stderr.strip()[:300]}")
     return json.loads(r.stdout)
@@ -497,6 +510,7 @@ def check_tools(*paths) -> None:
 
 def cmd_run(args) -> None:
     check_tools(args.dexpa, args.manifest_tool)
+    check_base_url(args.base_url)  # once, before the loop records it as every APK's failure
     lock = load_lock(args.lock)
     out = Path(args.out)
     reports_dir = out / "reports"
@@ -504,20 +518,36 @@ def cmd_run(args) -> None:
     state = FetchState(_budget(args))
     reports, checks, failures = {}, {}, {}
     sdks_cmd = [args.dexpa, "sdks"] + (["--exodus", args.exodus] if args.exodus else [])
+    # reports/ holds this lock's reports only: one left from an earlier run or lock would
+    # disagree with results.json.
+    keys = {_key(e) for e in lock["apk"]}
+    for old in reports_dir.glob("*.json"):
+        if old.stem not in keys:
+            old.unlink()
     aborted = None
     for e in lock["apk"]:
         k = _key(e)
+        report_file = reports_dir / f"{k}.json"
         try:
             path = ensure(e, Path(args.dest), args.base_url, state)
         except BudgetError as err:
             aborted = str(err)
             break
+        except (VerifyError, OSError) as err:  # a 404, a timeout, a hash that does not match
+            failures[k] = f"fetch: {err}"
+            report_file.unlink(missing_ok=True)
+            print(f"{k}: not fetched: {err}", flush=True)
+            continue
         try:
-            reports[k] = _json_cmd(sdks_cmd + [str(path), "--format", "json"])
-            (reports_dir / f"{k}.json").write_text(json.dumps(reports[k], indent=2, sort_keys=True) + "\n")
-            checks[k] = cross_check(_json_cmd([args.manifest_tool, str(path)]), e)
+            report = _json_cmd(sdks_cmd + [str(path), "--format", "json"], args.tool_timeout)
+            check = cross_check(_json_cmd([args.manifest_tool, str(path)], args.tool_timeout), e)
         except (RuntimeError, json.JSONDecodeError) as err:
+            # Both analyses or neither: a report without its cross-check would count twice.
             failures[k] = str(err)
+            report_file.unlink(missing_ok=True)
+        else:
+            reports[k], checks[k] = report, check
+            report_file.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
         finally:
             if not args.keep:
                 path.unlink(missing_ok=True)
@@ -527,7 +557,7 @@ def cmd_run(args) -> None:
         ks = [_key(e) for e in sorted((e for e in lock["apk"] if e["package"] == p), key=lambda e: e["version_code"]) if _key(e) in reports]
         for a, b in zip(ks, ks[1:]):
             try:
-                diffs[p].append(_json_cmd([args.dexpa, "sdks", "diff", str(reports_dir / f"{a}.json"), str(reports_dir / f"{b}.json"), "--format", "json"]))
+                diffs[p].append(_json_cmd([args.dexpa, "sdks", "diff", str(reports_dir / f"{a}.json"), str(reports_dir / f"{b}.json"), "--format", "json"], args.tool_timeout))
             except RuntimeError as err:
                 failures[f"diff {a} {b}"] = str(err)
     results = summarize(lock["apk"], reports, diffs, checks, failures)
@@ -549,24 +579,25 @@ def main(argv=None) -> int:
     s.add_argument("--lock", default=str(ROOT / "eval" / "fdroid.lock.toml"))
     s.add_argument("--per-stratum", type=int, default=10)
     s.add_argument("--versions", type=int, default=3)
-    s.add_argument("--max-file", type=int, default=60_000_000)
+    s.add_argument("--max-file", type=int, default=MAX_FILE_BYTES)
     s.add_argument("--seed", default="dexpa-m6-2026-11-01")
     for name in ("fetch", "run"):
         p = sub.add_parser(name)
         p.add_argument("--lock", default=str(ROOT / "eval" / "fdroid.lock.toml"))
         p.add_argument("--dest", default=str(CACHE / "apks"))
         p.add_argument("--base-url", default=REPO)
-        p.add_argument("--max-file", type=int, default=60_000_000)
-        p.add_argument("--max-total", type=int, default=3_000_000_000)
-        p.add_argument("--minutes", type=float, default=45)
-        p.add_argument("--min-free", type=int, default=15_000_000_000)
-        p.add_argument("--pause", type=float, default=1.0)
+        p.add_argument("--max-file", type=int, default=MAX_FILE_BYTES)
+        p.add_argument("--max-total", type=int, default=MAX_TOTAL_BYTES)
+        p.add_argument("--minutes", type=float, default=MAX_MINUTES)
+        p.add_argument("--min-free", type=int, default=MIN_FREE_BYTES)
+        p.add_argument("--pause", type=float, default=PAUSE_SECONDS)
     r = sub.choices["run"]
     r.add_argument("--dexpa", required=True)
     r.add_argument("--manifest-tool", required=True)
     r.add_argument("--exodus")
     r.add_argument("--out", default=str(ROOT / "eval"))
     r.add_argument("--keep", action="store_true")
+    r.add_argument("--tool-timeout", type=float, default=TOOL_TIMEOUT_SECONDS, help="seconds per dexpa or manifest-tool call")
     args = ap.parse_args(argv)
     try:
         {"select": cmd_select, "fetch": cmd_fetch, "run": cmd_run}[args.cmd](args)

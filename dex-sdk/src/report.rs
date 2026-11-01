@@ -1,4 +1,5 @@
-// Modified by Zero (2026-11-01): new module (fork M4); build_report and value_text (M5). See NOTICE.
+// Modified by Zero (2026-11-01): new module (fork M4); build_report and value_text (M5);
+// catalogue_fingerprint and manifest_error (2026-11-02, /review). See NOTICE.
 //! The SDK report: what `dexpa sdks` prints as JSON, and what `diff` reads back.
 
 use dexpa_core::{DexResult, axml::XmlValue, manifest::Manifest};
@@ -35,6 +36,14 @@ pub struct SdkReport {
     pub skipped_signatures: usize,
     /// Present when Exodus data was loaded.
     pub attribution: Option<String>,
+    /// [`Catalogue::fingerprint`] of the catalogue that made this report. Absent in reports
+    /// made before it existed.
+    #[serde(default)]
+    pub catalogue_fingerprint: Option<String>,
+    /// Why `AndroidManifest.xml` could not be read, when an APK has one that does not parse.
+    /// The report then holds the DEX evidence only.
+    #[serde(default)]
+    pub manifest_error: Option<String>,
     /// SDKs found, sorted by id.
     pub matches: Vec<SdkMatch>,
 }
@@ -58,6 +67,8 @@ pub fn build_report(
         catalogue_size: catalogue.sdks.len(),
         skipped_signatures: catalogue.skipped.len(),
         attribution: exodus.then(|| EXODUS_ATTRIBUTION.to_string()),
+        catalogue_fingerprint: Some(catalogue.fingerprint()),
+        manifest_error: None,
         matches: match_sdks(catalogue, &inventory, manifest),
     })
 }

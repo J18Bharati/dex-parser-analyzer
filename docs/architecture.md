@@ -1,4 +1,4 @@
-<!-- Modified by Zero (2026-11-01): axml.rs and manifest.rs rows, multidex.rs entry rules, dex-sdk, `dexpa sdks` (fork). See NOTICE. -->
+<!-- Modified by Zero (2026-11-01): axml.rs and manifest.rs rows, multidex.rs entry rules, dex-sdk, `dexpa sdks` (fork); review fixes (2026-11-02). See NOTICE. -->
 # Architecture
 
 What exists in the workspace as of 2026-10-21. The documents in `docs/research/` are design surveys written before the code; where they describe something not listed here (for example a full OWASP static-analysis engine, CHA call graphs, or disassembly and hex views in the GUI), it is not built.
@@ -27,9 +27,9 @@ Parsing borrows from the input buffer (`DexFile<'a>`), so nothing is copied unti
 | `bytecode.rs` | 2,925 | The Dalvik opcode table and decoder: registers, literals, references, switch and fill-array payloads, and the ART/odex quickened forms. |
 | `graphs.rs` | 449 | Basic-block CFGs with fallthrough, branch, switch and exception edges; a direct-edge call graph (one edge per resolved `invoke-*` target, without class-hierarchy resolution); cross-references (strings, fields, types, protos, call sites, method handles). Built on `petgraph`. |
 | `dto.rs` | 248 | Serializable overviews (`DexOverviewDto`, ...) that the CLI and GUI print. |
-| `multidex.rs` | 307 | Reading an APK's app DEX entries (`zip`): archive-root `classes.dex`, `classes2.dex`, ... in numeric load order, each read capped (`MAX_DEX_ENTRY_BYTES`) and their sum capped (`MAX_TOTAL_DEX_BYTES`); and `MultiDex`, which builds shared class, method, string and type indexes across files. |
-| `axml.rs` | 297 | (fork) Android binary XML: string pools (UTF-8 and UTF-16, decoded lazily under a byte budget), the resource map, and the element tree; attribute values stay typed, references unresolved. Depth-limited, never panics. |
-| `manifest.rs` | 251 | (fork) The `AndroidManifest.xml` model: package, version, SDK levels, permissions, components and meta-data. `android:` attributes resolve by framework resource id first, so names removed by resource shrinking still resolve. |
+| `multidex.rs` | 326 | Reading an APK's app DEX entries (`zip`): archive-root `classes.dex`, `classes2.dex`, ... in numeric load order up to the first missing number (ART's rule), duplicate entry names refused, each read capped (`MAX_DEX_ENTRY_BYTES`) and their sum capped (`MAX_TOTAL_DEX_BYTES`); and `MultiDex`, which builds shared class, method, string and type indexes across files. |
+| `axml.rs` | 349 | (fork) Android binary XML: string pools (UTF-8 and UTF-16, decoded lazily under a byte budget), the resource map, and the element tree; attribute values stay typed, references unresolved. Depth-limited, never panics. |
+| `manifest.rs` | 275 | (fork) The `AndroidManifest.xml` model: package, version, SDK levels, permissions, components and meta-data. `android:` attributes resolve by framework resource id first, so names removed by resource shrinking still resolve. |
 | `semantics.rs` | 67 | Small helpers layered on `DexFile`. |
 | `error.rs` | 84 | `DexError`, the crate's single error type. |
 
@@ -55,15 +55,15 @@ Published with the other crates since M5, because `dexpa-cli` depends on it. It 
 
 | Module | Role |
 |---|---|
-| `catalogue.rs` | SDK definitions: this project's TOML list (`dex-sdk/catalogue/sdks.toml`, compiled in; package prefixes of at least two segments and exact meta-data keys) and an importer for Exodus tracker files supplied at run time (signatures anchored at the class name's start; invalid ones skipped and counted). |
-| `matcher.rs` | Matches a catalogue against an inventory and a manifest. Evidence per SDK: defined classes (binary search in the sorted class list), manifest components (qualified the way Android does), and meta-data keys, each with counts, examples and DEX indexes. |
+| `catalogue.rs` | SDK definitions: this project's TOML list (`dex-sdk/catalogue/sdks.toml`, compiled in; package prefixes of at least two segments and exact meta-data keys) and an importer for Exodus tracker files supplied at run time (each signature must compile on its own, then is anchored at the class name's start; invalid ones skipped and counted), and `Catalogue::fingerprint`, which reports carry so `diff` can refuse a mismatch. |
+| `matcher.rs` | Matches a catalogue against an inventory and a manifest. Evidence per SDK: defined classes (binary search in the sorted class list; Exodus signatures in one `RegexSet` pass), manifest components (qualified the way Android does), and meta-data keys, each with counts, examples and DEX indexes. |
 | `report.rs` | `SdkReport`, the JSON `dexpa sdks` prints (`schema_version` 1, ODbL attribution when Exodus data was used), and `build_report`, which runs the inventory and the matcher over an app's DEX buffers and manifest. |
 | `diff.rs` | SDK changes between two reports: added, removed (with `strong` or `uncertain` confidence) and evidence changed. Counts and DEX placement are deliberately ignored. |
 | `inventory.rs` | The classes an app defines, one pass over each DEX file's `class_defs` (no `MultiDex` index, and no merely referenced types), with per-DEX totals and per-prefix class and method counts at depths 2 to 4. |
 
 ## dex-cli
 
-`main.rs`: clap arguments (a `.dex` or APK path, `--format`, `--max-findings`, `--fail-on`), then `read_dex_buffers_from_bytes` for APKs, and `parse_dex`, `dex_to_overview` and `analyze_dex` per DEX file, printed as text or as one JSON document. (fork) `sdks.rs`: the `dexpa sdks` subcommand (`args_conflicts_with_subcommands`, so `dexpa <FILE>` is unchanged), which reads the DEX files and the manifest, calls `dexpa_sdk::report::build_report`, and diffs two saved reports. [dex-cli/README.md](../dex-cli/README.md) documents the JSON schema and the exit codes.
+`main.rs`: clap arguments (a `.dex` or APK path, `--format`, `--max-findings`, `--fail-on`), then `read_dex_buffers_from_bytes` for APKs, and `parse_dex`, `dex_to_overview` and `analyze_dex` per DEX file, printed as text or as one JSON document. (fork) `sdks.rs`: the `dexpa sdks` subcommand (`args_conflicts_with_subcommands`, so `dexpa <FILE>` is unchanged), which reads the DEX files and the manifest, calls `dexpa_sdk::report::build_report`, and diffs two saved reports (refused when their catalogue fingerprints differ). A malformed manifest leaves a DEX-only report with `manifest_error` set; text output escapes control characters. [dex-cli/README.md](../dex-cli/README.md) documents the JSON schema and the exit codes.
 
 ## dex-gui
 

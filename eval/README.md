@@ -1,4 +1,4 @@
-<!-- Modified by Zero (2026-11-02): new file (fork M6). See NOTICE. -->
+<!-- Modified by Zero (2026-11-02): new file (fork M6); review note on report fields. See NOTICE. -->
 # F-Droid evaluation of `dexpa sdks`
 
 **Claim.** On 90 F-Droid APKs (30 apps × 3 versions), the manifest parser agreed with F-Droid's index on every field it could have known. 81 APKs match exactly, and the other 9 differ only by values the index adds itself. The SDK matcher found SDKs in 9 of the 30 apps. Finding them took manifest evidence as well as class names. The run also turned up two weaknesses in the matcher, described below.
@@ -24,6 +24,8 @@ nix develop .#eval -c just fdroid-eval     # fetch, analyse, delete; writes resu
 ## Results
 
 The full table is in [TABLE.md](TABLE.md); per-APK reports are in [reports/](reports/) and aggregates in [results.json](results.json).
+
+The committed reports were made before `catalogue_fingerprint` and `manifest_error` existed, so they lack both, and `dexpa sdks diff` warns that it cannot check their catalogues. The run also predates two parser changes from review: DEX files now stop at the first missing number, and an APK with duplicate entry names is refused. Re-running would show whether either changes any of the 90 results; it has not been re-run.
 
 | | Tracking | NonFreeNet | control |
 |---|---:|---:|---:|

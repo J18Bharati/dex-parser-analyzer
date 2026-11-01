@@ -57,7 +57,7 @@ Each changed file carries a "Modified by" note. Changes so far:
   eval/fdroid.lock.toml (F-Droid metadata: package names, versions, file names, hashes and sizes;
   no APK and no Exodus data). dex-core/examples/manifest_json.rs (new). A `.#eval` dev shell in
   flake.nix; eval-test, fdroid-select and fdroid-eval recipes in the Justfile; `.cache/` in
-  .gitignore.
+  .gitignore, and (7830f55) `__pycache__/` and `*.pyc`.
 - M6b: the F-Droid run: eval/results.json, eval/TABLE.md, eval/reports/ (this tool's output
   over the locked APKs; no APK and no Exodus data), eval/README.md. eval/fdroid.py classifies
   index-side manifest differences and checks for its tools before downloading; the fdroid-eval
@@ -67,5 +67,19 @@ Each changed file carries a "Modified by" note. Changes so far:
 - /cso fixes (2026-11-02): dex-core/src/multidex.rs caps the sum of DEX entries
   (MAX_TOTAL_DEX_BYTES, read_dex_buffers_from_bytes_with_limits), tested in
   dex-core/tests/apk_entries_test.rs; eval/fdroid.py refuses a jar with duplicate entry names.
+
+- /review fixes (2026-11-02): dex-core/src/multidex.rs (entries stop at the first missing number;
+  duplicate names refused; `u64::MAX` limits), dex-core/src/manifest.rs (duplicate names refused;
+  `u64::MAX` limit), dex-core/src/axml.rs (raw string value first); tests in
+  dex-core/tests/apk_entries_test.rs (the fork's own numeric-order test now uses contiguous
+  entries) and dex-core/tests/manifest_test.rs, with new builder options in
+  dex-core/tests/common/axml_builder.rs. dex-sdk/src/catalogue.rs (signature compiled raw first;
+  Catalogue::fingerprint), dex-sdk/src/report.rs (catalogue_fingerprint, manifest_error),
+  dex-sdk/src/matcher.rs (RegexSet), with tests in dex-sdk/tests/{matcher,report,diff}_test.rs.
+  dex-cli/src/sdks.rs (DEX-only report on a malformed manifest, diff catalogue check, escaped
+  text output), dex-cli/tests/sdks.rs and regenerated dex-cli/tests/golden/sdks-positive-*.json.
+  eval/fdroid.py (per-APK fetch failures, tool timeout, stale reports removed) and
+  eval/tests/test_fdroid.py. .gitignore header; dex-cli/README.md,
+  docs/architecture.md, eval/README.md, CHANGELOG.md.
 
 Upstream tests edited: none.

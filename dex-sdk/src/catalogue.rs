@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M3). See NOTICE.
+// Modified by Zero (2026-11-01): new module (fork M3); review fixes (2026-11-02). See NOTICE.
 //! SDK catalogues: this project's TOML list, and an importer for Exodus tracker files.
 
 use regex::Regex;
@@ -168,7 +168,11 @@ pub fn load_exodus_json(text: &str) -> Result<Catalogue, CatalogueError> {
             skipped.push(format!("{id}: empty code signature"));
             continue;
         }
-        match Regex::new(&format!("^(?:{})", t.code_signature)) {
+        // Check the signature on its own first: wrapped unchecked, an unbalanced `a)|(b`
+        // would compile as `^(?:a)|(b)`, whose second branch escapes the anchor.
+        let anchored = Regex::new(&t.code_signature)
+            .and_then(|_| Regex::new(&format!("^(?:{})", t.code_signature)));
+        match anchored {
             Ok(re) => sdks.push(Sdk {
                 id,
                 name: t.name,
@@ -195,6 +199,36 @@ impl Catalogue {
             return Err(invalid(&w[0].id, "duplicate id"));
         }
         Ok(self)
+    }
+
+    /// Identifies what this catalogue matches: a hash (64-bit FNV-1a, stable across builds and
+    /// platforms) of every SDK's id, package prefixes or signature, and meta-data keys, in id
+    /// order. Names and categories are display text and are left out. `sdks diff` uses it to
+    /// refuse reports made with different catalogues.
+    pub fn fingerprint(&self) -> String {
+        let mut h: u64 = 0xcbf2_9ce4_8422_2325;
+        let mut feed = |part: &str| {
+            for b in part.bytes().chain([0]) {
+                h = (h ^ u64::from(b)).wrapping_mul(0x0000_0100_0000_01b3);
+            }
+        };
+        for sdk in &self.sdks {
+            feed(&sdk.id);
+            match &sdk.rule {
+                Rule::Packages(prefixes) => {
+                    feed("packages");
+                    prefixes.iter().for_each(|p| feed(p));
+                }
+                Rule::Signature(re) => {
+                    feed("signature");
+                    feed(re.as_str());
+                }
+            }
+            feed("meta");
+            sdk.meta_data_keys.iter().for_each(|k| feed(k));
+            feed("\n");
+        }
+        format!("fnv1a64:{h:016x}")
     }
 
     /// Combines two catalogues. Ids must not collide.

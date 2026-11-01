@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M1b). See NOTICE.
+// Modified by Zero (2026-11-01): new module (fork M1b); review fixes (2026-11-02). See NOTICE.
 //! The parts of `AndroidManifest.xml` that identify an app and the SDKs it declares.
 
 use serde::Serialize;
@@ -9,7 +9,7 @@ use std::{
     path::Path,
 };
 
-use zip::ZipArchive;
+use zip::{ZipArchive, ZipReadOptions};
 
 use crate::axml::{XmlElement, XmlValue, parse_axml};
 use crate::error::{DexError, DexResult};
@@ -253,14 +253,19 @@ fn read_manifest_entry<R: Read + Seek>(
     archive: &mut ZipArchive<R>,
     limit: u64,
 ) -> DexResult<Manifest> {
-    let file = archive.by_name("AndroidManifest.xml")?;
+    // Header consistency also refuses duplicate names: the zip crate keeps one copy, and
+    // Android or another tool might read the other.
+    let file = archive.by_name_with_options(
+        "AndroidManifest.xml",
+        ZipReadOptions::new().enforce_header_consistency(true),
+    )?;
     if file.size() > limit {
         return Err(DexError::Message(
             "AndroidManifest.xml exceeds the size limit",
         ));
     }
     let mut buf = Vec::new();
-    file.take(limit + 1).read_to_end(&mut buf)?;
+    file.take(limit.saturating_add(1)).read_to_end(&mut buf)?;
     if buf.len() as u64 > limit {
         return Err(DexError::Message(
             "AndroidManifest.xml exceeds the size limit",

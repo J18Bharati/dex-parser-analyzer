@@ -1,4 +1,5 @@
-// Modified by Zero (2026-11-01): new module (fork M5). See NOTICE.
+// Modified by Zero (2026-11-01): new module (fork M5); manifest_error, diff catalogue check and
+// escaped text output (2026-11-02, /review). See NOTICE.
 //! `dexpa sdks`: which third-party SDKs an app contains, and `dexpa sdks diff`: what changed.
 
 use std::{fs, path::Path, path::PathBuf};
@@ -127,9 +128,12 @@ fn load_catalogue(toml: Option<&Path>, exodus: Option<&Path>) -> Result<Catalogu
 }
 
 /// The DEX buffers and, for an APK, the manifest. An APK without `AndroidManifest.xml` is read
-/// as DEX only; a manifest that is present but does not parse is an error, not silently skipped.
+/// as DEX only. A manifest that is present but does not parse is not silently skipped: Android
+/// may still install the app, so the report keeps the DEX evidence, records the error in
+/// `manifest_error`, and the error is printed on stderr.
 fn scan(input: &Path, catalogue: &Catalogue) -> Result<SdkReport> {
     let bytes = fs::read(input).with_context(|| format!("failed to read {}", input.display()))?;
+    let mut manifest_error = None;
     let (buffers, manifest): (Vec<Vec<u8>>, Option<Manifest>) = if bytes.starts_with(b"PK\x03\x04")
     {
         let buffers = read_dex_buffers_from_bytes(&bytes).context("failed to read the APK")?;
@@ -140,15 +144,22 @@ fn scan(input: &Path, catalogue: &Catalogue) -> Result<SdkReport> {
             Ok(m) => Some(m),
             Err(DexError::Zip(zip::result::ZipError::FileNotFound)) => None,
             Err(err) => {
-                return Err(err).context("failed to read AndroidManifest.xml");
+                eprintln!(
+                    "warning: {}: AndroidManifest.xml not read ({err}); the report has DEX evidence only",
+                    input.display()
+                );
+                manifest_error = Some(err.to_string());
+                None
             }
         };
         (buffers, manifest)
     } else {
         (vec![bytes], None)
     };
-    build_report(catalogue, &buffers, manifest.as_ref())
-        .with_context(|| format!("failed to read the DEX files of {}", input.display()))
+    let mut report = build_report(catalogue, &buffers, manifest.as_ref())
+        .with_context(|| format!("failed to read the DEX files of {}", input.display()))?;
+    report.manifest_error = manifest_error;
+    Ok(report)
 }
 
 fn load_report(path: &Path) -> Result<SdkReport> {
@@ -172,6 +183,27 @@ fn load_report(path: &Path) -> Result<SdkReport> {
 
 fn run_diff(old: &Path, new: &Path, format: Format) -> Result<()> {
     let (a, b) = (load_report(old)?, load_report(new)?);
+    // Another catalogue would show its differences as SDKs added or removed.
+    match (&a.catalogue_fingerprint, &b.catalogue_fingerprint) {
+        (Some(x), Some(y)) if x != y => bail!(
+            "{} and {} were made with different catalogues ({x}, {y}); rerun both with the same \
+             --catalogue and --exodus options",
+            old.display(),
+            new.display()
+        ),
+        (Some(_), Some(_)) => {}
+        _ => eprintln!(
+            "warning: a report has no catalogue_fingerprint, so whether both used the same \
+             catalogue cannot be checked"
+        ),
+    }
+    if a.package != b.package {
+        eprintln!(
+            "warning: comparing different packages: {} and {}",
+            shown(a.package.as_deref().unwrap_or("(no manifest)")),
+            shown(b.package.as_deref().unwrap_or("(no manifest)"))
+        );
+    }
     let output = DiffOutput {
         schema_version: SCHEMA_VERSION,
         old: (&a).into(),
@@ -193,22 +225,43 @@ fn print_json<T: Serialize>(value: &T) -> Result<()> {
     Ok(())
 }
 
+/// `s` with control characters and bidirectional overrides escaped (`\u{1b}`): text from an
+/// APK must not be able to move the cursor, recolour or reorder the analyst's terminal.
+fn shown(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for c in s.chars() {
+        if c.is_control() || matches!(c, '\u{202a}'..='\u{202e}' | '\u{2066}'..='\u{2069}') {
+            out.extend(c.escape_unicode());
+        } else {
+            out.push(c);
+        }
+    }
+    out
+}
+
 fn label(v: &Version) -> String {
     format!(
         "{} {} ({})",
-        v.package.as_deref().unwrap_or("(no manifest)"),
-        v.version_name.as_deref().unwrap_or("?"),
-        v.version_code.as_deref().unwrap_or("?"),
+        shown(v.package.as_deref().unwrap_or("(no manifest)")),
+        shown(v.version_name.as_deref().unwrap_or("?")),
+        shown(v.version_code.as_deref().unwrap_or("?")),
     )
 }
 
 fn print_report(input: &Path, r: &SdkReport) {
-    println!("SDKs in {}", input.display());
+    println!("SDKs in {}", shown(&input.display().to_string()));
     if let Some(package) = &r.package {
         println!(
-            "Package:        {package} {} ({})",
-            r.version_name.as_deref().unwrap_or("?"),
-            r.version_code.as_deref().unwrap_or("?")
+            "Package:        {} {} ({})",
+            shown(package),
+            shown(r.version_name.as_deref().unwrap_or("?")),
+            shown(r.version_code.as_deref().unwrap_or("?"))
+        );
+    }
+    if let Some(err) = &r.manifest_error {
+        println!(
+            "Manifest:       AndroidManifest.xml not read ({}); DEX evidence only",
+            shown(err)
         );
     }
     println!(
@@ -221,14 +274,20 @@ fn print_report(input: &Path, r: &SdkReport) {
     );
     println!("\nFound {}:", r.matches.len());
     for m in &r.matches {
-        println!("  {}  {} [{}]", m.id, m.name, m.category);
+        println!(
+            "  {}  {} [{}]",
+            shown(&m.id),
+            shown(&m.name),
+            shown(&m.category)
+        );
         for e in &m.evidence {
+            let examples: Vec<String> = e.examples.iter().map(|x| shown(x)).collect();
             println!(
                 "      {}:{}  x{}  e.g. {}",
                 e.source.as_str(),
-                e.rule,
+                shown(&e.rule),
                 e.count,
-                e.examples.join(", ")
+                examples.join(", ")
             );
         }
     }
@@ -242,23 +301,25 @@ fn print_report(input: &Path, r: &SdkReport) {
 
 fn print_diff(d: &DiffOutput) {
     println!("{}  ->  {}", label(&d.old), label(&d.new));
+    let list = |v: &[String]| v.iter().map(|x| shown(x)).collect::<Vec<_>>().join(", ");
     for event in &d.events {
         match event {
             DiffEvent::SdkAdded {
                 id,
                 name,
                 confidence,
-            } => println!("+ {id}  {name}  [{confidence:?}]"),
+            } => println!("+ {}  {}  [{confidence:?}]", shown(id), shown(name)),
             DiffEvent::SdkRemoved {
                 id,
                 name,
                 confidence,
-            } => println!("- {id}  {name}  [{confidence:?}]"),
+            } => println!("- {}  {}  [{confidence:?}]", shown(id), shown(name)),
             DiffEvent::SdkEvidenceChanged { id, gained, lost } => {
                 println!(
-                    "~ {id}  gained [{}]  lost [{}]",
-                    gained.join(", "),
-                    lost.join(", ")
+                    "~ {}  gained [{}]  lost [{}]",
+                    shown(id),
+                    list(gained),
+                    list(lost)
                 );
             }
         }

@@ -1,5 +1,7 @@
 // Modified by Zero (2026-11-01): app DEX entries are top-level classes(N).dex in numeric order,
-// and each entry read is size-limited; their sum is capped too (2026-11-02, /cso). See NOTICE.
+// and each entry read is size-limited; their sum is capped too (2026-11-02, /cso). /review
+// (2026-11-02): u64::MAX limits, ART's stop at the first missing number, duplicate names refused.
+// See NOTICE.
 //! Helpers for coordinating multiple DEX files (e.g., multi-dex APKs).
 
 use std::{
@@ -15,7 +17,7 @@ use crate::{
     model::{ClassHandle, DexFile, MethodHandle},
     parse_dex,
 };
-use zip::ZipArchive;
+use zip::{ZipArchive, ZipReadOptions};
 
 /// Identifies an item inside a specific dex file.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -278,20 +280,19 @@ fn read_dex_entries<R: Read + Seek>(archive: &mut ZipArchive<R>) -> DexResult<Ve
     read_dex_entries_limited(archive, MAX_DEX_ENTRY_BYTES, MAX_TOTAL_DEX_BYTES)
 }
 
-/// The position of an app DEX entry in load order: `classes.dex` is 1, `classesN.dex` is N
-/// (N >= 2, no leading zero). Anything else, including `*.dex` outside the archive root, is not
-/// loaded by Android as app code and returns `None`.
-fn classes_dex_index(name: &str) -> Option<u32> {
-    let stem = name.strip_prefix("classes")?.strip_suffix(".dex")?;
-    if stem.is_empty() {
-        return Some(1);
+/// The name of the `n`-th app DEX entry (from 1): `classes.dex`, then `classes2.dex`, ...
+fn classes_dex_name(n: usize) -> String {
+    if n == 1 {
+        "classes.dex".to_string()
+    } else {
+        format!("classes{n}.dex")
     }
-    if stem.starts_with('0') || !stem.bytes().all(|b| b.is_ascii_digit()) {
-        return None;
-    }
-    stem.parse::<u32>().ok().filter(|n| *n >= 2)
 }
 
+/// Reads `classes.dex`, `classes2.dex`, ... from the archive root, stopping at the first missing
+/// number, which is what ART loads (`OpenAllDexFilesFromZip`). A `classesN.dex` after a gap, or
+/// any other `*.dex`, is never loaded as app code. Duplicate entry names are refused: the zip
+/// crate keeps one copy, and another reader might keep the other.
 fn read_dex_entries_limited<R: Read + Seek>(
     archive: &mut ZipArchive<R>,
     per_entry: u64,
@@ -299,27 +300,27 @@ fn read_dex_entries_limited<R: Read + Seek>(
 ) -> DexResult<Vec<Vec<u8>>> {
     let mut entries = Vec::new();
     let mut remaining = total;
-    for i in 0..archive.len() {
-        let file = archive.by_index(i)?;
-        let name = file.name()?.into_owned();
-        let Some(index) = classes_dex_index(&name) else {
-            continue;
+    // Each number needs its own entry, so the archive's length bounds the loop.
+    for n in 1..=archive.len() {
+        let Some(i) = archive.index_for_name(&classes_dex_name(n)) else {
+            break;
         };
+        let file = archive
+            .by_index_with_options(i, ZipReadOptions::new().enforce_header_consistency(true))?;
         let limit = per_entry.min(remaining);
         if file.size() > limit {
             return Err(DexError::Message("zip entries exceed the size limit"));
         }
         // The declared size can lie; bound the read itself too.
         let mut buf = Vec::new();
-        file.take(limit + 1).read_to_end(&mut buf)?;
+        file.take(limit.saturating_add(1)).read_to_end(&mut buf)?;
         if buf.len() as u64 > limit {
             return Err(DexError::Message("zip entries exceed the size limit"));
         }
         remaining -= buf.len() as u64;
         if buf.starts_with(b"dex\n") {
-            entries.push((index, buf));
+            entries.push(buf);
         }
     }
-    entries.sort_by_key(|(index, _)| *index);
-    Ok(entries.into_iter().map(|(_, data)| data).collect())
+    Ok(entries)
 }

@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new test file (fork M1). See NOTICE.
+// Modified by Zero (2026-11-01): new test file (fork M1); review fixes (2026-11-02). See NOTICE.
 //! Which zip entries count as the app's DEX files, in what order, and how much is read.
 //!
 //! Android loads `classes.dex`, then `classes2.dex`, `classes3.dex`, ... from the archive root.
@@ -34,17 +34,65 @@ fn dex_entries_are_in_numeric_order() {
         fixture("Test.dex"),
         fixture("StringTests.dex"),
     );
-    // Written out of order on purpose: the archive's order must not matter either.
-    let apk = zip_of(&[
-        ("classes10.dex", &ten),
-        ("classes.dex", &one),
-        ("classes2.dex", &two),
-    ]);
-    let got = read_dex_buffers_from_bytes(&apk).unwrap();
-    assert_eq!(got.len(), 3);
+    // classes.dex .. classes10.dex, written out of order on purpose: the archive's order must
+    // not matter, and a text sort would put classes10.dex before classes2.dex.
+    let names: Vec<String> = (3..=9).map(|n| format!("classes{n}.dex")).collect();
+    let mut entries: Vec<(&str, &[u8])> = vec![("classes10.dex", &ten), ("classes.dex", &one)];
+    entries.extend(names.iter().map(|n| (n.as_str(), one.as_slice())));
+    entries.push(("classes2.dex", &two));
+    let got = read_dex_buffers_from_bytes(&zip_of(&entries)).unwrap();
+    assert_eq!(got.len(), 10);
     assert!(got[0] == one, "classes.dex first");
     assert!(got[1] == two, "classes2.dex second");
-    assert!(got[2] == ten, "classes10.dex last, not before classes2.dex");
+    assert!(got[9] == ten, "classes10.dex last, not before classes2.dex");
+}
+
+/// /review (2026-11-02): ART loads classes.dex, classes2.dex, ... and stops at the first missing
+/// number. A classesN.dex after a gap is never loaded, so it is not app code: it must neither
+/// add classes nor, when it does not parse, block the analysis of the real ones.
+#[test]
+fn dex_entries_stop_at_the_first_gap() {
+    let one = fixture("classes.dex");
+    // Other entries make the archive long enough that a loop which skipped the gap would
+    // reach classes3.dex.
+    let apk = zip_of(&[
+        ("AndroidManifest.xml", b"not read here"),
+        ("resources.arsc", b"not read here"),
+        ("classes.dex", &one),
+        ("classes3.dex", b"dex\n035\0not really a dex file"),
+    ]);
+    let got = read_dex_buffers_from_bytes(&apk).unwrap();
+    assert_eq!(
+        got.len(),
+        1,
+        "classes3.dex follows a gap: Android never loads it"
+    );
+    assert!(got[0] == one);
+}
+
+/// /review (2026-11-02): the zip crate keeps one of two entries with the same name, and other
+/// readers may keep the other one. Two `classes.dex` entries are refused, not silently merged.
+#[test]
+fn duplicate_entry_names_are_refused() {
+    let (one, other) = (fixture("classes.dex"), fixture("Test.dex"));
+    let mut apk = zip_of(&[("classes.dex", &one), ("classes.dey", &other)]);
+    replace_all(&mut apk, b"classes.dey", b"classes.dex");
+    assert!(read_dex_buffers_from_bytes(&apk).is_err());
+}
+
+/// Renames entries in a built archive (local headers and central directory alike), to make
+/// archives that `ZipWriter` refuses to write.
+fn replace_all(bytes: &mut [u8], from: &[u8], to: &[u8]) {
+    assert_eq!(from.len(), to.len());
+    let mut i = 0;
+    while i + from.len() <= bytes.len() {
+        if &bytes[i..i + from.len()] == from {
+            bytes[i..i + from.len()].copy_from_slice(to);
+            i += from.len();
+        } else {
+            i += 1;
+        }
+    }
 }
 
 #[test]
@@ -108,3 +156,14 @@ fn the_sum_of_entries_is_capped_as_well() {
 
 // Room for several full-size DEX files: checked at compile time.
 const _: () = assert!(MAX_TOTAL_DEX_BYTES >= 4 * (1 << 28));
+
+/// /review (2026-11-02): `u64::MAX` as a limit means "no limit". `limit + 1` overflowed on it:
+/// a panic in debug builds, and in release `take(0)`, which silently dropped every entry.
+#[test]
+fn u64_max_limits_mean_no_limit() {
+    let one = fixture("classes.dex");
+    let apk = zip_of(&[("classes.dex", &one)]);
+    let got = read_dex_buffers_from_bytes_with_limits(&apk, u64::MAX, u64::MAX).unwrap();
+    assert_eq!(got.len(), 1);
+    assert!(got[0] == one);
+}

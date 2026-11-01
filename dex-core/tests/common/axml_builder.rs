@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new test helper (fork M1b). See NOTICE.
+// Modified by Zero (2026-11-01): new test helper (fork M1b); review shapes (2026-11-02). See NOTICE.
 //! Builds Android binary XML (AXML) documents for tests, written from the chunk layout in
 //! AOSP's ResourceTypes.h. There is no AXML fixture in the repo and third-party APKs are not
 //! committed, so tests build the documents they need, in both string-pool encodings.
@@ -14,6 +14,9 @@ pub enum V {
     Hex(u32),
     Bool(bool),
     Ref(u32),
+    /// A string whose raw index and typed index name different pool strings (raw, typed).
+    /// Android reads string attributes through the raw index.
+    StrSplit(String, String),
 }
 
 #[derive(Clone)]
@@ -72,6 +75,10 @@ pub struct Opts {
     pub strip_names: bool,
     /// Insert a chunk of an unknown type after the resource map.
     pub unknown_chunk: bool,
+    /// Emit the root element a second time after the first one closes.
+    pub second_root: bool,
+    /// Put the string pool after the element chunks instead of before them.
+    pub pool_after_body: bool,
 }
 
 struct Pool {
@@ -117,6 +124,9 @@ pub fn build(root: &El, opts: &Opts) -> Vec<u8> {
     // start namespace
     node(&mut body, 0x0100, &[ns_prefix, ns_uri]);
     emit(root, &mut pool, &id_names, ns_uri, &mut body);
+    if opts.second_root {
+        emit(root, &mut pool, &id_names, ns_uri, &mut body);
+    }
     node(&mut body, 0x0101, &[ns_prefix, ns_uri]);
 
     let mut strings = pool.strings.clone();
@@ -126,7 +136,9 @@ pub fn build(root: &El, opts: &Opts) -> Vec<u8> {
         }
     }
     let mut out = Vec::new();
-    out.extend(string_pool(&strings, opts.utf8));
+    if !opts.pool_after_body {
+        out.extend(string_pool(&strings, opts.utf8));
+    }
     let mut map = Vec::new();
     for (_, id) in &id_names {
         map.extend(id.to_le_bytes());
@@ -136,6 +148,9 @@ pub fn build(root: &El, opts: &Opts) -> Vec<u8> {
         out.extend(chunk(0x0777, 8, &[1, 2, 3, 4, 5, 6, 7, 8]));
     }
     out.extend(body);
+    if opts.pool_after_body {
+        out.extend(string_pool(&strings, opts.utf8));
+    }
     let mut doc = Vec::new();
     doc.extend(0x0003u16.to_le_bytes());
     doc.extend(8u16.to_le_bytes());
@@ -163,6 +178,7 @@ fn emit(e: &El, pool: &mut Pool, id_names: &[(&str, u32)], ns_uri: u32, out: &mu
                 let i = pool.index(v);
                 (i, 0x03u8, i)
             }
+            V::StrSplit(raw, typed) => (pool.index(raw), 0x03u8, pool.index(typed)),
             V::Int(v) => (NO_INDEX, 0x10, *v as u32),
             V::Hex(v) => (NO_INDEX, 0x11, *v),
             V::Bool(v) => (NO_INDEX, 0x12, if *v { 0xffff_ffff } else { 0 }),

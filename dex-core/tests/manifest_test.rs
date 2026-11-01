@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new test file (fork M1b). See NOTICE.
+// Modified by Zero (2026-11-01): new test file (fork M1b); review fixes (2026-11-02). See NOTICE.
 //! The AXML parser and the AndroidManifest model.
 
 #[path = "common/axml_builder.rs"]
@@ -428,4 +428,65 @@ fn manifest_is_read_from_an_apk() {
         "over the cap"
     );
     assert!(read_manifest_from_apk_bytes_with_limit(&apk, doc.len() as u64).is_ok());
+}
+
+/// /review (2026-11-02): `u64::MAX` as a limit means "no limit"; `limit + 1` overflowed on it.
+#[test]
+fn a_u64_max_manifest_limit_means_no_limit() {
+    let doc = build(&sample(), &Opts::default());
+    let apk = apk_with(&[("AndroidManifest.xml", &doc)]);
+    check_sample(&read_manifest_from_apk_bytes_with_limit(&apk, u64::MAX).unwrap());
+}
+
+/// /review (2026-11-02): Android reads a string attribute through its raw string index (AOSP
+/// `ResXMLParser::getAttributeStringValue`, which `getAttributeValue(null, "package")` uses), not
+/// through the typed value. A manifest whose two indexes disagree must show what Android sees.
+#[test]
+fn a_string_attribute_reads_its_raw_value_like_android() {
+    let mut root = sample();
+    root.attrs[0] = pa(
+        "package",
+        V::StrSplit("org.example.real".into(), "org.example.decoy".into()),
+    );
+    let m = parse_manifest(&build(&root, &Opts::default())).unwrap();
+    assert_eq!(m.package.as_deref(), Some("org.example.real"));
+}
+
+/// /review (2026-11-02): one root element only; a second one is an error, not a replacement.
+#[test]
+fn a_second_root_element_is_an_error() {
+    let opts = Opts {
+        second_root: true,
+        ..Opts::default()
+    };
+    assert!(parse_axml(&build(&sample(), &opts)).is_err());
+    assert!(parse_axml(&build(&sample(), &Opts::default())).is_ok());
+}
+
+/// /review (2026-11-02): elements name their strings by pool index, so a pool that comes after
+/// them is an error.
+#[test]
+fn an_element_before_the_string_pool_is_an_error() {
+    let opts = Opts {
+        pool_after_body: true,
+        ..Opts::default()
+    };
+    assert!(parse_axml(&build(&sample(), &opts)).is_err());
+}
+
+/// /review (2026-11-02): two `AndroidManifest.xml` entries are refused: the zip crate keeps one
+/// of them, and Android or another tool may read the other.
+#[test]
+fn duplicate_manifest_entries_are_refused() {
+    let doc = build(&sample(), &Opts::default());
+    let mut apk = apk_with(&[("AndroidManifest.xml", &doc), ("AndroidManifest.xmm", &doc)]);
+    let (from, to) = (b"AndroidManifest.xmm", b"AndroidManifest.xml");
+    let mut i = 0;
+    while i + from.len() <= apk.len() {
+        if &apk[i..i + from.len()] == from {
+            apk[i..i + from.len()].copy_from_slice(to);
+        }
+        i += 1;
+    }
+    assert!(read_manifest_from_apk_bytes(&apk).is_err());
 }

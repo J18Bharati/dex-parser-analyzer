@@ -1,10 +1,11 @@
-# Modified by Zero (2026-11-01): new test file (fork M6). See NOTICE.
+# Modified by Zero (2026-11-01): new test file (fork M6); run-loop tests (2026-11-02, /review). See NOTICE.
 """Offline tests for eval/fdroid.py. No network: the "repo" is a temp directory served as file://.
 
 Run: python3 -m unittest discover -s eval/tests   (or `just eval-test`).
 """
 
 import hashlib
+import json
 import sys
 import tempfile
 import tomllib
@@ -380,6 +381,88 @@ class RunTest(unittest.TestCase):
             fdroid.check_tools(str(tool))
             rc = fdroid.main(["run", "--dexpa", str(Path(d) / "nope"), "--manifest-tool", str(tool), "--dest", d])
             self.assertEqual(rc, 1)
+
+
+FAKE_DEXPA = """#!/bin/sh
+# Stands in for `dexpa`: `sdks diff A B ...` prints no events, `sdks FILE ...` a minimal report.
+if [ "$2" = "diff" ]; then echo '{"events": []}'; exit 0; fi
+case "$2" in *bad*) echo "boom" >&2; exit 1;; esac
+echo '{"matches": [], "class_count": 1}'
+"""
+
+FAKE_MANIFEST = """#!/bin/sh
+case "$1" in *nomanifest*) echo "no manifest" >&2; exit 1;; esac
+echo '{"package": "org.example", "version_code": {"type": "int", "value": 1}, "version_name": {"type": "string", "value": "1.0"}, "min_sdk": {"type": "int", "value": 21}, "target_sdk": {"type": "int", "value": 34}, "uses_permissions": []}'
+"""
+
+SLOW_TOOL = """#!/bin/sh
+sleep 5
+"""
+
+
+class RunLoopTest(unittest.TestCase):
+    """/review (2026-11-02): `run` end to end over a file:// repo, with stand-in tools."""
+
+    def setUp(self):
+        self.r = Repo()
+        self.addCleanup(self.r.close)
+        self.out = self.r.root / "out"
+
+    def tool(self, name, text):
+        path = self.r.root / name
+        path.write_text(text)
+        path.chmod(0o755)
+        return str(path)
+
+    def run_main(self, entries, dexpa=FAKE_DEXPA, manifest=FAKE_MANIFEST, extra=()):
+        lock = self.r.root / "lock.toml"
+        lock.write_text(fdroid.lock_toml({"index_sha256": "ab" * 32, "entry_timestamp": 1, "seed": "s"}, entries))
+        return fdroid.main([
+            "run", "--lock", str(lock), "--dest", str(self.r.dest), "--base-url", self.r.base,
+            "--out", str(self.out), "--min-free", "0", "--pause", "0",
+            "--dexpa", self.tool("dexpa", dexpa), "--manifest-tool", self.tool("manifest", manifest), *extra,
+        ])
+
+    def results(self):
+        return json.loads((self.out / "results.json").read_text())
+
+    def test_a_failed_fetch_is_recorded_and_the_run_goes_on(self):
+        good = self.r.add("/org.example_1.apk", b"A" * 10, version_code=1)
+        gone = self.r.add("/org.example_2.apk", b"B" * 10, version_code=2)
+        (self.r.repo / "org.example_2.apk").unlink()  # a 404 on the real repo
+        wrong = self.r.add("/org.example_3.apk", b"C" * 10, version_code=3, sha256="0" * 64)
+        self.assertEqual(self.run_main([good, gone, wrong]), 0)
+        res = self.results()
+        self.assertEqual(sorted(res["failures"]), ["org.example_2", "org.example_3"])
+        self.assertEqual(res["strata"]["control"]["analysed"], 1)
+        self.assertTrue((self.out / "TABLE.md").exists())
+
+    def test_a_hung_tool_times_out_as_that_apks_failure(self):
+        e = self.r.add("/org.example_1.apk", b"A" * 10)
+        self.assertEqual(self.run_main([e], dexpa=SLOW_TOOL, extra=("--tool-timeout", "0.5")), 0)
+        self.assertIn("timed out", self.results()["failures"]["org.example_1"])
+
+    def test_a_manifest_failure_is_a_failure_only(self):
+        e = self.r.add("/nomanifest_1.apk", b"A" * 10, package="nomanifest")
+        self.assertEqual(self.run_main([e]), 0)
+        st = self.results()["strata"]["control"]
+        self.assertEqual((st["analysed"], st["failed"]), (0, 1), "not counted as both")
+        self.assertFalse((self.out / "reports" / "nomanifest_1.json").exists())
+
+    def test_a_refused_base_url_stops_the_run_instead_of_failing_each_apk(self):
+        e = self.r.add("/org.example_1.apk", b"A" * 10)
+        self.r.base = "http://f-droid.org/repo"
+        self.assertEqual(self.run_main([e]), 1)
+
+    def test_reports_from_earlier_runs_do_not_survive(self):
+        e = self.r.add("/bad_1.apk", b"A" * 10, package="bad")
+        reports = self.out / "reports"
+        reports.mkdir(parents=True)
+        (reports / "bad_1.json").write_text("{}")  # this APK's report from an earlier run
+        (reports / "gone.app_7.json").write_text("{}")  # an app no longer in the lock
+        self.assertEqual(self.run_main([e]), 0)
+        self.assertEqual(list(reports.iterdir()), [])
+
 
 if __name__ == "__main__":
     unittest.main()

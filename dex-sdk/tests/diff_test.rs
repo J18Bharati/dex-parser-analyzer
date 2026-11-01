@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new test file (fork M4). See NOTICE.
+// Modified by Zero (2026-11-01): new test file (fork M4); new report fields (2026-11-02, /review). See NOTICE.
 use dexpa_sdk::catalogue::Origin;
 use dexpa_sdk::diff::{Confidence, DiffEvent, diff};
 use dexpa_sdk::matcher::{Evidence, SdkMatch, Source};
@@ -35,6 +35,8 @@ fn report(matches: Vec<SdkMatch>) -> SdkReport {
         catalogue_size: 25,
         skipped_signatures: 0,
         attribution: None,
+        catalogue_fingerprint: None,
+        manifest_error: None,
         matches,
     }
 }

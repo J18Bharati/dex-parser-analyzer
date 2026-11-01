@@ -1,8 +1,10 @@
 {
   "attribution": null,
+  "catalogue_fingerprint": "fnv1a64:608ed0e5cc895aec",
   "catalogue_size": 25,
   "class_count": 5,
   "dex_count": 1,
+  "manifest_error": null,
   "matches": [
     {
       "category": "analytics",
