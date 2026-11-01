@@ -39,5 +39,7 @@ Each changed file carries a "Modified by" note. Changes so far:
   project's own SDK list, written by hand; no Exodus data is included), and
   dex-sdk/tests/matcher_test.rs; dex-sdk depends on regex, serde_json, thiserror and toml
   (Cargo.lock); docs/architecture.md; CHANGELOG.md.
+- M4: dex-sdk/src/report.rs, dex-sdk/src/diff.rs and dex-sdk/tests/diff_test.rs; Deserialize on
+  the match types; docs/architecture.md; CHANGELOG.md.
 
 Upstream tests edited: none.

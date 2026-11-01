@@ -62,3 +62,9 @@ From the 2026-11-01 eng review of the plan. They are recorded here before any AP
   - a bad regex made fatal.
 - **Fuzzing `parse_manifest` for 60 s (M1 follow-up):** 6.7 million inputs, 210 edges covered, no crash and no panic. The nightly fuzz shell took 2 GB of disk; 29 GB free after.
 - **The bundled catalogue (25 SDKs) is written from memory of public package names and documented manifest keys.** Every entry is a hypothesis until M6 sees it in a real APK. The table there should report, per entry, whether it matched anything at all.
+
+## 2026-11-01: the version diff (M4)
+
+- Moved ahead of the F-Droid milestone, so the tool is complete offline even if M6's network budget fails.
+- **Rule:** compare which SDKs are present and the kinds of evidence (`source:rule`), never counts or DEX placement. A rebuild moves classes between `classesN.dex` files and changes counts without changing what the app contains.
+- **Mutation check:** 4 mutants, 4 killed. Two of them target the "no event" tests, which had passed trivially against the empty stub, so those tests do carry weight.

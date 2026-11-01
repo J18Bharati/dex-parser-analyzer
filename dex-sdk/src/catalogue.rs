@@ -2,7 +2,7 @@
 //! SDK catalogues: this project's TOML list, and an importer for Exodus tracker files.
 
 use regex::Regex;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 /// Errors loading a catalogue.
 #[derive(Debug, thiserror::Error)]
@@ -21,7 +21,7 @@ pub enum CatalogueError {
 }
 
 /// Where an SDK definition came from.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Origin {
     /// This project's TOML catalogue.

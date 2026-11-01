@@ -8,5 +8,7 @@
 //! only referenced (`java.lang.Object`, a Play Services API stub the app calls) are not counted.
 
 pub mod catalogue;
+pub mod diff;
 pub mod inventory;
 pub mod matcher;
+pub mod report;

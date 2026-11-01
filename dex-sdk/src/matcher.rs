@@ -2,13 +2,13 @@
 //! Matching a catalogue against an inventory and a manifest, with the evidence for each match.
 
 use dexpa_core::manifest::Manifest;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::catalogue::{Catalogue, Origin, Rule};
 use crate::inventory::Inventory;
 
 /// What kind of evidence supports a match.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Source {
     /// Classes the app defines.
@@ -21,7 +21,7 @@ pub enum Source {
 }
 
 /// One piece of evidence: everything one rule matched from one source.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Evidence {
     /// The source.
     pub source: Source,
@@ -39,7 +39,7 @@ pub struct Evidence {
 pub const MAX_EXAMPLES: usize = 3;
 
 /// One SDK found, with its evidence.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SdkMatch {
     /// Catalogue id.
     pub id: String,
