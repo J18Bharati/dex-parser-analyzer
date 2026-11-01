@@ -23,5 +23,10 @@ Each changed file carries a "Modified by" note. Changes so far:
 
 - M0: NOTES.md (dated findings: the baseline test count and the `just ci` result) and this
   entry. No upstream file's behaviour is changed.
+- M1a: dex-core/src/multidex.rs reads only the archive-root classes.dex and classesN.dex, in
+  numeric order (upstream sorted names as text and accepted any *.dex at any path), and caps each
+  entry read (MAX_DEX_ENTRY_BYTES, read_dex_buffers_from_bytes_with_limit). New test file
+  dex-core/tests/apk_entries_test.rs; zip added as a dev-dependency of dex-core (same version).
+  CHANGELOG.md [Unreleased].
 
 Upstream tests edited: none.

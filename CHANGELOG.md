@@ -1,3 +1,4 @@
+<!-- Modified by Zero (2026-11-01): fork entries marked (fork). See NOTICE. -->
 # Changelog
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project adheres to [Semantic Versioning](https://semver.org/).
@@ -5,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Changed
+- (fork) An APK's DEX files are now the archive-root `classes.dex`, `classes2.dex`, ... in numeric order, which is what Android loads. Before, entry names were sorted as text, so `classes10.dex` came before `classes2.dex`, and any `*.dex` anywhere in the archive (for example `assets/plugin.dex`) was read as app code. Each entry read is capped at `MAX_DEX_ENTRY_BYTES` (256 MiB); a larger entry is an error, not a truncation. `read_dex_buffers_from_bytes_with_limit` takes a caller's limit.
 - The GUI loads nothing from a third party: Bootstrap's CSS is self-hosted, the unused highlight.js (it ran before the app rendered, so it never highlighted anything) is gone, and a release build carries a Content-Security-Policy that allows only the page's own scripts, styles and wasm. The Pages deploy builds the bundle with the flake (pinned trunk, cached) and runs on changes to any crate the GUI links, not only `dex-gui/`.
 - **Breaking:** `Finding` gains `cwe` (the rule's CWE number) and `remediation` (what to change), filled by the engine from the new `rules::RULES` catalogue; both deserialize as `null` when absent, so older JSON reports still load.
 - The report lists findings most severe first, with exact duplicates removed, before `max_findings` truncates it, so a cap keeps the most severe findings (previously it kept the first ones emitted). `Severity` is now `Ord`.

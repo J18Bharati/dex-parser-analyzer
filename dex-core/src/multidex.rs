@@ -1,3 +1,5 @@
+// Modified by Zero (2026-11-01): app DEX entries are top-level classes(N).dex in numeric order,
+// and each entry read is size-limited. See NOTICE.
 //! Helpers for coordinating multiple DEX files (e.g., multi-dex APKs).
 
 use std::{
@@ -8,7 +10,7 @@ use std::{
 };
 
 use crate::{
-    error::DexResult,
+    error::{DexError, DexResult},
     format::{ClassIdx, MethodIdx, StringIdx, TypeIdx},
     model::{ClassHandle, DexFile, MethodHandle},
     parse_dex,
@@ -228,6 +230,13 @@ pub fn read_dex_buffers_from_bytes(bytes: &[u8]) -> DexResult<Vec<Vec<u8>>> {
     read_dex_entries(&mut archive)
 }
 
+/// Like [`read_dex_buffers_from_bytes`], with a per-entry size limit in bytes.
+pub fn read_dex_buffers_from_bytes_with_limit(bytes: &[u8], limit: u64) -> DexResult<Vec<Vec<u8>>> {
+    let cursor = Cursor::new(bytes);
+    let mut archive = ZipArchive::new(cursor)?;
+    read_dex_entries_limited(&mut archive, limit)
+}
+
 fn method_descriptor(dex: &DexFile<'_>, idx: MethodIdx) -> Option<String> {
     let method = dex.method(idx)?;
     let class = method.class()?.descriptor().ok()?.to_string();
@@ -247,20 +256,52 @@ fn method_descriptor(dex: &DexFile<'_>, idx: MethodIdx) -> Option<String> {
     Some(format!("{class}->{name}{params}"))
 }
 
+/// Default per-entry limit for a DEX entry read from an archive: 256 MiB. A real DEX is far
+/// smaller (method and field ids are 16-bit), so this bounds memory on hostile archives.
+pub const MAX_DEX_ENTRY_BYTES: u64 = 256 * 1024 * 1024;
+
 fn read_dex_entries<R: Read + Seek>(archive: &mut ZipArchive<R>) -> DexResult<Vec<Vec<u8>>> {
+    read_dex_entries_limited(archive, MAX_DEX_ENTRY_BYTES)
+}
+
+/// The position of an app DEX entry in load order: `classes.dex` is 1, `classesN.dex` is N
+/// (N >= 2, no leading zero). Anything else, including `*.dex` outside the archive root, is not
+/// loaded by Android as app code and returns `None`.
+fn classes_dex_index(name: &str) -> Option<u32> {
+    let stem = name.strip_prefix("classes")?.strip_suffix(".dex")?;
+    if stem.is_empty() {
+        return Some(1);
+    }
+    if stem.starts_with('0') || !stem.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    stem.parse::<u32>().ok().filter(|n| *n >= 2)
+}
+
+fn read_dex_entries_limited<R: Read + Seek>(
+    archive: &mut ZipArchive<R>,
+    limit: u64,
+) -> DexResult<Vec<Vec<u8>>> {
     let mut entries = Vec::new();
     for i in 0..archive.len() {
-        let mut file = archive.by_index(i)?;
+        let file = archive.by_index(i)?;
         let name = file.name()?.into_owned();
-        if !name.ends_with(".dex") {
+        let Some(index) = classes_dex_index(&name) else {
             continue;
+        };
+        if file.size() > limit {
+            return Err(DexError::Message("zip entry exceeds the size limit"));
         }
+        // The declared size can lie; bound the read itself too.
         let mut buf = Vec::new();
-        file.read_to_end(&mut buf)?;
+        file.take(limit + 1).read_to_end(&mut buf)?;
+        if buf.len() as u64 > limit {
+            return Err(DexError::Message("zip entry exceeds the size limit"));
+        }
         if buf.starts_with(b"dex\n") {
-            entries.push((name, buf));
+            entries.push((index, buf));
         }
     }
-    entries.sort_by(|a, b| a.0.cmp(&b.0));
+    entries.sort_by_key(|(index, _)| *index);
     Ok(entries.into_iter().map(|(_, data)| data).collect())
 }

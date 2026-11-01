@@ -1,3 +1,4 @@
+# Modified by Zero (2026-11-01): zip as a dev-dependency for the fork's APK entry tests. See NOTICE.
 [package]
 name = "dexpa-core"
 description = "Parser for Android DEX files: header, sections, classes, methods, bytecode, CFG, call graph and multi-dex APK input"
@@ -22,3 +23,5 @@ zip = { version = "9", default-features = false, features = ["deflate"] }
 
 [dev-dependencies]
 serde_json = "1.0"
+# Fork M1: tests build APKs in memory with zip::ZipWriter (same crate and version as above).
+zip = { version = "9", default-features = false, features = ["deflate"] }
