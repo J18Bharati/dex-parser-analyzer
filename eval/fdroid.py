@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# Modified by Zero (2026-11-01): new file (fork M6); run-loop fixes (2026-11-02, /review). See NOTICE.
+# Modified by Zero (2026-11-01): new file (fork M6); run-loop fixes (2026-11-02, /review); reports
+# cleared before a run, tool errors per APK, UTF-8 lockfile (re-review). See NOTICE.
 """The F-Droid evaluation of `dexpa sdks`: select apps, fetch them under a budget, analyse them.
 
   select  Verify F-Droid's signed entry.jar against the pinned key, fetch index-v2.json (its
@@ -251,7 +252,8 @@ def _toml_value(v) -> str:
     if isinstance(v, int):
         return str(v)
     if isinstance(v, str):
-        return json.dumps(v)  # JSON string escapes are valid TOML basic-string escapes
+        # JSON's escapes are valid TOML except surrogate pairs, which ensure_ascii=False avoids.
+        return json.dumps(v, ensure_ascii=False)
     if isinstance(v, list):
         return "[" + ", ".join(_toml_value(x) for x in v) + "]"
     raise TypeError(type(v))
@@ -296,7 +298,7 @@ def cmd_select(args) -> None:
         "versions_per_app": args.versions,
         "max_apk_bytes": args.max_file,
     }
-    Path(args.lock).write_text(lock_toml(source, entries))
+    Path(args.lock).write_text(lock_toml(source, entries), encoding="utf-8")
     counts = Counter(e["stratum"] for e in entries)
     print(f"wrote {args.lock}: {len(entries)} APKs, {sum(e['size'] for e in entries) / 1e6:.0f} MB, {dict(counts)}")
 
@@ -473,13 +475,21 @@ def table_md(results: dict, lock_source: dict) -> str:
 
 
 def _json_cmd(cmd: list[str], timeout: float = TOOL_TIMEOUT_SECONDS) -> dict:
+    """The JSON a tool prints. Every way it can fail is a RuntimeError, which the caller records
+    as that APK's (or that pair's) failure."""
+    name = Path(cmd[0]).name
     try:
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
     except subprocess.TimeoutExpired:
-        raise RuntimeError(f"{Path(cmd[0]).name} timed out after {timeout} s") from None
+        raise RuntimeError(f"{name} timed out after {timeout} s") from None
+    except OSError as err:  # the tool exists but cannot start
+        raise RuntimeError(f"{name} did not start: {err}") from None
     if r.returncode != 0:
-        raise RuntimeError(f"{Path(cmd[0]).name} exited {r.returncode}: {r.stderr.strip()[:300]}")
-    return json.loads(r.stdout)
+        raise RuntimeError(f"{name} exited {r.returncode}: {r.stderr.strip()[:300]}")
+    try:
+        return json.loads(r.stdout)
+    except json.JSONDecodeError as err:
+        raise RuntimeError(f"{name} printed something that is not JSON: {err}") from None
 
 
 def _budget(args) -> Budget:
@@ -487,7 +497,7 @@ def _budget(args) -> Budget:
 
 
 def load_lock(path) -> dict:
-    lock = tomllib.loads(Path(path).read_text())
+    lock = tomllib.loads(Path(path).read_text(encoding="utf-8"))
     if lock.get("version") != 1:
         raise VerifyError(f"{path}: unknown lock version {lock.get('version')}")
     return lock
@@ -518,12 +528,11 @@ def cmd_run(args) -> None:
     state = FetchState(_budget(args))
     reports, checks, failures = {}, {}, {}
     sdks_cmd = [args.dexpa, "sdks"] + (["--exodus", args.exodus] if args.exodus else [])
-    # reports/ holds this lock's reports only: one left from an earlier run or lock would
-    # disagree with results.json.
-    keys = {_key(e) for e in lock["apk"]}
+    # reports/ holds this run's reports only. Every report is rewritten when its APK is analysed,
+    # so one left from an earlier run (another lock, an APK that now fails, one an aborted run
+    # never reached) could only disagree with results.json.
     for old in reports_dir.glob("*.json"):
-        if old.stem not in keys:
-            old.unlink()
+        old.unlink()
     aborted = None
     for e in lock["apk"]:
         k = _key(e)
@@ -535,16 +544,14 @@ def cmd_run(args) -> None:
             break
         except (VerifyError, OSError) as err:  # a 404, a timeout, a hash that does not match
             failures[k] = f"fetch: {err}"
-            report_file.unlink(missing_ok=True)
             print(f"{k}: not fetched: {err}", flush=True)
             continue
         try:
             report = _json_cmd(sdks_cmd + [str(path), "--format", "json"], args.tool_timeout)
             check = cross_check(_json_cmd([args.manifest_tool, str(path)], args.tool_timeout), e)
-        except (RuntimeError, json.JSONDecodeError) as err:
+        except RuntimeError as err:
             # Both analyses or neither: a report without its cross-check would count twice.
             failures[k] = str(err)
-            report_file.unlink(missing_ok=True)
         else:
             reports[k], checks[k] = report, check
             report_file.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")

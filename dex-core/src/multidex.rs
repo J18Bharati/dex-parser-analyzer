@@ -1,6 +1,7 @@
 // Modified by Zero (2026-11-01): app DEX entries are top-level classes(N).dex in numeric order,
 // and each entry read is size-limited; their sum is capped too (2026-11-02, /cso). /review
-// (2026-11-02): u64::MAX limits, ART's stop at the first missing number, duplicate names refused.
+// (2026-11-02): u64::MAX limits, ART's stop at the first missing number, duplicate names refused,
+// a numbered entry that is not DEX is an error.
 // See NOTICE.
 //! Helpers for coordinating multiple DEX files (e.g., multi-dex APKs).
 
@@ -318,9 +319,12 @@ fn read_dex_entries_limited<R: Read + Seek>(
             return Err(DexError::Message("zip entries exceed the size limit"));
         }
         remaining -= buf.len() as u64;
-        if buf.starts_with(b"dex\n") {
-            entries.push(buf);
+        // ART refuses an app whose numbered entry is not a DEX file; skipping it would
+        // undercount the app's code without a word.
+        if !buf.starts_with(b"dex\n") {
+            return Err(DexError::Message("a classesN.dex entry is not a DEX file"));
         }
+        entries.push(buf);
     }
     Ok(entries)
 }

@@ -70,6 +70,19 @@ fn dex_entries_stop_at_the_first_gap() {
     assert!(got[0] == one);
 }
 
+/// Re-review (2026-11-02): ART refuses an app whose numbered DEX entry is not a DEX file. One
+/// was skipped silently, so the report undercounted and its classes were missing.
+#[test]
+fn a_numbered_entry_that_is_not_dex_is_an_error() {
+    let one = fixture("classes.dex");
+    let apk = zip_of(&[
+        ("classes.dex", &one),
+        ("classes2.dex", b"PK\x03\x04 not a dex file"),
+        ("classes3.dex", &one),
+    ]);
+    assert!(read_dex_buffers_from_bytes(&apk).is_err());
+}
+
 /// /review (2026-11-02): the zip crate keeps one of two entries with the same name, and other
 /// readers may keep the other one. Two `classes.dex` entries are refused, not silently merged.
 #[test]

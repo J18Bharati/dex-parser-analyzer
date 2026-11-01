@@ -1,4 +1,5 @@
-// Modified by Zero (2026-11-01): new module (fork M4); uses Source::as_str (M5). See NOTICE.
+// Modified by Zero (2026-11-01): new module (fork M4); uses Source::as_str (M5); unread manifests
+// are uncertain (2026-11-02, /review). See NOTICE.
 //! SDK changes between two versions of an app.
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -12,9 +13,11 @@ use crate::report::SdkReport;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Confidence {
-    /// The side that has the SDK has manifest evidence, which minification does not rename.
+    /// The side that has the SDK has manifest evidence, which minification does not rename, and
+    /// the other side's manifest was read.
     Strong,
     /// Class-name evidence only: R8 renaming can make it appear or vanish with no real change.
+    /// Also when the other side's manifest was not read, so its absence there proves nothing.
     Uncertain,
 }
 
@@ -51,12 +54,19 @@ pub enum DiffEvent {
     },
 }
 
-fn confidence(m: &SdkMatch) -> Confidence {
-    if m.evidence.iter().any(|e| e.source != Source::DexClass) {
+/// `m` is on one side; `other` is the report it is missing from.
+fn confidence(m: &SdkMatch, other: &SdkReport) -> Confidence {
+    if manifest_read(other) && m.evidence.iter().any(|e| e.source != Source::DexClass) {
         Confidence::Strong
     } else {
         Confidence::Uncertain
     }
+}
+
+/// Whether a report's manifest evidence can be trusted to be complete: a DEX-only input has no
+/// package, and a manifest that did not parse has `manifest_error`.
+pub fn manifest_read(r: &SdkReport) -> bool {
+    r.package.is_some() && r.manifest_error.is_none()
 }
 
 fn kinds(m: &SdkMatch) -> BTreeSet<String> {
@@ -80,12 +90,12 @@ pub fn diff(old: &SdkReport, new: &SdkReport) -> Vec<DiffEvent> {
             (None, Some(n)) => events.push(DiffEvent::SdkAdded {
                 id: id.into(),
                 name: n.name.clone(),
-                confidence: confidence(n),
+                confidence: confidence(n, old),
             }),
             (Some(o), None) => events.push(DiffEvent::SdkRemoved {
                 id: id.into(),
                 name: o.name.clone(),
-                confidence: confidence(o),
+                confidence: confidence(o, new),
             }),
             (Some(o), Some(n)) => {
                 let (ko, kn) = (kinds(o), kinds(n));

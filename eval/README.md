@@ -25,7 +25,7 @@ nix develop .#eval -c just fdroid-eval     # fetch, analyse, delete; writes resu
 
 The full table is in [TABLE.md](TABLE.md); per-APK reports are in [reports/](reports/) and aggregates in [results.json](results.json).
 
-The committed reports were made before `catalogue_fingerprint` and `manifest_error` existed, so they lack both, and `dexpa sdks diff` warns that it cannot check their catalogues. The run also predates two parser changes from review: DEX files now stop at the first missing number, and an APK with duplicate entry names is refused. Re-running would show whether either changes any of the 90 results; it has not been re-run.
+The committed reports were made before `catalogue_fingerprint` and `manifest_error` existed, so they lack both, and `dexpa sdks diff` warns that it cannot check their catalogues. The run also predates three parser changes from review: DEX files now stop at the first missing number, an APK with duplicate entry names is refused, and a numbered DEX entry that is not a DEX file is an error. Re-running would show whether either changes any of the 90 results; it has not been re-run.
 
 | | Tracking | NonFreeNet | control |
 |---|---:|---:|---:|

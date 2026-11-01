@@ -1,14 +1,14 @@
-<!-- Modified by Zero (2026-11-01): dexpa-sdk in the crate list (fork M5). See NOTICE. -->
+<!-- Modified by Zero (2026-11-01): dexpa-sdk in the crate list (fork M5); four crates (2026-11-02, /review). See NOTICE. -->
 # Releasing dex-parser-analyzer
 
 From github.com/dhilipsiva/products/templates/RELEASING.md. The release workflow (`.github/workflows/release.yml`) and this runbook change in the same commit.
 
 ## What a release is
 
-- Channels: crates.io (the three crates below), a GitHub Release with the `dexpa` binaries and SHA256SUMS, and the GUI on GitHub Pages (https://dhilipsiva.github.io/dex-parser-analyzer/).
+- Channels: crates.io (the four crates below), a GitHub Release with the `dexpa` binaries and SHA256SUMS, and the GUI on GitHub Pages (https://dhilipsiva.github.io/dex-parser-analyzer/).
 - Crates to publish (`CRATES` in `release.yml`; cargo orders them by dependency): `dexpa-core`, `dexpa-analysis`, `dexpa-sdk` (fork), `dexpa-cli`. `dex-gui` is `publish = false`.
 - Binary and targets (`BIN` and the `build` matrix): `dexpa` for `x86_64-unknown-linux-gnu`, `aarch64-unknown-linux-gnu`, `aarch64-apple-darwin` and `x86_64-pc-windows-msvc`, built with the toolchain pinned in `rust-toolchain.toml`.
-- Secrets: `CARGO_REGISTRY_TOKEN` (crates.io, publish-update scope on exactly these three crates, with an expiry). The first publish of a new crate name needs a token with the publish-new scope; narrow it afterwards.
+- Secrets: `CARGO_REGISTRY_TOKEN` (crates.io, publish-update scope on exactly these four crates, with an expiry). The first publish of a new crate name needs a token with the publish-new scope; narrow it afterwards.
 
 ## One-time setup
 
@@ -20,7 +20,7 @@ From github.com/dhilipsiva/products/templates/RELEASING.md. The release workflow
 1. CI is green on `main` for the commit you will tag.
 2. Bump the version in `Cargo.toml` (`[workspace.package] version`). The tag must equal it; the preflight refuses a mismatch.
 3. Roll `CHANGELOG.md`: rename `[Unreleased]` to `[X.Y.Z] - YYYY-MM-DD` and open a new empty `[Unreleased]`. The release notes are that section, and the preflight refuses a tag without it.
-4. `nix develop -c just release` passes locally: the gate, `cargo publish --dry-run` for the three crates, and `nix build` of `.#dex-cli` and `.#dex-gui`.
+4. `nix develop -c just release` passes locally: the gate, `cargo publish --dry-run` for the four crates, and `nix build` of `.#dex-cli` and `.#dex-gui`.
 5. Rehearse: run the Release workflow by hand (Actions, Release, "Run workflow"). A manual run is always a dry run. It builds every binary, writes SHA256SUMS, renders the notes and dry-runs the publish, and creates and deploys nothing. Before step 3 it rehearses with the `[Unreleased]` notes and says so in a warning.
 
 ## Cutting the release (the owner)

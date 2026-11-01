@@ -1,4 +1,4 @@
-# Modified by Zero (2026-11-01): new test file (fork M6); run-loop tests (2026-11-02, /review). See NOTICE.
+# Modified by Zero (2026-11-01): new test file (fork M6); run-loop tests (2026-11-02, /review, re-review). See NOTICE.
 """Offline tests for eval/fdroid.py. No network: the "repo" is a temp directory served as file://.
 
 Run: python3 -m unittest discover -s eval/tests   (or `just eval-test`).
@@ -218,6 +218,15 @@ class SelectTest(unittest.TestCase):
         self.assertEqual(lock["apk"], entries)
         self.assertEqual(entries[0]["permissions"], ["android.permission.CAMERA", "android.permission.INTERNET"])
 
+    def test_lockfile_keeps_characters_outside_the_basic_plane(self):
+        """Re-review (2026-11-02): JSON's surrogate-pair escapes are not valid TOML."""
+        entries = [dict(package="p", stratum="control", version_code=1,
+                        version_name="1.0 \U0001F600", name="/p_1.apk", sha256="0" * 64, size=1,
+                        anti_features=[], min_sdk=21, target_sdk=34, permissions=[])]
+        source = {"index_sha256": "ab" * 32, "entry_timestamp": 1, "seed": "s"}
+        lock = tomllib.loads(fdroid.lock_toml(source, entries))
+        self.assertEqual(lock["apk"][0]["version_name"], "1.0 \U0001F600")
+
 
 class EntryJarTest(unittest.TestCase):
     FP = "43:23:8D:51:2C:1E:5E:B2:D6:56:9F:4A:3A:FB:F5:52:34:18:B8:2E:0A:3E:D1:55:27:70:AB:B9:A9:C9:CC:AB"
@@ -390,9 +399,18 @@ case "$2" in *bad*) echo "boom" >&2; exit 1;; esac
 echo '{"matches": [], "class_count": 1}'
 """
 
+BAD_DIFF_DEXPA = """#!/bin/sh
+# Like FAKE_DEXPA, but `sdks diff` prints something that is not JSON.
+if [ "$2" = "diff" ]; then echo 'not json'; exit 0; fi
+echo '{"matches": [], "class_count": 1}'
+"""
+
 FAKE_MANIFEST = """#!/bin/sh
 case "$1" in *nomanifest*) echo "no manifest" >&2; exit 1;; esac
 echo '{"package": "org.example", "version_code": {"type": "int", "value": 1}, "version_name": {"type": "string", "value": "1.0"}, "min_sdk": {"type": "int", "value": 21}, "target_sdk": {"type": "int", "value": 34}, "uses_permissions": []}'
+"""
+
+NO_INTERPRETER = """#!/nonexistent/interpreter
 """
 
 SLOW_TOOL = """#!/bin/sh
@@ -436,6 +454,36 @@ class RunLoopTest(unittest.TestCase):
         self.assertEqual(sorted(res["failures"]), ["org.example_2", "org.example_3"])
         self.assertEqual(res["strata"]["control"]["analysed"], 1)
         self.assertTrue((self.out / "TABLE.md").exists())
+
+    def test_a_failed_fetch_removes_its_old_report(self):
+        gone = self.r.add("/org.example_2.apk", b"B" * 10, version_code=2)
+        (self.r.repo / "org.example_2.apk").unlink()
+        reports = self.out / "reports"
+        reports.mkdir(parents=True)
+        (reports / "org.example_2.json").write_text("{}")  # from an earlier run
+        self.assertEqual(self.run_main([gone]), 0)
+        self.assertFalse((reports / "org.example_2.json").exists())
+
+    def test_an_aborted_run_leaves_no_report_it_did_not_write(self):
+        a = self.r.add("/org.example_1.apk", b"A" * 10, version_code=1)
+        b = self.r.add("/org.example_2.apk", b"B" * 500, version_code=2)
+        reports = self.out / "reports"
+        reports.mkdir(parents=True)
+        (reports / "org.example_2.json").write_text("{}")  # from an earlier run
+        self.assertEqual(self.run_main([a, b], extra=("--max-total", "100")), 3)
+        self.assertEqual(sorted(p.name for p in reports.iterdir()), ["org.example_1.json"])
+        self.assertIsNotNone(self.results()["aborted"])
+
+    def test_a_diff_that_is_not_json_is_that_pairs_failure(self):
+        a = self.r.add("/org.example_1.apk", b"A" * 10, version_code=1)
+        b = self.r.add("/org.example_2.apk", b"B" * 10, version_code=2)
+        self.assertEqual(self.run_main([a, b], dexpa=BAD_DIFF_DEXPA), 0)
+        self.assertEqual(list(self.results()["failures"]), ["diff org.example_1 org.example_2"])
+
+    def test_a_tool_that_cannot_start_is_that_apks_failure(self):
+        e = self.r.add("/org.example_1.apk", b"A" * 10)
+        self.assertEqual(self.run_main([e], manifest=NO_INTERPRETER), 0)
+        self.assertIn("org.example_1", self.results()["failures"])
 
     def test_a_hung_tool_times_out_as_that_apks_failure(self):
         e = self.r.add("/org.example_1.apk", b"A" * 10)

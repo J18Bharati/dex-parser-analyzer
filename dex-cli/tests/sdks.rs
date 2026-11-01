@@ -304,13 +304,18 @@ fn apk_without_an_app_dex_exits_1() {
 }
 
 /// /review (2026-11-02): APK strings go to the analyst's terminal. Control characters (escape
-/// sequences that could rewrite or hide lines) are printed escaped in text mode.
+/// sequences that could rewrite or hide lines) are printed escaped in text mode. Re-review: so
+/// are invisible format characters (marks, zero-width characters), which make one name look
+/// like another.
 #[test]
 fn text_output_escapes_control_characters() {
     let root = el(
         "manifest",
         vec![
-            pa("package", s("app.fix\u{1b}[2Kture\u{202e}")),
+            pa(
+                "package",
+                s("app.fix\u{1b}[2Kture\u{202e}\u{200f}\u{200b}\u{feff}\u{61c}\u{2028}"),
+            ),
             aa("versionCode", VERSION_CODE, V::Int(1)),
         ],
         vec![el("application", vec![], vec![])],
@@ -323,7 +328,10 @@ fn text_output_escapes_control_characters() {
         !text.contains('\u{1b}') && !text.contains('\u{202e}'),
         "{text:?}"
     );
-    assert!(text.contains("app.fix\\u{1b}[2Kture\\u{202e}"), "{text}");
+    assert!(
+        text.contains("app.fix\\u{1b}[2Kture\\u{202e}\\u{200f}\\u{200b}\\u{feff}\\u{61c}\\u{2028}"),
+        "{text}"
+    );
 }
 
 /// /review (2026-11-02): reports made with different catalogues cannot be diffed: every SDK the
@@ -368,6 +376,43 @@ fn diff_refuses_reports_from_different_catalogues() {
     let output = dexpa(&["sdks", "diff", a.to_str().unwrap(), b.to_str().unwrap()]);
     assert_eq!(output.status.code(), Some(0), "stderr: {}", stderr(&output));
     assert!(stderr(&output).contains("catalogue"), "{}", stderr(&output));
+}
+
+/// /review (2026-11-02): an SDK seen only in the manifest disappears from a report whose
+/// manifest did not parse. The diff says so on stderr, and the removal is `uncertain`.
+#[test]
+fn diff_warns_when_a_manifest_was_not_read() {
+    let good = json(&dexpa(&[
+        "sdks",
+        &write_apk("read.apk", 2, "positive"),
+        "--format",
+        "json",
+    ]));
+    let broken_apk =
+        write_apk_with_manifest("unread.apk", b"\x03\x00\x08\x00junk".to_vec(), "positive");
+    let broken = json(&dexpa(&["sdks", &broken_apk, "--format", "json"]));
+    let (a, b) = (scratch("read.json"), scratch("unread.json"));
+    fs::write(&a, good.to_string()).unwrap();
+    fs::write(&b, broken.to_string()).unwrap();
+    let output = dexpa(&[
+        "sdks",
+        "diff",
+        a.to_str().unwrap(),
+        b.to_str().unwrap(),
+        "--format",
+        "json",
+    ]);
+    assert_eq!(output.status.code(), Some(0), "stderr: {}", stderr(&output));
+    assert!(
+        stderr(&output).contains("manifest was not read"),
+        "{}",
+        stderr(&output)
+    );
+    let events = json(&output)["events"].as_array().unwrap().clone();
+    assert!(
+        events.iter().all(|e| e["confidence"] != "strong"),
+        "{events:?}"
+    );
 }
 
 #[test]

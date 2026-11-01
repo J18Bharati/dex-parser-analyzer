@@ -1,4 +1,4 @@
-<!-- Modified by Zero (2026-11-01): `dexpa sdks` and `dexpa sdks diff` (fork M5); APK entries in load order (fork M1a); manifest_error, catalogue_fingerprint, diff refusal (2026-11-02, /review). See NOTICE. -->
+<!-- Modified by Zero (2026-11-01): `dexpa sdks` and `dexpa sdks diff` (fork M5); APK entries in load order (fork M1a); manifest_error, catalogue_fingerprint, diff refusal (2026-11-02, /review); unread-manifest confidence (re-review). See NOTICE. -->
 # dexpa-cli
 
 `dexpa`, the command-line front end of [dex-parser-analyzer](../README.md). It parses a `.dex` file, or every `classes*.dex` in an APK, with [`dexpa-core`](../dex-core/), runs every [`dexpa-analysis`](../dex-analysis/) pass with the default configuration, and prints the results.
@@ -111,11 +111,11 @@ dexpa sdks diff [--format text|json] <OLD.json> <NEW.json>
 
 The bundled catalogue lists 25 SDKs (`dex-sdk/catalogue/sdks.toml`). `--catalogue` replaces it with your own TOML in the same shape. `--exodus` adds the trackers from an [Exodus Privacy](https://exodus-privacy.eu.org/) JSON file you supply; that data is ODbL 1.0, is never bundled, and when it is used the report carries an `attribution`.
 
-An APK without `AndroidManifest.xml` is read as DEX only (`package` is `null`). A manifest that is present but malformed is reported on stderr and in `manifest_error`, and the report has DEX evidence only. The app's DEX files are `classes.dex`, `classes2.dex`, ... up to the first missing number, as Android loads them; an APK with two entries of the same name is refused. Text output escapes control and bidirectional-override characters.
+An APK without `AndroidManifest.xml` is read as DEX only (`package` is `null`). A manifest that is present but malformed is reported on stderr and in `manifest_error`, and the report has DEX evidence only. The app's DEX files are `classes.dex`, `classes2.dex`, ... up to the first missing number, as Android loads them; an APK with two entries of the same name is refused. Text output escapes control characters, bidirectional marks and overrides, zero-width and other invisible format characters.
 
 `dexpa sdks diff` compares two reports from `dexpa sdks --format json`. It refuses reports whose `catalogue_fingerprint`s differ, since a different catalogue would show up as SDKs added and removed, and warns when a report has no fingerprint (one made before the field existed) or the packages differ.
 
-- `sdk_added` and `sdk_removed` have a `confidence`. It is `strong` when the side that has the SDK has manifest evidence, and `uncertain` when that side has only class names, which a change in minification can make appear or vanish.
+- `sdk_added` and `sdk_removed` have a `confidence`. It is `strong` when the side that has the SDK has manifest evidence and the other side's manifest was read, and `uncertain` when that side has only class names (which a change in minification can make appear or vanish) or the other side's manifest was not read (DEX-only input or `manifest_error`), so its absence there proves nothing. An unread manifest is also named on stderr.
 - `sdk_evidence_changed` lists the `source:rule` pairs gained and lost.
 
 Counts and DEX placement are not compared, because a rebuild changes them without changing what the app contains.

@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new test file (fork M4); new report fields (2026-11-02, /review). See NOTICE.
+// Modified by Zero (2026-11-01): new test file (fork M4); new report fields; unread manifests (2026-11-02, /review). See NOTICE.
 use dexpa_sdk::catalogue::Origin;
 use dexpa_sdk::diff::{Confidence, DiffEvent, diff};
 use dexpa_sdk::matcher::{Evidence, SdkMatch, Source};
@@ -128,4 +128,37 @@ fn reports_round_trip_through_json() {
     let r = report(vec![m("a", vec![ev(Source::DexClass, "com.a", 3, &[0])])]);
     let back: SdkReport = serde_json::from_str(&serde_json::to_string(&r).unwrap()).unwrap();
     assert_eq!(back, r);
+}
+
+/// /review (2026-11-02): a side whose manifest was not read (DEX-only input, or `manifest_error`)
+/// says nothing about manifest evidence, so manifest evidence on the other side cannot make an
+/// added or removed SDK `strong`.
+#[test]
+fn an_unread_manifest_makes_added_and_removed_uncertain() {
+    let with_manifest = report(vec![m(
+        "tracker",
+        vec![ev(Source::ManifestComponent, "com.t", 1, &[])],
+    )]);
+    let mut broken = report(vec![]);
+    broken.manifest_error = Some("binary XML is malformed".into());
+    let mut dex_only = report(vec![]);
+    dex_only.package = None;
+    for unread in [&broken, &dex_only] {
+        assert_eq!(
+            diff(&with_manifest, unread),
+            vec![DiffEvent::SdkRemoved {
+                id: "tracker".into(),
+                name: "TRACKER".into(),
+                confidence: Confidence::Uncertain
+            }]
+        );
+        assert_eq!(
+            diff(unread, &with_manifest),
+            vec![DiffEvent::SdkAdded {
+                id: "tracker".into(),
+                name: "TRACKER".into(),
+                confidence: Confidence::Uncertain
+            }]
+        );
+    }
 }

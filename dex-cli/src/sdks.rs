@@ -1,5 +1,5 @@
 // Modified by Zero (2026-11-01): new module (fork M5); manifest_error, diff catalogue check and
-// escaped text output (2026-11-02, /review). See NOTICE.
+// escaped text output (2026-11-02, /review); unread-manifest warning, Cf escapes (re-review). See NOTICE.
 //! `dexpa sdks`: which third-party SDKs an app contains, and `dexpa sdks diff`: what changed.
 
 use std::{fs, path::Path, path::PathBuf};
@@ -13,7 +13,7 @@ use dexpa_core::{
 };
 use dexpa_sdk::{
     catalogue::{self, Catalogue},
-    diff::{DiffEvent, diff},
+    diff::{DiffEvent, diff, manifest_read},
     report::{SCHEMA_VERSION, SdkReport, build_report},
 };
 use serde::Serialize;
@@ -197,6 +197,17 @@ fn run_diff(old: &Path, new: &Path, format: Format) -> Result<()> {
              catalogue cannot be checked"
         ),
     }
+    // An unread manifest hides manifest evidence: SDKs seen only there look removed or added.
+    for (path, r) in [(old, &a), (new, &b)] {
+        if !manifest_read(r) {
+            eprintln!(
+                "warning: {}: the manifest was not read ({}); SDKs seen only in a manifest on \
+                 the other side are reported as uncertain",
+                shown(&path.display().to_string()),
+                shown(r.manifest_error.as_deref().unwrap_or("DEX-only input"))
+            );
+        }
+    }
     if a.package != b.package {
         eprintln!(
             "warning: comparing different packages: {} and {}",
@@ -225,18 +236,32 @@ fn print_json<T: Serialize>(value: &T) -> Result<()> {
     Ok(())
 }
 
-/// `s` with control characters and bidirectional overrides escaped (`\u{1b}`): text from an
-/// APK must not be able to move the cursor, recolour or reorder the analyst's terminal.
+/// `s` with control and invisible characters escaped (`\u{1b}`): text from an APK must not be
+/// able to move the cursor, recolour or reorder the analyst's terminal, or make one name look
+/// like another.
 fn shown(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     for c in s.chars() {
-        if c.is_control() || matches!(c, '\u{202a}'..='\u{202e}' | '\u{2066}'..='\u{2069}') {
+        if c.is_control() || is_format_or_separator(c) {
             out.extend(c.escape_unicode());
         } else {
             out.push(c);
         }
     }
     out
+}
+
+/// Unicode's format characters (general category Cf: bidirectional marks and overrides,
+/// zero-width characters, tags) and the line and paragraph separators. The standard library
+/// has no category lookup, so the Cf ranges of Unicode 16 are listed here.
+fn is_format_or_separator(c: char) -> bool {
+    matches!(c,
+        '\u{ad}' | '\u{600}'..='\u{605}' | '\u{61c}' | '\u{6dd}' | '\u{70f}'
+        | '\u{890}'..='\u{891}' | '\u{8e2}' | '\u{180e}' | '\u{200b}'..='\u{200f}'
+        | '\u{2028}'..='\u{202e}' | '\u{2060}'..='\u{2064}' | '\u{2066}'..='\u{206f}'
+        | '\u{feff}' | '\u{fff9}'..='\u{fffb}' | '\u{110bd}' | '\u{110cd}'
+        | '\u{13430}'..='\u{1343f}' | '\u{1bca0}'..='\u{1bca3}' | '\u{1d173}'..='\u{1d17a}'
+        | '\u{e0001}' | '\u{e0020}'..='\u{e007f}')
 }
 
 fn label(v: &Version) -> String {
