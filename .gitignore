@@ -28,3 +28,6 @@ fuzz/target/
 fuzz/corpus/
 fuzz/artifacts/
 fuzz/coverage/
+
+# (fork M6) F-Droid evaluation downloads: index, entry.jar, APKs. Never committed.
+.cache/

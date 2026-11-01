@@ -1,0 +1,1183 @@
+# Written by `eval/fdroid.py select`. Do not edit: `fetch` downloads exactly this.
+version = 1
+
+[source]
+repo = "https://f-droid.org/repo"
+entry_signer_sha256 = "43238d512c1e5eb2d6569f4a3afbf5523418b82e0a3ed1552770abb9a9c9ccab"
+entry_timestamp = 1793418664799
+index_sha256 = "214b029d8b4b18e7df3f8eb767cb26cc4422c17a78cb52f094a71f528c357beb"
+index_packages = 4923
+seed = "dexpa-m6-2026-11-01"
+per_stratum = 10
+versions_per_app = 3
+max_apk_bytes = 60000000
+
+[[apk]]
+package = "me.testcase.ognarviewer"
+stratum = "Tracking"
+version_code = 25
+version_name = "1.0.8"
+name = "/me.testcase.ognarviewer_25.apk"
+sha256 = "deab8845ad8520b0e4c60d569b4701b350703ad02da28686a61846e8e68bdd89"
+size = 5040321
+anti_features = ["Tracking"]
+min_sdk = 26
+target_sdk = 35
+permissions = ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.CAMERA", "android.permission.INTERNET", "me.testcase.ognarviewer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "me.testcase.ognarviewer"
+stratum = "Tracking"
+version_code = 24
+version_name = "1.0.7"
+name = "/me.testcase.ognarviewer_24.apk"
+sha256 = "3417a4201770cdf58f8bd0915910d5cdbe14b97558d176c52b485be7747e596e"
+size = 5025257
+anti_features = ["Tracking"]
+min_sdk = 26
+target_sdk = 35
+permissions = ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.CAMERA", "android.permission.INTERNET", "me.testcase.ognarviewer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "me.testcase.ognarviewer"
+stratum = "Tracking"
+version_code = 23
+version_name = "1.0.6"
+name = "/me.testcase.ognarviewer_23.apk"
+sha256 = "64774be66ae33b676f9d494f05bc37c2c2214263be17d12a8c172f54f3bee2aa"
+size = 5029273
+anti_features = ["Tracking"]
+min_sdk = 26
+target_sdk = 34
+permissions = ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.CAMERA", "android.permission.INTERNET", "me.testcase.ognarviewer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.orpheusdroid.screenrecorder"
+stratum = "Tracking"
+version_code = 33
+version_name = "2.0.3-fdroid"
+name = "/com.orpheusdroid.screenrecorder_33.apk"
+sha256 = "e8acdda4e5290559df6315e641bc033f0e51b542fb5239352a6af18fc1d2404e"
+size = 2196948
+anti_features = ["Tracking"]
+min_sdk = 21
+target_sdk = 28
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.CAMERA", "android.permission.CAPTURE_AUDIO_OUTPUT", "android.permission.DUMP", "android.permission.FOREGROUND_SERVICE", "android.permission.INTERNET", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.RECORD_AUDIO", "android.permission.SYSTEM_ALERT_WINDOW", "android.permission.VIBRATE", "android.permission.WRITE_EXTERNAL_STORAGE", "com.orpheusdroid.screenrecorder.TOGGLETOUCHES"]
+
+[[apk]]
+package = "com.orpheusdroid.screenrecorder"
+stratum = "Tracking"
+version_code = 32
+version_name = "2.0.2-fdroid"
+name = "/com.orpheusdroid.screenrecorder_32.apk"
+sha256 = "9b00989cfb28582689a79250a3d914fbd1f3eef20898f4ca9cdabf09e5d58553"
+size = 2195940
+anti_features = ["Tracking"]
+min_sdk = 21
+target_sdk = 28
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.CAMERA", "android.permission.CAPTURE_AUDIO_OUTPUT", "android.permission.DUMP", "android.permission.FOREGROUND_SERVICE", "android.permission.INTERNET", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.RECORD_AUDIO", "android.permission.SYSTEM_ALERT_WINDOW", "android.permission.VIBRATE", "android.permission.WRITE_EXTERNAL_STORAGE", "com.orpheusdroid.screenrecorder.TOGGLETOUCHES"]
+
+[[apk]]
+package = "com.orpheusdroid.screenrecorder"
+stratum = "Tracking"
+version_code = 31
+version_name = "2.0.1-fdroid"
+name = "/com.orpheusdroid.screenrecorder_31.apk"
+sha256 = "b469dee6f7675ea4536df891647bcba4466b0207105e8c32e270da840fd92ec6"
+size = 2180841
+anti_features = ["Tracking"]
+min_sdk = 21
+target_sdk = 28
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.CAMERA", "android.permission.CAPTURE_AUDIO_OUTPUT", "android.permission.DUMP", "android.permission.FOREGROUND_SERVICE", "android.permission.INTERNET", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.RECORD_AUDIO", "android.permission.SYSTEM_ALERT_WINDOW", "android.permission.VIBRATE", "android.permission.WRITE_EXTERNAL_STORAGE", "com.orpheusdroid.screenrecorder.TOGGLETOUCHES"]
+
+[[apk]]
+package = "com.github.andreyasadchy.xtra"
+stratum = "Tracking"
+version_code = 364
+version_name = "2.60.9"
+name = "/com.github.andreyasadchy.xtra_364.apk"
+sha256 = "1aace7746997c0ba558dcbde9496ebbc574581a9fd968cc041ca47d3e4028424"
+size = 18017122
+anti_features = ["NonFreeNet", "Tracking"]
+min_sdk = 24
+target_sdk = 37
+permissions = ["android.permission.ACCESS_LOCAL_NETWORK", "android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK", "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.WAKE_LOCK", "com.github.andreyasadchy.xtra.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.github.andreyasadchy.xtra"
+stratum = "Tracking"
+version_code = 363
+version_name = "2.60.8"
+name = "/com.github.andreyasadchy.xtra_363.apk"
+sha256 = "420f3aba6d42a5a39ed69ca5d83212665dbb3b1e75eaf55bfb038bf505cb9b5c"
+size = 17886181
+anti_features = ["NonFreeNet", "Tracking"]
+min_sdk = 24
+target_sdk = 37
+permissions = ["android.permission.ACCESS_LOCAL_NETWORK", "android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK", "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.WAKE_LOCK", "com.github.andreyasadchy.xtra.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.github.andreyasadchy.xtra"
+stratum = "Tracking"
+version_code = 362
+version_name = "2.60.7"
+name = "/com.github.andreyasadchy.xtra_362.apk"
+sha256 = "2e58edde9360fcb444afe2af46a5d4df1f4536e351fa02ee7f25b3845ce53f0f"
+size = 17886181
+anti_features = ["NonFreeNet", "Tracking"]
+min_sdk = 24
+target_sdk = 37
+permissions = ["android.permission.ACCESS_LOCAL_NETWORK", "android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK", "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.WAKE_LOCK", "com.github.andreyasadchy.xtra.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.spisoft.quicknote"
+stratum = "Tracking"
+version_code = 251
+version_name = "0.25.1"
+name = "/com.spisoft.quicknote_251.apk"
+sha256 = "ec822bbf23e6da1211a196496b85c1b38a5d7faa29b11d1fc026f455c3199c44"
+size = 12223980
+anti_features = ["Tracking"]
+min_sdk = 21
+target_sdk = 33
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.AUTHENTICATE_ACCOUNTS", "android.permission.CAMERA", "android.permission.FOREGROUND_SERVICE", "android.permission.GET_ACCOUNTS", "android.permission.INTERNET", "android.permission.MANAGE_ACCOUNTS", "android.permission.MANAGE_DOCUMENTS", "android.permission.MODIFY_AUDIO_SETTINGS", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.SYSTEM_ALERT_WINDOW", "android.permission.USE_CREDENTIALS", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "com.android.launcher.permission.INSTALL_SHORTCUT", "com.spisoft.quicknote.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.spisoft.quicknote"
+stratum = "Tracking"
+version_code = 241
+version_name = "0.24.1"
+name = "/com.spisoft.quicknote_241.apk"
+sha256 = "f58e4fc9348577c8f2271b1f9969826fe03d1d6c5c7f065c9843ef249c25c814"
+size = 7942104
+anti_features = ["Tracking"]
+min_sdk = 21
+target_sdk = 29
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.AUTHENTICATE_ACCOUNTS", "android.permission.CAMERA", "android.permission.FOREGROUND_SERVICE", "android.permission.GET_ACCOUNTS", "android.permission.INTERNET", "android.permission.MANAGE_ACCOUNTS", "android.permission.MANAGE_DOCUMENTS", "android.permission.MODIFY_AUDIO_SETTINGS", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.SYSTEM_ALERT_WINDOW", "android.permission.USE_CREDENTIALS", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "com.android.launcher.permission.INSTALL_SHORTCUT"]
+
+[[apk]]
+package = "com.spisoft.quicknote"
+stratum = "Tracking"
+version_code = 231
+version_name = "0.23.1"
+name = "/com.spisoft.quicknote_231.apk"
+sha256 = "a08f995a8bf345e45f6465ff08623c921843a5fe97fc53e570f8d9161b1fcedd"
+size = 7922463
+anti_features = ["Tracking"]
+min_sdk = 21
+target_sdk = 29
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.AUTHENTICATE_ACCOUNTS", "android.permission.CAMERA", "android.permission.FOREGROUND_SERVICE", "android.permission.GET_ACCOUNTS", "android.permission.INTERNET", "android.permission.MANAGE_ACCOUNTS", "android.permission.MANAGE_DOCUMENTS", "android.permission.MODIFY_AUDIO_SETTINGS", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.SYSTEM_ALERT_WINDOW", "android.permission.USE_CREDENTIALS", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "com.android.launcher.permission.INSTALL_SHORTCUT"]
+
+[[apk]]
+package = "net.pgaskin.remotedesktop.rustdesk"
+stratum = "Tracking"
+version_code = 8
+version_name = "8"
+name = "/net.pgaskin.remotedesktop.rustdesk_8.apk"
+sha256 = "4a87d7a9993f7cb178f7cb29988e9def0d21b6d5c06c7edc3cbedbae21755428"
+size = 1753923
+anti_features = ["Tracking"]
+min_sdk = 34
+target_sdk = 36
+permissions = []
+
+[[apk]]
+package = "net.pgaskin.remotedesktop.rustdesk"
+stratum = "Tracking"
+version_code = 7
+version_name = "7"
+name = "/net.pgaskin.remotedesktop.rustdesk_7.apk"
+sha256 = "14b1e96b1c36efee9b9f590ba1a0380098764bce2a40bc6e4306ecf0c0709c29"
+size = 1749827
+anti_features = ["Tracking"]
+min_sdk = 34
+target_sdk = 36
+permissions = []
+
+[[apk]]
+package = "net.pgaskin.remotedesktop.rustdesk"
+stratum = "Tracking"
+version_code = 6
+version_name = "6"
+name = "/net.pgaskin.remotedesktop.rustdesk_6.apk"
+sha256 = "cd21b05b5dbe854412e0ebb0f59fe187c585af3fddc7c874928e205d06951cc0"
+size = 1487683
+anti_features = ["Tracking"]
+min_sdk = 34
+target_sdk = 36
+permissions = []
+
+[[apk]]
+package = "info.dvkr.screenstream"
+stratum = "Tracking"
+version_code = 44002
+version_name = "4.4.2"
+name = "/info.dvkr.screenstream_44002.apk"
+sha256 = "900de047c912d2659d00ec8c38bf6de2effadcc77787486ec4481b73e4a4f218"
+size = 4326111
+anti_features = ["Tracking"]
+min_sdk = 24
+target_sdk = 37
+permissions = ["android.permission.ACCESS_LOCAL_NETWORK", "android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.CHANGE_WIFI_MULTICAST_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION", "android.permission.FOREGROUND_SERVICE_MICROPHONE", "android.permission.INTERNET", "android.permission.MODIFY_AUDIO_SETTINGS", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.TURN_SCREEN_ON", "android.permission.WAKE_LOCK", "info.dvkr.screenstream.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "info.dvkr.screenstream"
+stratum = "Tracking"
+version_code = 44001
+version_name = "4.4.1"
+name = "/info.dvkr.screenstream_44001.apk"
+sha256 = "02b390bb356c45760de396383892a3641dc63ef84974efca818c63d3aca59827"
+size = 4289247
+anti_features = ["Tracking"]
+min_sdk = 24
+target_sdk = 37
+permissions = ["android.permission.ACCESS_LOCAL_NETWORK", "android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.CHANGE_WIFI_MULTICAST_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION", "android.permission.FOREGROUND_SERVICE_MICROPHONE", "android.permission.INTERNET", "android.permission.MODIFY_AUDIO_SETTINGS", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.TURN_SCREEN_ON", "android.permission.WAKE_LOCK", "info.dvkr.screenstream.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "info.dvkr.screenstream"
+stratum = "Tracking"
+version_code = 44000
+version_name = "4.4.0"
+name = "/info.dvkr.screenstream_44000.apk"
+sha256 = "ee8ce61250efc64a62776b5afde2a512f61b5b0ed73e511e53e2f682faae6fb2"
+size = 4289247
+anti_features = ["Tracking"]
+min_sdk = 24
+target_sdk = 37
+permissions = ["android.permission.ACCESS_LOCAL_NETWORK", "android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.CHANGE_WIFI_MULTICAST_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION", "android.permission.FOREGROUND_SERVICE_MICROPHONE", "android.permission.INTERNET", "android.permission.MODIFY_AUDIO_SETTINGS", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.TURN_SCREEN_ON", "android.permission.WAKE_LOCK", "info.dvkr.screenstream.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "tech.dongdongbh.mindwtr"
+stratum = "Tracking"
+version_code = 159
+version_name = "1.3.7"
+name = "/tech.dongdongbh.mindwtr_159.apk"
+sha256 = "279a51370d5913e5868510e1d520395fd013ab2629c5d8c27297e88066ea7bed"
+size = 40319746
+anti_features = ["Tracking"]
+min_sdk = 24
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.INTERNET", "android.permission.MODIFY_AUDIO_SETTINGS", "android.permission.POST_NOTIFICATIONS", "android.permission.READ_CALENDAR", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.SCHEDULE_EXACT_ALARM", "android.permission.USE_BIOMETRIC", "android.permission.USE_FINGERPRINT", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "android.permission.WRITE_CALENDAR", "tech.dongdongbh.mindwtr.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "tech.dongdongbh.mindwtr"
+stratum = "Tracking"
+version_code = 156
+version_name = "1.3.6"
+name = "/tech.dongdongbh.mindwtr_156.apk"
+sha256 = "c1ff7748139b4d90a0d388a57d435f973b4b3f266d13d143c5fd59626fd98acc"
+size = 39643906
+anti_features = ["Tracking"]
+min_sdk = 24
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.INTERNET", "android.permission.MODIFY_AUDIO_SETTINGS", "android.permission.POST_NOTIFICATIONS", "android.permission.READ_CALENDAR", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.SCHEDULE_EXACT_ALARM", "android.permission.USE_BIOMETRIC", "android.permission.USE_FINGERPRINT", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "android.permission.WRITE_CALENDAR", "tech.dongdongbh.mindwtr.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "tech.dongdongbh.mindwtr"
+stratum = "Tracking"
+version_code = 154
+version_name = "1.3.4"
+name = "/tech.dongdongbh.mindwtr_154.apk"
+sha256 = "0a9b0a83caa21a281ba38e2ecb1682b448816ff9720a78cfc3fc67478c0c7bda"
+size = 39303938
+anti_features = ["Tracking"]
+min_sdk = 24
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.INTERNET", "android.permission.MODIFY_AUDIO_SETTINGS", "android.permission.POST_NOTIFICATIONS", "android.permission.READ_CALENDAR", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.SCHEDULE_EXACT_ALARM", "android.permission.USE_BIOMETRIC", "android.permission.USE_FINGERPRINT", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "android.permission.WRITE_CALENDAR", "tech.dongdongbh.mindwtr.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "me.timschneeberger.shizustore"
+stratum = "Tracking"
+version_code = 150
+version_name = "1.5.0"
+name = "/me.timschneeberger.shizustore_150.apk"
+sha256 = "c22751c125b600e24289df2085e5ebb151be948b7e69fe9621b1756a98f87c5f"
+size = 10795766
+anti_features = ["NonFreeNet", "Tracking"]
+min_sdk = 24
+target_sdk = 37
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_DATA_SYNC", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.REQUEST_DELETE_PACKAGES", "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS", "android.permission.REQUEST_INSTALL_PACKAGES", "android.permission.WAKE_LOCK", "me.timschneeberger.shizustore.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "moe.shizuku.manager.permission.API_V23"]
+
+[[apk]]
+package = "me.timschneeberger.shizustore"
+stratum = "Tracking"
+version_code = 120
+version_name = "1.2.0"
+name = "/me.timschneeberger.shizustore_120.apk"
+sha256 = "e8bbde38d010891b4a342da425974c5d2cae283af5d89fe0306cd81c422d648e"
+size = 9874342
+anti_features = ["NonFreeNet", "Tracking"]
+min_sdk = 24
+target_sdk = 37
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_DATA_SYNC", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.REQUEST_DELETE_PACKAGES", "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS", "android.permission.REQUEST_INSTALL_PACKAGES", "android.permission.WAKE_LOCK", "me.timschneeberger.shizustore.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "moe.shizuku.manager.permission.API_V23"]
+
+[[apk]]
+package = "me.timschneeberger.shizustore"
+stratum = "Tracking"
+version_code = 110
+version_name = "1.1.0"
+name = "/me.timschneeberger.shizustore_110.apk"
+sha256 = "8539e793742f1df130ee7440a834943ba3e70f15fc7dc32321f22c3060ed1e3f"
+size = 9815454
+anti_features = ["NonFreeNet", "Tracking"]
+min_sdk = 24
+target_sdk = 37
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_DATA_SYNC", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.REQUEST_DELETE_PACKAGES", "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS", "android.permission.REQUEST_INSTALL_PACKAGES", "android.permission.WAKE_LOCK", "me.timschneeberger.shizustore.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "moe.shizuku.manager.permission.API_V23"]
+
+[[apk]]
+package = "com.kjxbyz.picguard"
+stratum = "Tracking"
+version_code = 481
+version_name = "5.7.2"
+name = "/com.kjxbyz.picguard_481.apk"
+sha256 = "66eeea857f36c2fa930d5274f4228469cbad43b4488893bbe6462b93116d14b5"
+size = 38124434
+anti_features = ["NonFreeNet", "Tracking"]
+min_sdk = 24
+target_sdk = 36
+permissions = ["android.permission.INTERNET", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE", "com.kjxbyz.picguard.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.kjxbyz.picguard"
+stratum = "Tracking"
+version_code = 480
+version_name = "5.7.1"
+name = "/com.kjxbyz.picguard_480.apk"
+sha256 = "20b33e1902022914c9d4c182eea11715869eb6b6abcb8fdacbf8d3bf01da0699"
+size = 37976814
+anti_features = ["NonFreeNet", "Tracking"]
+min_sdk = 24
+target_sdk = 36
+permissions = ["android.permission.INTERNET", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE", "com.kjxbyz.picguard.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.kjxbyz.picguard"
+stratum = "Tracking"
+version_code = 479
+version_name = "5.7.0"
+name = "/com.kjxbyz.picguard_479.apk"
+sha256 = "a6f75003d96642ab5406d135145bf79e6c8b2c0f33113d3eb1bb10b3a90304c5"
+size = 37942742
+anti_features = ["NonFreeNet", "Tracking"]
+min_sdk = 24
+target_sdk = 36
+permissions = ["android.permission.INTERNET", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE", "com.kjxbyz.picguard.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "it.zitzusoft.lyrics_2"
+stratum = "Tracking"
+version_code = 27
+version_name = "1.0.3"
+name = "/it.zitzusoft.lyrics_2_27.apk"
+sha256 = "f3301e1567c9e2b39f22dc7de5ded4936513e465cdb70add96d6227b12207f6f"
+size = 24891911
+anti_features = ["NonFreeNet", "Tracking"]
+min_sdk = 19
+target_sdk = 33
+permissions = ["android.permission.INTERNET", "android.permission.RECORD_AUDIO"]
+
+[[apk]]
+package = "it.zitzusoft.lyrics_2"
+stratum = "Tracking"
+version_code = 26
+version_name = "1.0.2"
+name = "/it.zitzusoft.lyrics_2_26.apk"
+sha256 = "115e878dcd1ca497d2c739fd5e673f54161302bb0de570fd120b4305d05e1d08"
+size = 24887815
+anti_features = ["NonFreeNet", "Tracking"]
+min_sdk = 19
+target_sdk = 33
+permissions = ["android.permission.INTERNET", "android.permission.RECORD_AUDIO"]
+
+[[apk]]
+package = "it.zitzusoft.lyrics_2"
+stratum = "Tracking"
+version_code = 25
+version_name = "1.0.1"
+name = "/it.zitzusoft.lyrics_2_25.apk"
+sha256 = "7aad016c0e222cd38883639db6d9c7bc25ad87dd91d2b563712e79ffb3586774"
+size = 24850951
+anti_features = ["NonFreeNet", "Tracking"]
+min_sdk = 19
+target_sdk = 33
+permissions = ["android.permission.INTERNET", "android.permission.RECORD_AUDIO"]
+
+[[apk]]
+package = "io.github.landwarderer.futon"
+stratum = "NonFreeNet"
+version_code = 90900
+version_name = "9.9"
+name = "/io.github.landwarderer.futon_90900.apk"
+sha256 = "b64df92f11a114d6c6f241bf74f5b9262e0de5fd9b7ba182f3821b9192adf2b5"
+size = 23983697
+anti_features = ["NonFreeNet"]
+min_sdk = 23
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.AUTHENTICATE_ACCOUNTS", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_DATA_SYNC", "android.permission.GET_ACCOUNTS", "android.permission.INTERNET", "android.permission.MANAGE_ACCOUNTS", "android.permission.MANAGE_EXTERNAL_STORAGE", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.READ_SYNC_SETTINGS", "android.permission.READ_SYNC_STATS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.REQUEST_DELETE_PACKAGES", "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS", "android.permission.REQUEST_INSTALL_PACKAGES", "android.permission.USE_BIOMETRIC", "android.permission.USE_CREDENTIALS", "android.permission.USE_FINGERPRINT", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.WRITE_SYNC_SETTINGS", "io.github.landwarderer.futon.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "io.github.landwarderer.futon"
+stratum = "NonFreeNet"
+version_code = 90802
+version_name = "9.8.2"
+name = "/io.github.landwarderer.futon_90802.apk"
+sha256 = "87f52a2c2f3d45106e11aaf73ce6c30f79025f060440889aa74213e30e21f40c"
+size = 19735010
+anti_features = ["NonFreeNet"]
+min_sdk = 23
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.AUTHENTICATE_ACCOUNTS", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_DATA_SYNC", "android.permission.GET_ACCOUNTS", "android.permission.INTERNET", "android.permission.MANAGE_ACCOUNTS", "android.permission.MANAGE_EXTERNAL_STORAGE", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.READ_SYNC_SETTINGS", "android.permission.READ_SYNC_STATS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.REQUEST_DELETE_PACKAGES", "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS", "android.permission.REQUEST_INSTALL_PACKAGES", "android.permission.USE_BIOMETRIC", "android.permission.USE_CREDENTIALS", "android.permission.USE_FINGERPRINT", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.WRITE_SYNC_SETTINGS", "io.github.landwarderer.futon.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "io.github.landwarderer.futon"
+stratum = "NonFreeNet"
+version_code = 90801
+version_name = "9.8.1"
+name = "/io.github.landwarderer.futon_90801.apk"
+sha256 = "5fe3c7911731a051d4ee8da0bdc077cf68da0c6c10e30f7348cb94ca318d766a"
+size = 19660473
+anti_features = ["NonFreeNet"]
+min_sdk = 23
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.AUTHENTICATE_ACCOUNTS", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_DATA_SYNC", "android.permission.GET_ACCOUNTS", "android.permission.INTERNET", "android.permission.MANAGE_ACCOUNTS", "android.permission.MANAGE_EXTERNAL_STORAGE", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.READ_SYNC_SETTINGS", "android.permission.READ_SYNC_STATS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.REQUEST_DELETE_PACKAGES", "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS", "android.permission.REQUEST_INSTALL_PACKAGES", "android.permission.USE_BIOMETRIC", "android.permission.USE_CREDENTIALS", "android.permission.USE_FINGERPRINT", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.WRITE_SYNC_SETTINGS", "io.github.landwarderer.futon.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "seamain.org.typhoonEye"
+stratum = "NonFreeNet"
+version_code = 184
+version_name = "1.3.2"
+name = "/seamain.org.typhoonEye_184.apk"
+sha256 = "bcfcf550fc96a9f150c28cdecd6c1b3c5adec0be75c08b7552afbbf3dae0c9e3"
+size = 10130229
+anti_features = ["NonFreeNet"]
+min_sdk = 29
+target_sdk = 36
+permissions = ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.POST_PROMOTED_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.WAKE_LOCK", "seamain.org.typhoonEye.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "seamain.org.typhoonEye"
+stratum = "NonFreeNet"
+version_code = 183
+version_name = "1.3.2"
+name = "/seamain.org.typhoonEye_183.apk"
+sha256 = "fc5a387f625b2be32dc7c29f4fec64f3e6900e85d45fd95075ed49fb88cea1f2"
+size = 10187384
+anti_features = ["NonFreeNet"]
+min_sdk = 29
+target_sdk = 36
+permissions = ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.POST_PROMOTED_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.WAKE_LOCK", "seamain.org.typhoonEye.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "seamain.org.typhoonEye"
+stratum = "NonFreeNet"
+version_code = 182
+version_name = "1.3.2"
+name = "/seamain.org.typhoonEye_182.apk"
+sha256 = "e2d3b810e7d3fd5ddf406379741c93b70d8ba97e4f4a0b99596ebd548b3d2223"
+size = 9943814
+anti_features = ["NonFreeNet"]
+min_sdk = 29
+target_sdk = 36
+permissions = ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.POST_PROMOTED_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.WAKE_LOCK", "seamain.org.typhoonEye.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "joshuatee.wx"
+stratum = "NonFreeNet"
+version_code = 55997
+version_name = "55997"
+name = "/joshuatee.wx_55997.apk"
+sha256 = "37cae75729743148f21704dc36cf1fd31061daaa5bdc4e8f97b260346b9d3d8c"
+size = 31271810
+anti_features = ["NonFreeNet"]
+min_sdk = 29
+target_sdk = 37
+permissions = ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_NETWORK_STATE", "android.permission.ACTION_MANAGE_OVERLAY_PERMISSION", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.SYSTEM_ALERT_WINDOW", "joshuatee.wx.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "joshuatee.wx"
+stratum = "NonFreeNet"
+version_code = 55990
+version_name = "55990"
+name = "/joshuatee.wx_55990.apk"
+sha256 = "e3f1acdc96bc13ab77002be5d7cb978dc0cf9e62944fee993f315cd2a287654f"
+size = 30467722
+anti_features = ["NonFreeNet"]
+min_sdk = 29
+target_sdk = 36
+permissions = ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_NETWORK_STATE", "android.permission.ACTION_MANAGE_OVERLAY_PERMISSION", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.SYSTEM_ALERT_WINDOW", "joshuatee.wx.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "joshuatee.wx"
+stratum = "NonFreeNet"
+version_code = 55985
+version_name = "55985"
+name = "/joshuatee.wx_55985.apk"
+sha256 = "2bd5cec8aad4a59db95d2d98fe57e10559b9ec27b9e0bdc58390af5f1fae4db0"
+size = 30459690
+anti_features = ["NonFreeNet"]
+min_sdk = 29
+target_sdk = 36
+permissions = ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_NETWORK_STATE", "android.permission.ACTION_MANAGE_OVERLAY_PERMISSION", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.SYSTEM_ALERT_WINDOW", "joshuatee.wx.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.akslabs.cloudgallery"
+stratum = "NonFreeNet"
+version_code = 8
+version_name = "0.7"
+name = "/com.akslabs.cloudgallery_8.apk"
+sha256 = "57d38d474f87c126cd6375c36f91c07029a91cc1d0d7ad09b76dd1b6c875fae3"
+size = 9871192
+anti_features = ["NonFreeNet"]
+min_sdk = 29
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_DATA_SYNC", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.READ_MEDIA_IMAGES", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "com.akslabs.cloudgallery.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.akslabs.cloudgallery"
+stratum = "NonFreeNet"
+version_code = 6
+version_name = "0.6"
+name = "/com.akslabs.cloudgallery_6.apk"
+sha256 = "d1548bf337ead512e9091c2c430e2469a39d3249402b1a231e4621501a692783"
+size = 7681942
+anti_features = ["NonFreeNet"]
+min_sdk = 29
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_DATA_SYNC", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.READ_MEDIA_IMAGES", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "com.akslabs.cloudgallery.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.akslabs.cloudgallery"
+stratum = "NonFreeNet"
+version_code = 5
+version_name = "0.5"
+name = "/com.akslabs.cloudgallery_5.apk"
+sha256 = "1054a35fc5a8aca5a06a741e88c5431c72302b3423f055d81f15c62d5b7beb3e"
+size = 7189899
+anti_features = ["NonFreeNet"]
+min_sdk = 29
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_DATA_SYNC", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.READ_MEDIA_IMAGES", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "com.akslabs.cloudgallery.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "io.dashchan2"
+stratum = "NonFreeNet"
+version_code = 11483
+version_name = "3.2.68"
+name = "/io.dashchan2_11483.apk"
+sha256 = "44ae54bd92634e01be967beb40ddad304482bee14bf273589ea8272a045469c1"
+size = 21225288
+anti_features = ["NonFreeNet"]
+min_sdk = 30
+target_sdk = 37
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_DATA_SYNC", "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK", "android.permission.INTERNET", "android.permission.MODIFY_AUDIO_SETTINGS", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.REQUEST_DELETE_PACKAGES", "android.permission.REQUEST_INSTALL_PACKAGES", "android.permission.WAKE_LOCK", "io.dashchan2.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "io.dashchan2"
+stratum = "NonFreeNet"
+version_code = 11482
+version_name = "3.2.68"
+name = "/io.dashchan2_11482.apk"
+sha256 = "d33d2dcf43a2ac27d84b3c34bdedaba165a5d951d3fb37a13adc80cf5cd6e824"
+size = 19521406
+anti_features = ["NonFreeNet"]
+min_sdk = 30
+target_sdk = 37
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_DATA_SYNC", "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK", "android.permission.INTERNET", "android.permission.MODIFY_AUDIO_SETTINGS", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.REQUEST_DELETE_PACKAGES", "android.permission.REQUEST_INSTALL_PACKAGES", "android.permission.WAKE_LOCK", "io.dashchan2.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "io.dashchan2"
+stratum = "NonFreeNet"
+version_code = 11481
+version_name = "3.2.68"
+name = "/io.dashchan2_11481.apk"
+sha256 = "75881461ec8a44744d23678dcabd99552ea0cea6cf876dd8c6c9538e86c2bbfd"
+size = 18522000
+anti_features = ["NonFreeNet"]
+min_sdk = 30
+target_sdk = 37
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_DATA_SYNC", "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK", "android.permission.INTERNET", "android.permission.MODIFY_AUDIO_SETTINGS", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.REQUEST_DELETE_PACKAGES", "android.permission.REQUEST_INSTALL_PACKAGES", "android.permission.WAKE_LOCK", "io.dashchan2.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "de.sorunome.unifiednlp.trains"
+stratum = "NonFreeNet"
+version_code = 15
+version_name = "v1.3.0"
+name = "/de.sorunome.unifiednlp.trains_15.apk"
+sha256 = "5abec114bbfeb2c906abef3088cb184c4c7894ef15d0310b07c35c3dcaf1dce8"
+size = 274994
+anti_features = ["NonFreeNet"]
+min_sdk = 24
+target_sdk = 24
+permissions = ["android.permission.ACCESS_BACKGROUND_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.INTERNET"]
+
+[[apk]]
+package = "de.sorunome.unifiednlp.trains"
+stratum = "NonFreeNet"
+version_code = 14
+version_name = "v1.0.0"
+name = "/de.sorunome.unifiednlp.trains_14.apk"
+sha256 = "495c8d7409a7202257c557922010fd886f38590b0156e72e502e08d53a7343e6"
+size = 274994
+anti_features = ["NonFreeNet"]
+min_sdk = 24
+target_sdk = 24
+permissions = ["android.permission.ACCESS_BACKGROUND_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.INTERNET"]
+
+[[apk]]
+package = "de.sorunome.unifiednlp.trains"
+stratum = "NonFreeNet"
+version_code = 13
+version_name = "v0.1.0"
+name = "/de.sorunome.unifiednlp.trains_13.apk"
+sha256 = "97f0a72c3a7a6abf4dfd6ae4fd73e365667a8503d9090b000431439eb4d3e848"
+size = 270898
+anti_features = ["NonFreeNet"]
+min_sdk = 24
+target_sdk = 24
+permissions = ["android.permission.ACCESS_BACKGROUND_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.INTERNET"]
+
+[[apk]]
+package = "com.anopticlabs.gravel"
+stratum = "NonFreeNet"
+version_code = 2567
+version_name = "0.4.2"
+name = "/com.anopticlabs.gravel_2567.apk"
+sha256 = "700ae6f928ffceb67d04a5c0233275bcc9cc187e3fdc4b5fc37be7ee58ce50f7"
+size = 16053774
+anti_features = ["NonFreeNet"]
+min_sdk = 26
+target_sdk = 36
+permissions = ["android.permission.ACCESS_BACKGROUND_LOCATION", "android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_NETWORK_STATE", "android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN", "android.permission.BLUETOOTH_ADVERTISE", "android.permission.BLUETOOTH_CONNECT", "android.permission.BLUETOOTH_SCAN", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE", "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.INTERNET", "android.permission.MANAGE_ONGOING_CALLS", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_CALENDAR", "android.permission.READ_CALL_LOG", "android.permission.READ_CONTACTS", "android.permission.READ_PHONE_STATE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.REQUEST_COMPANION_PROFILE_WATCH", "android.permission.REQUEST_COMPANION_RUN_IN_BACKGROUND", "android.permission.REQUEST_COMPANION_START_FOREGROUND_SERVICES_FROM_BACKGROUND", "android.permission.REQUEST_COMPANION_USE_DATA_IN_BACKGROUND", "android.permission.REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE", "android.permission.RUN_USER_INITIATED_JOBS", "android.permission.SCHEDULE_EXACT_ALARM", "android.permission.USE_BIOMETRIC", "android.permission.WAKE_LOCK", "android.permission.WRITE_CALENDAR", "android.permission.health.WRITE_EXERCISE", "android.permission.health.WRITE_EXERCISE_ROUTE", "android.permission.health.WRITE_HEART_RATE", "android.permission.health.WRITE_SLEEP", "android.permission.health.WRITE_STEPS", "com.anopticlabs.gravel.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "io.rebble.pebblekit2.permission.RECEIVE_DATA_FROM_WATCH"]
+
+[[apk]]
+package = "com.anopticlabs.gravel"
+stratum = "NonFreeNet"
+version_code = 2514
+version_name = "0.4.0"
+name = "/com.anopticlabs.gravel_2514.apk"
+sha256 = "cd9105c399ea734462cb9e26129312dc12c3f4fe24891fc340940dcaf7cc33e5"
+size = 16053774
+anti_features = ["NonFreeNet"]
+min_sdk = 26
+target_sdk = 36
+permissions = ["android.permission.ACCESS_BACKGROUND_LOCATION", "android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_NETWORK_STATE", "android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN", "android.permission.BLUETOOTH_ADVERTISE", "android.permission.BLUETOOTH_CONNECT", "android.permission.BLUETOOTH_SCAN", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE", "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.INTERNET", "android.permission.MANAGE_ONGOING_CALLS", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_CALENDAR", "android.permission.READ_CALL_LOG", "android.permission.READ_CONTACTS", "android.permission.READ_PHONE_STATE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.REQUEST_COMPANION_PROFILE_WATCH", "android.permission.REQUEST_COMPANION_RUN_IN_BACKGROUND", "android.permission.REQUEST_COMPANION_START_FOREGROUND_SERVICES_FROM_BACKGROUND", "android.permission.REQUEST_COMPANION_USE_DATA_IN_BACKGROUND", "android.permission.REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE", "android.permission.RUN_USER_INITIATED_JOBS", "android.permission.SCHEDULE_EXACT_ALARM", "android.permission.USE_BIOMETRIC", "android.permission.WAKE_LOCK", "android.permission.WRITE_CALENDAR", "android.permission.health.WRITE_EXERCISE", "android.permission.health.WRITE_EXERCISE_ROUTE", "android.permission.health.WRITE_HEART_RATE", "android.permission.health.WRITE_SLEEP", "android.permission.health.WRITE_STEPS", "com.anopticlabs.gravel.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "io.rebble.pebblekit2.permission.RECEIVE_DATA_FROM_WATCH"]
+
+[[apk]]
+package = "com.anopticlabs.gravel"
+stratum = "NonFreeNet"
+version_code = 2482
+version_name = "0.3.4"
+name = "/com.anopticlabs.gravel_2482.apk"
+sha256 = "7465eb3021f221fb5062d49e78510e3318f4fb59e47da8f3c92e1e1612d8d31e"
+size = 10745139
+anti_features = ["NonFreeNet"]
+min_sdk = 26
+target_sdk = 36
+permissions = ["android.permission.ACCESS_BACKGROUND_LOCATION", "android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_NETWORK_STATE", "android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN", "android.permission.BLUETOOTH_ADVERTISE", "android.permission.BLUETOOTH_CONNECT", "android.permission.BLUETOOTH_SCAN", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE", "android.permission.INTERNET", "android.permission.MANAGE_ONGOING_CALLS", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_CALENDAR", "android.permission.READ_CALL_LOG", "android.permission.READ_CONTACTS", "android.permission.READ_PHONE_STATE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.REQUEST_COMPANION_PROFILE_WATCH", "android.permission.REQUEST_COMPANION_RUN_IN_BACKGROUND", "android.permission.REQUEST_COMPANION_START_FOREGROUND_SERVICES_FROM_BACKGROUND", "android.permission.REQUEST_COMPANION_USE_DATA_IN_BACKGROUND", "android.permission.REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE", "android.permission.RUN_USER_INITIATED_JOBS", "android.permission.WAKE_LOCK", "android.permission.WRITE_CALENDAR", "android.permission.health.WRITE_EXERCISE", "android.permission.health.WRITE_EXERCISE_ROUTE", "android.permission.health.WRITE_HEART_RATE", "android.permission.health.WRITE_SLEEP", "android.permission.health.WRITE_STEPS", "com.anopticlabs.gravel.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "io.rebble.pebblekit2.permission.RECEIVE_DATA_FROM_WATCH"]
+
+[[apk]]
+package = "org.ntust.app.tigerduck.fdroid"
+stratum = "NonFreeNet"
+version_code = 30
+version_name = "2.4.0-fdroid"
+name = "/org.ntust.app.tigerduck.fdroid_30.apk"
+sha256 = "6597fc9a37cd405cb213c21e14f83844d0d8ce9b97e8bcaa82416f230a5f2a1d"
+size = 18571132
+anti_features = ["NonFreeNet"]
+min_sdk = 29
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.CAMERA", "android.permission.FOREGROUND_SERVICE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.POST_PROMOTED_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.SCHEDULE_EXACT_ALARM", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "org.ntust.app.tigerduck.fdroid.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "org.ntust.app.tigerduck.fdroid"
+stratum = "NonFreeNet"
+version_code = 29
+version_name = "2.3.1-fdroid"
+name = "/org.ntust.app.tigerduck.fdroid_29.apk"
+sha256 = "bbc5619f2c46579940a47f957b059c7c8d286f471f130196f4c65af2e7d823f2"
+size = 11765920
+anti_features = ["NonFreeNet"]
+min_sdk = 29
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.POST_PROMOTED_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.SCHEDULE_EXACT_ALARM", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "org.ntust.app.tigerduck.fdroid.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "org.ntust.app.tigerduck.fdroid"
+stratum = "NonFreeNet"
+version_code = 28
+version_name = "2.3.0-fdroid"
+name = "/org.ntust.app.tigerduck.fdroid_28.apk"
+sha256 = "88ee0279ed5a80d5473334766415ecc28fb4835ed44048baf71e751aa440cd8b"
+size = 11740952
+anti_features = ["NonFreeNet"]
+min_sdk = 29
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.POST_PROMOTED_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.SCHEDULE_EXACT_ALARM", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "org.ntust.app.tigerduck.fdroid.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.a10miaomiao.bilimiao"
+stratum = "NonFreeNet"
+version_code = 117
+version_name = "2.4.8.1"
+name = "/com.a10miaomiao.bilimiao_117.apk"
+sha256 = "6084e5876ce095baa683b413504a5b72d348d6906dfaf711053bf0efa6b1bf73"
+size = 32618509
+anti_features = ["NonFreeNet"]
+min_sdk = 21
+target_sdk = 35
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.VIBRATE", "android.permission.WRITE_EXTERNAL_STORAGE", "com.a10miaomiao.bilimiao.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.a10miaomiao.bilimiao"
+stratum = "NonFreeNet"
+version_code = 116
+version_name = "2.4.8"
+name = "/com.a10miaomiao.bilimiao_116.apk"
+sha256 = "767251506408c3ea352ae6f03a92b83a569016562dedf680884ba5e4a48cc2a3"
+size = 32618298
+anti_features = ["NonFreeNet"]
+min_sdk = 21
+target_sdk = 35
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.VIBRATE", "android.permission.WRITE_EXTERNAL_STORAGE", "com.a10miaomiao.bilimiao.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.a10miaomiao.bilimiao"
+stratum = "NonFreeNet"
+version_code = 115
+version_name = "2.4.7"
+name = "/com.a10miaomiao.bilimiao_115.apk"
+sha256 = "b2bf04fb208a74e38d5457e5fa7f5806343cffdcbcb27bd0e2dfe94d4c78e2dd"
+size = 32663679
+anti_features = ["NonFreeNet"]
+min_sdk = 21
+target_sdk = 35
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.VIBRATE", "android.permission.WRITE_EXTERNAL_STORAGE", "com.a10miaomiao.bilimiao.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.aerotoad.thud"
+stratum = "NonFreeNet"
+version_code = 11
+version_name = "1.3.1"
+name = "/com.aerotoad.thud_11.apk"
+sha256 = "c0b1514febba412d2ec4ada351d41cdb88e40ec4de93bafacec52682e456d1cd"
+size = 11252838
+anti_features = ["NonFreeNet"]
+min_sdk = 22
+target_sdk = 33
+permissions = ["android.permission.INTERNET", "android.permission.VIBRATE", "com.aerotoad.thud.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.aerotoad.thud"
+stratum = "NonFreeNet"
+version_code = 10
+version_name = "1.3.0"
+name = "/com.aerotoad.thud_10.apk"
+sha256 = "0103a4bd7442069002fcf1d2b9d96249856e0f73bee0ba9818a6f0bdbb3b40ab"
+size = 10847334
+anti_features = ["NonFreeNet"]
+min_sdk = 22
+target_sdk = 33
+permissions = ["android.permission.INTERNET", "android.permission.VIBRATE", "com.aerotoad.thud.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.aerotoad.thud"
+stratum = "NonFreeNet"
+version_code = 8
+version_name = "1.2.1"
+name = "/com.aerotoad.thud_8.apk"
+sha256 = "7967c71f5afe099b7f9ef594439292b106b291929f9cc78eebc52e9beae33e15"
+size = 10161398
+anti_features = ["NonFreeNet"]
+min_sdk = 22
+target_sdk = 32
+permissions = ["android.permission.INTERNET", "android.permission.VIBRATE", "com.aerotoad.thud.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "dev.imranr.obtainium.fdroid"
+stratum = "control"
+version_code = 23613
+version_name = "1.7.3"
+name = "/dev.imranr.obtainium.fdroid_23613.apk"
+sha256 = "afd28d1ecf7a5fa462517d22007f4b2a3be062bd80193dadfc1f93d2d8824b14"
+size = 34532014
+anti_features = []
+min_sdk = 26
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.ENFORCE_UPDATE_OWNERSHIP", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_SHORT_SERVICE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.REQUEST_DELETE_PACKAGES", "android.permission.REQUEST_INSTALL_PACKAGES", "android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "com.rosan.dhizuku.permission.API", "dev.imranr.obtainium.fdroid.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "moe.shizuku.manager.permission.API_V23"]
+
+[[apk]]
+package = "dev.imranr.obtainium.fdroid"
+stratum = "control"
+version_code = 23612
+version_name = "1.7.3"
+name = "/dev.imranr.obtainium.fdroid_23612.apk"
+sha256 = "02b9bc8ec90a7c4534eeb09b4dd00141183dc615325283d9344b9248b85d4c50"
+size = 30444216
+anti_features = []
+min_sdk = 26
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.ENFORCE_UPDATE_OWNERSHIP", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_SHORT_SERVICE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.REQUEST_DELETE_PACKAGES", "android.permission.REQUEST_INSTALL_PACKAGES", "android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "com.rosan.dhizuku.permission.API", "dev.imranr.obtainium.fdroid.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "moe.shizuku.manager.permission.API_V23"]
+
+[[apk]]
+package = "dev.imranr.obtainium.fdroid"
+stratum = "control"
+version_code = 23611
+version_name = "1.7.3"
+name = "/dev.imranr.obtainium.fdroid_23611.apk"
+sha256 = "95e3894a345a4f9abaa7cec47e5df0f88e5f0c81e6027f8f2c6b4c92ccb39060"
+size = 36858527
+anti_features = []
+min_sdk = 26
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.ENFORCE_UPDATE_OWNERSHIP", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_SHORT_SERVICE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.REQUEST_DELETE_PACKAGES", "android.permission.REQUEST_INSTALL_PACKAGES", "android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "com.rosan.dhizuku.permission.API", "dev.imranr.obtainium.fdroid.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "moe.shizuku.manager.permission.API_V23"]
+
+[[apk]]
+package = "com.frequent.habits"
+stratum = "control"
+version_code = 35
+version_name = "2.3.5"
+name = "/com.frequent.habits_35.apk"
+sha256 = "cdf959120b7078290f5f5fe41a41c20f526b6adc098a689abc46bc7f3b4dbfa8"
+size = 14782620
+anti_features = []
+min_sdk = 24
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK", "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.POST_NOTIFICATIONS", "android.permission.POST_PROMOTED_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.SCHEDULE_EXACT_ALARM", "android.permission.USE_EXACT_ALARM", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "com.frequent.habits.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.frequent.habits"
+stratum = "control"
+version_code = 17
+version_name = "2.0.1"
+name = "/com.frequent.habits_17.apk"
+sha256 = "3b6cb46847c99fb82537e7fa3f0527f4443c544fa8a8839588c5ce32e368b446"
+size = 13326707
+anti_features = []
+min_sdk = 24
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "com.frequent.habits.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.frequent.habits"
+stratum = "control"
+version_code = 16
+version_name = "2.0"
+name = "/com.frequent.habits_16.apk"
+sha256 = "6d74b26b5cf3a426edee53d5c47c263ec7f4017aa7fa627d52e9a7439ba1c4a0"
+size = 13326703
+anti_features = []
+min_sdk = 24
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.POST_NOTIFICATIONS", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "com.frequent.habits.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "eu.faircode.netguard"
+stratum = "control"
+version_code = 2026080101
+version_name = "2.337"
+name = "/eu.faircode.netguard_2026080101.apk"
+sha256 = "158b4308da0006298d22ed557adbff24b282fddeb1bc0b3468829a60f405a8c4"
+size = 2852296
+anti_features = []
+min_sdk = 23
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_PHONE_STATE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "com.android.vending.BILLING", "eu.faircode.netguard.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "eu.faircode.netguard.permission.ADMIN"]
+
+[[apk]]
+package = "eu.faircode.netguard"
+stratum = "control"
+version_code = 2026073101
+version_name = "2.336"
+name = "/eu.faircode.netguard_2026073101.apk"
+sha256 = "85f4fb8df49e402e2c48470aeeeaaa927910962b905240cf12350bc8cba32bf7"
+size = 2780196
+anti_features = []
+min_sdk = 23
+target_sdk = 36
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_PHONE_STATE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "com.android.vending.BILLING", "eu.faircode.netguard.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "eu.faircode.netguard.permission.ADMIN"]
+
+[[apk]]
+package = "eu.faircode.netguard"
+stratum = "control"
+version_code = 2026052101
+version_name = "2.335"
+name = "/eu.faircode.netguard_2026052101.apk"
+sha256 = "1875bd846167fb832412ddb412ba1e6bfa9f8b43db3da1b4e5482e2b63313e1c"
+size = 2789052
+anti_features = []
+min_sdk = 22
+target_sdk = 35
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.ACCESS_WIFI_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_SPECIAL_USE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_PHONE_STATE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "com.android.vending.BILLING", "eu.faircode.netguard.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION", "eu.faircode.netguard.permission.ADMIN"]
+
+[[apk]]
+package = "com.presley.fit_book"
+stratum = "control"
+version_code = 2243
+version_name = "2.0.106"
+name = "/com.presley.fit_book_2243.apk"
+sha256 = "5a75c91a12208c76cb0273fbd64c240225f4b89b32e7b60865b51314619503fd"
+size = 33855594
+anti_features = []
+min_sdk = 24
+target_sdk = 37
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.CAMERA", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_SHORT_SERVICE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "com.presley.fit_book.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.presley.fit_book"
+stratum = "control"
+version_code = 2242
+version_name = "2.0.106"
+name = "/com.presley.fit_book_2242.apk"
+sha256 = "d34eedff033388526721b48858587c1ac1f5759aedd6fdb6a09fde93df60930c"
+size = 31363800
+anti_features = []
+min_sdk = 24
+target_sdk = 37
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.CAMERA", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_SHORT_SERVICE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "com.presley.fit_book.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.presley.fit_book"
+stratum = "control"
+version_code = 2241
+version_name = "2.0.106"
+name = "/com.presley.fit_book_2241.apk"
+sha256 = "0a8466cf22039cd9733819124e3ce7d1e3e1fc2c0fe394cfb6f5c8d1afb27a9d"
+size = 35395685
+anti_features = []
+min_sdk = 24
+target_sdk = 37
+permissions = ["android.permission.ACCESS_NETWORK_STATE", "android.permission.CAMERA", "android.permission.FOREGROUND_SERVICE", "android.permission.FOREGROUND_SERVICE_SHORT_SERVICE", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.RECEIVE_BOOT_COMPLETED", "android.permission.RECORD_AUDIO", "android.permission.VIBRATE", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE", "com.presley.fit_book.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "dev.librenotes.app"
+stratum = "control"
+version_code = 12
+version_name = "1.6.3"
+name = "/dev.librenotes.app_12.apk"
+sha256 = "b156ef9ef4d400208237a085a504cec5aaa5c9776bbe79cc705d29d939a0dbfb"
+size = 9816192
+anti_features = []
+min_sdk = 21
+target_sdk = 35
+permissions = ["android.permission.INTERNET", "dev.librenotes.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "dev.librenotes.app"
+stratum = "control"
+version_code = 11
+version_name = "1.6.0"
+name = "/dev.librenotes.app_11.apk"
+sha256 = "9fce7b6639155f64b364c2a547d025e1e202f7662a36a3b81ee3f0bcbff49128"
+size = 9812096
+anti_features = []
+min_sdk = 21
+target_sdk = 35
+permissions = ["android.permission.INTERNET", "dev.librenotes.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "dev.librenotes.app"
+stratum = "control"
+version_code = 10
+version_name = "1.5.7"
+name = "/dev.librenotes.app_10.apk"
+sha256 = "cd66bdb95ffb4dd641d15be4a018b21ae0d9ba3f9ae9014b96866e4b14bbf216"
+size = 9746392
+anti_features = []
+min_sdk = 21
+target_sdk = 35
+permissions = ["android.permission.INTERNET", "dev.librenotes.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "org.herrlado.ask.languagepack.czech"
+stratum = "control"
+version_code = 6158
+version_name = "5.1.6158"
+name = "/org.herrlado.ask.languagepack.czech_6158.apk"
+sha256 = "be4b2fddb861891ecf1382abf86a27512785982a1f47fa00d06117cd1ec3c791"
+size = 4618194
+anti_features = []
+min_sdk = 21
+target_sdk = 35
+permissions = ["org.herrlado.ask.languagepack.czech.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "org.herrlado.ask.languagepack.czech"
+stratum = "control"
+version_code = 2234
+version_name = "4.0.2234"
+name = "/org.herrlado.ask.languagepack.czech_2234.apk"
+sha256 = "6e93c389ef8b5c93e9e42909d486a7f17fb3fec349ecc203438702ab551d8a5a"
+size = 1707982
+anti_features = []
+min_sdk = 9
+target_sdk = 28
+permissions = []
+
+[[apk]]
+package = "org.herrlado.ask.languagepack.czech"
+stratum = "control"
+version_code = 260
+version_name = "2.0.2"
+name = "/org.herrlado.ask.languagepack.czech_260.apk"
+sha256 = "b6a0b1cb2b8fdb5241776d42e9b6e56db48a90bcf7e87b606e55bca7bfbdee83"
+size = 1197901
+anti_features = []
+min_sdk = 7
+target_sdk = 26
+permissions = []
+
+[[apk]]
+package = "org.navitproject.navit"
+stratum = "control"
+version_code = 2026020887
+version_name = "v0.5.7"
+name = "/org.navitproject.navit_2026020887.apk"
+sha256 = "ff5a825b532ebb7d89f5d2d7128b5ed6fac96bf4dc3b3e0c38052832152919ba"
+size = 8207201
+anti_features = []
+min_sdk = 10
+target_sdk = 33
+permissions = ["android.permission.ACCESS_BACKGROUND_LOCATION", "android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.INTERNET", "android.permission.POST_NOTIFICATIONS", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE"]
+
+[[apk]]
+package = "org.navitproject.navit"
+stratum = "control"
+version_code = 2021030660
+version_name = "v0.5.6"
+name = "/org.navitproject.navit_2021030660.apk"
+sha256 = "fd1b2bc53697b178d1b1559c3f3e6dc57fd0a208036180958a4267acd411504b"
+size = 12451485
+anti_features = []
+min_sdk = 10
+target_sdk = 29
+permissions = ["android.permission.ACCESS_BACKGROUND_LOCATION", "android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.INTERNET", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE"]
+
+[[apk]]
+package = "org.navitproject.navit"
+stratum = "control"
+version_code = 6382
+version_name = "navit 0.5.0-6382"
+name = "/org.navitproject.navit_6382.apk"
+sha256 = "39a89695efc2a1d7fad6d448980a90785126879a441c355e12452b5f4c1e2040"
+size = 7264369
+anti_features = []
+min_sdk = 7
+target_sdk = 19
+permissions = ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.INTERNET", "android.permission.READ_EXTERNAL_STORAGE", "android.permission.WAKE_LOCK", "android.permission.WRITE_EXTERNAL_STORAGE"]
+
+[[apk]]
+package = "de.hosenhasser.funktrainer"
+stratum = "control"
+version_code = 53
+version_name = "1.4.0.3"
+name = "/de.hosenhasser.funktrainer_53.apk"
+sha256 = "1c581a97be0d1a52043ec8ce7403b244b672852b02ceb452309905b279a3a792"
+size = 30595849
+anti_features = []
+min_sdk = 21
+target_sdk = 36
+permissions = ["de.hosenhasser.funktrainer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "de.hosenhasser.funktrainer"
+stratum = "control"
+version_code = 51
+version_name = "1.4.0.1"
+name = "/de.hosenhasser.funktrainer_51.apk"
+sha256 = "3f1420fc99897929ade1f0aa06ba4d4bda61f14a60be2e479ccd30251cf9bfc4"
+size = 30428431
+anti_features = []
+min_sdk = 19
+target_sdk = 34
+permissions = ["de.hosenhasser.funktrainer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "de.hosenhasser.funktrainer"
+stratum = "control"
+version_code = 49
+version_name = "1.3.1.5"
+name = "/de.hosenhasser.funktrainer_49.apk"
+sha256 = "56eb4522fa766b9e8c7015484cd01c24f9d435e2aa1a505319b85342be895df6"
+size = 31000592
+anti_features = []
+min_sdk = 14
+target_sdk = 34
+permissions = ["de.hosenhasser.funktrainer.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "nl.devluuk.sleepywifi"
+stratum = "control"
+version_code = 10
+version_name = "1.9"
+name = "/nl.devluuk.sleepywifi_10.apk"
+sha256 = "5fb7e357e4cc652255257af596bb98b9339d69a2371a464882b823796b92e524"
+size = 1641948
+anti_features = []
+min_sdk = 26
+target_sdk = 28
+permissions = ["android.permission.ACCESS_WIFI_STATE", "android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN", "android.permission.CHANGE_WIFI_STATE", "android.permission.FOREGROUND_SERVICE", "android.permission.QUICKBOOT_POWERON", "android.permission.RECEIVE_BOOT_COMPLETED"]
+
+[[apk]]
+package = "nl.devluuk.sleepywifi"
+stratum = "control"
+version_code = 8
+version_name = "1.7"
+name = "/nl.devluuk.sleepywifi_8.apk"
+sha256 = "a8415c2194aaa43f884d99475e1c825b1c6298b3f42fcd157f74e117a080f605"
+size = 1479544
+anti_features = []
+min_sdk = 23
+target_sdk = 27
+permissions = ["android.permission.ACCESS_WIFI_STATE", "android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN", "android.permission.CHANGE_WIFI_STATE", "android.permission.QUICKBOOT_POWERON", "android.permission.RECEIVE_BOOT_COMPLETED"]
+
+[[apk]]
+package = "nl.devluuk.sleepywifi"
+stratum = "control"
+version_code = 6
+version_name = "1.5"
+name = "/nl.devluuk.sleepywifi_6.apk"
+sha256 = "01be481338820f7ea5fc0b096b956c16ac98df4705d0a9953ae175e07ffc8135"
+size = 2184999
+anti_features = []
+min_sdk = 23
+target_sdk = 27
+permissions = ["android.permission.ACCESS_WIFI_STATE", "android.permission.BLUETOOTH", "android.permission.BLUETOOTH_ADMIN", "android.permission.CHANGE_WIFI_STATE", "android.permission.QUICKBOOT_POWERON", "android.permission.RECEIVE_BOOT_COMPLETED"]
+
+[[apk]]
+package = "com.js.nowakelock"
+stratum = "control"
+version_code = 87
+version_name = "3.0.10"
+name = "/com.js.nowakelock_87.apk"
+sha256 = "43be2538cd3298dc7b62b2c4e8199e45cc534db29e5ccf3c5bca1ee37362bac7"
+size = 3005143
+anti_features = []
+min_sdk = 24
+target_sdk = 35
+permissions = ["android.permission.QUERY_ALL_PACKAGES", "com.js.nowakelock.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.js.nowakelock"
+stratum = "control"
+version_code = 86
+version_name = "3.0.9"
+name = "/com.js.nowakelock_86.apk"
+sha256 = "2f9c92c113cd6ad06c6095bfef8ea0fb08fa9810939b88dbaab37f28ccd552d4"
+size = 2904111
+anti_features = []
+min_sdk = 24
+target_sdk = 35
+permissions = ["android.permission.QUERY_ALL_PACKAGES", "com.js.nowakelock.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]
+
+[[apk]]
+package = "com.js.nowakelock"
+stratum = "control"
+version_code = 85
+version_name = "3.0.8"
+name = "/com.js.nowakelock_85.apk"
+sha256 = "4cd6e2c858668067167854be371e738061d901cdce7d4d475329eaac0fe8211a"
+size = 2904115
+anti_features = []
+min_sdk = 24
+target_sdk = 35
+permissions = ["android.permission.QUERY_ALL_PACKAGES", "com.js.nowakelock.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"]

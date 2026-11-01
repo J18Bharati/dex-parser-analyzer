@@ -84,3 +84,18 @@ From the 2026-11-01 eng review of the plan. They are recorded here before any AP
   - **Turning off `args_conflicts_with_subcommands` survived at first.** `dexpa --fail-on high sdks app.apk` then parsed, and `--fail-on` was silently ignored. Added `analysis_options_are_rejected_before_the_sdks_command`, which expects a usage error (exit 2).
   - **The other 8 were killed by the first version of the tests:** the manifest dropped, the schema check removed, `--catalogue` or `--exodus` ignored, no attribution, the skipped count lost, hex versionCodes printed in hex, and the diff's `+` marker removed.
 - `just ci` green: 158 tests (137 before; 16 CLI and 5 report tests added).
+
+## 2026-11-01: F-Droid evaluation tooling (M6a)
+
+- **Checked before writing any code:**
+  - **The signing key.** F-Droid's signing-keys page lists the index signer as `43:23:8D:51:…:C9:CC:AB`, the same value the eng review recalled. `jarsigner -verify` passes on `entry.jar`, and `keytool` reports exactly that SHA-256. The warnings about a self-signed certificate and SHA1withRSA are expected for F-Droid's long-lived key, so trust rests on the pinned fingerprint, not on a CA chain.
+  - **The index pin.** `entry.json` pins `index-v2.json` at 70,359,050 bytes, sha256 `214b029d…`, 4,923 packages. The download matched both.
+  - **The schema.** Per-version `antiFeatures`, `file.{name,sha256,size}`, and `manifest.{versionCode,versionName,usesSdk,usesPermission,usesPermissionSdk23}` exist as the scripts assume.
+- **The trust chain:** pinned key → `entry.jar` → `entry.json` → index sha256 → per-APK sha256 in the committed lockfile. `fetch` trusts only the lockfile, so a re-run downloads the same bytes or fails.
+- **Deviation: the archive repo is not used.** Plan hypothesis 6 expected fewer than 3 versions per app. In fact the main repo alone has 47 Tracking, 434 NonFreeNet and 2,628 control apps with 3 or more versions of 60 MB or less. The archive index (119 MB) would add only older versions. The sample is therefore biased toward apps that are still updated, and the README says so.
+- **Deviation: scripts.** The plan named `scripts/fdroid-select` and `scripts/fdroid-fetch`. Instead there is one module, `eval/fdroid.py`, with `select`, `fetch` and `run` subcommands, behind `just` recipes. The selection needs a JDK and Python with `ssl`, which upstream's default shell (`python3Minimal`) doesn't provide, so there is a separate `.#eval` shell.
+- **The selection** has 90 APKs (1,369 MB): 10 apps per stratum, 3 versions each. Apps are taken in seeded-hash order, and each versionCode uses its smallest APK, because ABI splits share a code. Stratum comes from the newest version's anti-features. Apps with any other anti-feature are left out of the control group.
+- **Tests:** 25 offline tests, run against a `file://` repo in a temp directory, so there's no network.
+  - **They were written before the module but had only failed at import.** So the weight check is the mutation pass.
+  - **Mutation check: 21 mutants, 21 killed.** They removed each fetch guard (sha256, size, read cut-off, partial cleanup, resume, total, per-file, disk and time budgets, file-name and URL-scheme checks); broke selection (anti-feature strata, smallest APK per code, newest versions, seed); weakened the signer checks (two signers, fingerprint); and broke the cross-check and summary (permissions, reference category, SDK-23 permissions, newest version).
+  - My script mislabelled the test that killed one mutant ("reference not separated"). Rerun by hand, the expected test, `test_reference_version_name_is_its_own_category`, fails.

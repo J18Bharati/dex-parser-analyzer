@@ -52,5 +52,11 @@ Each changed file carries a "Modified by" note. Changes so far:
   dex-sdk/tests/fixtures-src and the compiled dex-sdk/tests/data/sdk-{positive,negative}.dex, with
   a `sdk-fixtures` recipe in the Justfile. README.md, AGENTS.md, dex-cli/README.md,
   docs/architecture.md, CHANGELOG.md.
+- M6a: the F-Droid evaluation tooling: eval/fdroid.py (new; Python standard library only, no
+  HTTP client in any Rust crate), its offline tests in eval/tests/test_fdroid.py, and the lockfile
+  eval/fdroid.lock.toml (F-Droid metadata: package names, versions, file names, hashes and sizes;
+  no APK and no Exodus data). dex-core/examples/manifest_json.rs (new). A `.#eval` dev shell in
+  flake.nix; eval-test, fdroid-select and fdroid-eval recipes in the Justfile; `.cache/` in
+  .gitignore.
 
 Upstream tests edited: none.

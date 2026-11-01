@@ -1,4 +1,4 @@
-# Modified by Zero (2026-11-01): dex-sdk in the source fileset (fork). See NOTICE.
+# Modified by Zero (2026-11-01): dex-sdk in the source fileset (fork M2); eval dev shell (fork M6). See NOTICE.
 {
   description = "dex-parser-analyzer development flake";
 
@@ -118,6 +118,12 @@
               url = "https://dl.google.com/android/maven2/com/android/tools/r8/9.5.28/r8-9.5.28.jar";
               hash = "sha256-OKn/quu9F9FRTj7L/1qFuYm7E8VRueIkx0CVFO6oT/U=";
             };
+          };
+
+          # (fork M6) The F-Droid evaluation, eval/fdroid.py: Python with ssl and tomllib, and the
+          # JDK's jarsigner and keytool to verify the signed entry.jar. `just eval-test` runs offline.
+          devShells.eval = pkgs.mkShell {
+            packages = with pkgs; [ python3 jdk21_headless just ];
           };
 
           # cargo-fuzz needs nightly (-Zsanitizer); pinned so a run is reproducible. Used by fuzz.yml.

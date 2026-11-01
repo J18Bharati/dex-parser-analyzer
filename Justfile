@@ -1,4 +1,4 @@
-# Modified by Zero (2026-11-01): sdk-fixtures recipe (fork M5). See NOTICE.
+# Modified by Zero (2026-11-01): sdk-fixtures recipe (fork M5); eval recipes (fork M6). See NOTICE.
 # dex-parser-analyzer recipes, from products/templates/Justfile. Run them inside `nix develop`
 # (the toolchain is pinned in rust-toolchain.toml). `just ci` is the one local gate.
 
@@ -98,3 +98,16 @@ sdk-fixtures:
     done
     echo "fixtures written to dex-sdk/tests/data (scratch: $out)"
 
+# (fork M6) Offline tests of the F-Droid evaluation scripts (inside `nix develop .#eval`).
+eval-test:
+    python3 -m unittest discover -s eval/tests -v
+
+# (fork M6) Write eval/fdroid.lock.toml from F-Droid's signed index (network; `nix develop .#eval`).
+fdroid-select *args:
+    python3 eval/fdroid.py select {{args}}
+
+# (fork M6) Fetch the locked APKs, analyse each, delete it, and write eval/results.json and
+# eval/TABLE.md (network; budgets in eval/fdroid.py; `nix develop .#eval`).
+fdroid-eval *args:
+    cargo build --release -p dexpa-cli -p dexpa-core --example manifest_json
+    python3 eval/fdroid.py run --dexpa target/release/dexpa --manifest-tool target/release/examples/manifest_json {{args}}
