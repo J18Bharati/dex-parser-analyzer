@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): app DEX entries are top-level classes(N).dex in numeric order,
+// Modified by Jatin Bharati (2026-11-01): app DEX entries are top-level classes(N).dex in numeric order,
 // and each entry read is size-limited; their sum is capped too (2026-11-02, /cso). /review
 // (2026-11-02): u64::MAX limits, ART's stop at the first missing number, duplicate names refused,
 // a numbered entry that is not DEX is an error.

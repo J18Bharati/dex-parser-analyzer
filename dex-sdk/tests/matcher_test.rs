@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new test file (fork M3); review fixes (2026-11-02). See NOTICE.
+// Modified by Jatin Bharati (2026-11-01): new test file (fork M3); review fixes (2026-11-02). See NOTICE.
 use dexpa_core::axml::XmlValue;
 use dexpa_core::manifest::{Component, ComponentKind, Manifest, MetaData};
 use dexpa_sdk::catalogue::{Origin, bundled, load_exodus_json, load_toml};

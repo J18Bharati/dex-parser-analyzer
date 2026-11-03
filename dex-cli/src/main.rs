@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): `dexpa sdks` subcommand (fork M5); `dexpa <FILE>` unchanged; errors
+// Modified by Jatin Bharati (2026-11-01): `dexpa sdks` subcommand (fork M5); `dexpa <FILE>` unchanged; errors
 // escaped like other output (2026-11-02, re-review). See NOTICE.
 //! `dexpa`: the summary and static-analysis findings of an Android DEX file or APK.
 

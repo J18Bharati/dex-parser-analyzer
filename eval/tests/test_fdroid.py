@@ -1,4 +1,4 @@
-# Modified by Zero (2026-11-01): new test file (fork M6); run-loop tests (2026-11-02, /review, re-review). See NOTICE.
+# Modified by Jatin Bharati (2026-11-01): new test file (fork M6); run-loop tests (2026-11-02, /review, re-review). See NOTICE.
 """Offline tests for eval/fdroid.py. No network: the "repo" is a temp directory served as file://.
 
 Run: python3 -m unittest discover -s eval/tests   (or `just eval-test`).

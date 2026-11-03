@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M3); Source::as_str (M5); one RegexSet pass
+// Modified by Jatin Bharati (2026-11-01): new module (fork M3); Source::as_str (M5); one RegexSet pass
 // for Exodus signatures (2026-11-02, /review); activity aliases are not evidence (re-review).
 // See NOTICE.
 //! Matching a catalogue against an inventory and a manifest, with the evidence for each match.

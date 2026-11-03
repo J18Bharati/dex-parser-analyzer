@@ -1,4 +1,6 @@
-<!-- Modified by Zero (2026-11-01): dexpa-sdk and `dexpa sdks` rows (fork M5), F-Droid evaluation link (M6). See NOTICE. -->
+<!-- Modified by Jatin Bharati (2026-11-01): dexpa-sdk and `dexpa sdks` rows (fork M5), F-Droid evaluation link (M6). See NOTICE. -->
+> **Fork** of [dhilipsiva/dex-parser-analyzer](https://github.com/dhilipsiva/dex-parser-analyzer) at `3f5a124`. This fork adds Android manifest (AXML) parsing and third-party SDK detection (`dexpa-sdk`, `dexpa sdks`), evaluated on 90 F-Droid APKs. See [NOTICE](NOTICE) for every change.
+
 Status: alpha, unreleased (every crate is 0.1.0). The parser and analyzer run on the bundled fixtures; v0.2.0 will be the first crates.io release of `dexpa-core`, `dexpa-analysis` and `dexpa-cli` (binary `dexpa`). This fork adds `dexpa-sdk`, which `dexpa-cli` depends on.
 
 # dex-parser-analyzer
@@ -70,5 +72,7 @@ just ci        # fmt, clippy (native and wasm32), tests, docs, cargo deny
 ## License
 
 Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or [MIT license](LICENSE-MIT) at your option. The DEX and APK test fixtures under `dex-core/tests/data/` derive from the Androguard test corpus and keep its Apache-2.0 terms; see [NOTICE](NOTICE).
+
+The Exodus Privacy tracker data that the CLI can optionally load is ODbL 1.0; you supply it at run time and none is bundled in this repository.
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.

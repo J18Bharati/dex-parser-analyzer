@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M4); uses Source::as_str (M5); unread manifests
+// Modified by Jatin Bharati (2026-11-01): new module (fork M4); uses Source::as_str (M5); unread manifests
 // are uncertain, and only class evidence is compared (2026-11-02, /review). See NOTICE.
 //! SDK changes between two versions of an app.
 

@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new example (fork M6). See NOTICE.
+// Modified by Jatin Bharati (2026-11-01): new example (fork M6). See NOTICE.
 //! Prints an APK's parsed `AndroidManifest.xml` as JSON. The F-Droid evaluation
 //! (`eval/fdroid.py run`) compares it with the manifest fields in F-Droid's index.
 //!

@@ -1,4 +1,4 @@
-<!-- Modified by Zero (2026-11-01): `dexpa sdks` and `dexpa sdks diff` (fork M5); APK entries in load order (fork M1a); manifest_error, catalogue_fingerprint, diff refusal (2026-11-02, /review); unread-manifest confidence, unreadable_classes (re-review). See NOTICE. -->
+<!-- Modified by Jatin Bharati (2026-11-01): `dexpa sdks` and `dexpa sdks diff` (fork M5); APK entries in load order (fork M1a); manifest_error, catalogue_fingerprint, diff refusal (2026-11-02, /review); unread-manifest confidence, unreadable_classes (re-review). See NOTICE. -->
 # dexpa-cli
 
 `dexpa`, the command-line front end of [dex-parser-analyzer](../README.md). It parses a `.dex` file, or every `classes*.dex` in an APK, with [`dexpa-core`](../dex-core/), runs every [`dexpa-analysis`](../dex-analysis/) pass with the default configuration, and prints the results.

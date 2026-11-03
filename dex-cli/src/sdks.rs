@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M5); manifest_error, diff catalogue check and
+// Modified by Jatin Bharati (2026-11-01): new module (fork M5); manifest_error, diff catalogue check and
 // escaped text output (2026-11-02, /review); unread-manifest warning, Cf escapes,
 // escaped warnings, unreadable count (re-review). See NOTICE.
 //! `dexpa sdks`: which third-party SDKs an app contains, and `dexpa sdks diff`: what changed.

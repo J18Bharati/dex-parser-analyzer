@@ -1,7 +1,7 @@
-# Modified by Zero (2026-11-01): dexpa-sdk added to CRATES (fork M5). See NOTICE.
+# Modified by Jatin Bharati (2026-11-01): dexpa-sdk (publish = false) removed from CRATES (fork). See NOTICE.
 # Release for dex-parser-analyzer, from products/templates/release.yml; the runbook is RELEASING.md.
 # Tag -> preflight -> the CI gate -> dexpa binaries -> a DRAFT GitHub Release with checksums and
-# build provenance -> crates.io (dexpa-core, dexpa-analysis, dexpa-sdk, dexpa-cli) -> undraft -> redeploy the
+# build provenance -> crates.io (dexpa-core, dexpa-analysis, dexpa-cli) -> undraft -> redeploy the
 # GUI. A manual run is always a rehearsal: it builds, packages and dry-runs the publish, and
 # creates and deploys nothing. Every action, here and in deploy-dex-gui.yml, is pinned to a full
 # commit SHA with its release tag.
@@ -36,7 +36,7 @@ env:
   CARGO_TERM_COLOR: always
   BIN: dexpa
   # The crates to publish. cargo (1.90 or later) publishes them in dependency order, whatever order they are listed in.
-  CRATES: dexpa-core dexpa-analysis dexpa-sdk dexpa-cli
+  CRATES: dexpa-core dexpa-analysis dexpa-cli
 
 jobs:
   setup:

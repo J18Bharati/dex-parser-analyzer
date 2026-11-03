@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new fuzz target (fork M1b). See NOTICE.
+// Modified by Jatin Bharati (2026-11-01): new fuzz target (fork M1b). See NOTICE.
 //! Parse arbitrary bytes as a binary AndroidManifest.xml, then resolve every component name.
 #![no_main]
 

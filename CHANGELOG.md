@@ -1,4 +1,4 @@
-<!-- Modified by Zero (2026-11-01): fork entries marked (fork). See NOTICE. -->
+<!-- Modified by Jatin Bharati (2026-11-01): fork entries marked (fork). See NOTICE. -->
 # Changelog
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project adheres to [Semantic Versioning](https://semver.org/).
@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Changed
+- (fork) `dexpa-sdk` is `publish = false` and no longer in the release workflow's `CRATES`, so the fork publishes no crates; `dexpa-cli` depends on it, so a `dexpa-cli` release from the fork would fail (RELEASING.md).
 - (fork) An APK's DEX files stop at the first missing number, as ART's loader does: with `classes.dex` and `classes3.dex` only `classes.dex` is app code. An archive with two entries of the same name (`classes.dex` or `AndroidManifest.xml`) is refused, because zip readers disagree on which one wins.
 - (fork) A manifest string attribute is read the way Android reads it: one with a resource id (every `android:` attribute, which Android reads through `TypedArray`) by its typed value, one without (such as `package`, read through `XmlPullParser`) by its raw string, each falling back to the other. An APK whose two disagree no longer shows the decoy.
 - (fork) `<uses-permission-sdk-m>` counts as a permission, as `<uses-permission-sdk-23>` does.

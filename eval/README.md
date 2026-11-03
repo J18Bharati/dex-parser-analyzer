@@ -1,4 +1,4 @@
-<!-- Modified by Zero (2026-11-02): new file (fork M6); review note on report fields; parser changes (re-review). See NOTICE. -->
+<!-- Modified by Jatin Bharati (2026-11-02): new file (fork M6); review note on report fields; parser changes (re-review). See NOTICE. -->
 # F-Droid evaluation of `dexpa sdks`
 
 **Claim.** On 90 F-Droid APKs (30 apps × 3 versions), the manifest parser agreed with F-Droid's index on every field it could have known. 81 APKs match exactly, and the other 9 differ only by values the index adds itself. The SDK matcher found SDKs in 9 of the 30 apps. Finding them took manifest evidence as well as class names. The run also turned up two weaknesses in the matcher, described below.

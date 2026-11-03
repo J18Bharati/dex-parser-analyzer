@@ -1,4 +1,4 @@
-# Modified by Zero (2026-11-01): dex-sdk in the source fileset (fork M2); eval dev shell (fork M6). See NOTICE.
+# Modified by Jatin Bharati (2026-11-01): dex-sdk in the source fileset (fork M2); eval dev shell (fork M6). See NOTICE.
 {
   description = "dex-parser-analyzer development flake";
 

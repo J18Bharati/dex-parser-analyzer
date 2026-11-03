@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M4); build_report and value_text (M5);
+// Modified by Jatin Bharati (2026-11-01): new module (fork M4); build_report and value_text (M5);
 // catalogue_fingerprint and manifest_error (2026-11-02, /review); unreadable_classes (re-review).
 // See NOTICE.
 //! The SDK report: what `dexpa sdks` prints as JSON, and what `diff` reads back.

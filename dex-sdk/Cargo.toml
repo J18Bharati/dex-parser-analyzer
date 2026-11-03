@@ -1,4 +1,4 @@
-# Modified by Zero (2026-11-01): new crate (fork M2); publishable from M5. See NOTICE.
+# Modified by Jatin Bharati (2026-11-01): new crate (fork M2); publish = false, the fork publishes no crates. See NOTICE.
 [package]
 name = "dexpa-sdk"
 description = "Class-prefix inventory, SDK catalogue matching and version diffs over DEX files and APK manifests"
@@ -10,8 +10,9 @@ repository.workspace = true
 homepage.workspace = true
 keywords.workspace = true
 categories.workspace = true
-# Published with the others since M5: dexpa-cli depends on it, and a published crate cannot
-# depend on an unpublished one (`cargo publish --workspace` in `just release-dry-run`).
+# The fork does not publish this crate: the name is not the fork's to take on crates.io. Because
+# dexpa-cli depends on it, a `cargo publish` of dexpa-cli from this fork fails (RELEASING.md).
+publish = false
 
 [dependencies]
 dexpa-core = { path = "../dex-core", version = "0.1.0" }

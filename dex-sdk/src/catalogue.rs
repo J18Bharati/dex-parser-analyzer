@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M3); review fixes (2026-11-02). See NOTICE.
+// Modified by Jatin Bharati (2026-11-01): new module (fork M3); review fixes (2026-11-02). See NOTICE.
 //! SDK catalogues: this project's TOML list, and an importer for Exodus tracker files.
 
 use regex::Regex;

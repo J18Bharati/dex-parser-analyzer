@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new test helper (fork M1b); review shapes (2026-11-02). See NOTICE.
+// Modified by Jatin Bharati (2026-11-01): new test helper (fork M1b); review shapes (2026-11-02). See NOTICE.
 //! Builds Android binary XML (AXML) documents for tests, written from the chunk layout in
 //! AOSP's ResourceTypes.h. There is no AXML fixture in the repo and third-party APKs are not
 //! committed, so tests build the documents they need, in both string-pool encodings.

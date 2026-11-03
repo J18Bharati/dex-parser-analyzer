@@ -1,4 +1,4 @@
-<!-- Modified by Zero (2026-11-01): dex-sdk crate, sdk-fixtures recipe, four published crates (fork M5). See NOTICE. -->
+<!-- Modified by Jatin Bharati (2026-11-01): dex-sdk crate, sdk-fixtures recipe, dexpa-sdk is publish = false (fork). See NOTICE. -->
 # Agent guide
 
 dex-parser-analyzer is a Cargo workspace of five crates (layout and module roles: `docs/architecture.md`):
@@ -24,7 +24,7 @@ Work inside the dev shell, which pins the toolchain from `rust-toolchain.toml`:
 | `just doc` | rustdoc with `-D warnings` |
 | `just fixtures` | inside `nix develop .#fixtures` (JDK 21 and a pinned R8): recompile `dex-analysis/tests/fixtures-src` into `dex-analysis/tests/data/rules-{positive,negative}.dex` |
 | `just sdk-fixtures` | (fork) inside `nix develop .#fixtures`: recompile `dex-sdk/tests/fixtures-src` into `dex-sdk/tests/data/sdk-{positive,negative}.dex` |
-| `just release` | the local release rehearsal: `ci`, `cargo publish --dry-run` for the four crates, and `nix build` of both packages; uploads nothing (RELEASING.md) |
+| `just release` | the local release rehearsal: `ci`, `cargo publish --dry-run` for the publishable crates, and `nix build` of both packages; uploads nothing (RELEASING.md) |
 | `nix build .#dex-cli` / `nix build .#dex-gui` | the `dexpa` binary / the static GUI bundle |
 | `just deny` | `cargo deny check advisories bans licenses sources` (policy in `deny.toml`) |
 | `cargo run -p dexpa-cli -- <file.dex or .apk>` | run the `dexpa` CLI |

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Modified by Zero (2026-11-01): new file (fork M6); run-loop fixes (2026-11-02, /review); reports
+# Modified by Jatin Bharati (2026-11-01): new file (fork M6); run-loop fixes (2026-11-02, /review); reports
 # cleared before a run, tool errors per APK, UTF-8 lockfile, HTTP errors per APK (re-review).
 # See NOTICE.
 """The F-Droid evaluation of `dexpa sdks`: select apps, fetch them under a budget, analyse them.

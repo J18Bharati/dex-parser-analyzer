@@ -1,4 +1,4 @@
-# Modified by Zero (2026-11-01): sdk-fixtures recipe (fork M5); eval recipes (fork M6). See NOTICE.
+# Modified by Jatin Bharati (2026-11-01): sdk-fixtures recipe (fork M5); eval recipes (fork M6). See NOTICE.
 # dex-parser-analyzer recipes, from products/templates/Justfile. Run them inside `nix develop`
 # (the toolchain is pinned in rust-toolchain.toml). `just ci` is the one local gate.
 

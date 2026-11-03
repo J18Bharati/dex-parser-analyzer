@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new crate (fork M2). See NOTICE.
+// Modified by Jatin Bharati (2026-11-01): new crate (fork M2). See NOTICE.
 #![deny(unsafe_code)]
 #![deny(unused_must_use)]
 

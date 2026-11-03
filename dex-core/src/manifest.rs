@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M1b); review fixes (2026-11-02); uses-permission-sdk-m (re-review). See NOTICE.
+// Modified by Jatin Bharati (2026-11-01): new module (fork M1b); review fixes (2026-11-02); uses-permission-sdk-m (re-review). See NOTICE.
 //! The parts of `AndroidManifest.xml` that identify an app and the SDKs it declares.
 
 use serde::Serialize;

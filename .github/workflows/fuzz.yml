@@ -1,4 +1,4 @@
-# Modified by Zero (2026-11-01): parse_manifest in the matrix (fork). See NOTICE.
+# Modified by Jatin Bharati (2026-11-01): parse_manifest in the matrix (fork). See NOTICE.
 # A weekly fuzz campaign: each target for 20 minutes (an hour in all), on the pinned nightly from
 # the flake's fuzz dev shell. A crash fails the job and keeps its input as an artifact.
 name: Fuzz

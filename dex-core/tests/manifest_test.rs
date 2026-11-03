@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new test file (fork M1b); review fixes (2026-11-02). See NOTICE.
+// Modified by Jatin Bharati (2026-11-01): new test file (fork M1b); review fixes (2026-11-02). See NOTICE.
 //! The AXML parser and the AndroidManifest model.
 
 #[path = "common/axml_builder.rs"]

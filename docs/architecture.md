@@ -1,4 +1,4 @@
-<!-- Modified by Zero (2026-11-01): axml.rs and manifest.rs rows, multidex.rs entry rules, dex-sdk, `dexpa sdks` (fork); review fixes (2026-11-02). See NOTICE. -->
+<!-- Modified by Jatin Bharati (2026-11-01): axml.rs and manifest.rs rows, multidex.rs entry rules, dex-sdk, `dexpa sdks` (fork); review fixes (2026-11-02). See NOTICE. -->
 # Architecture
 
 What exists in the workspace as of 2026-10-21. The documents in `docs/research/` are design surveys written before the code; where they describe something not listed here (for example a full OWASP static-analysis engine, CHA call graphs, or disassembly and hex views in the GUI), it is not built.

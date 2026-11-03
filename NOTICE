@@ -15,7 +15,7 @@ Copyright 2011-2024 The Bootstrap Authors, licensed under the MIT License
 (https://github.com/twbs/bootstrap/blob/main/LICENSE). It is vendored unmodified, with its
 licence header, and is part of the GUI bundle only; no published crate contains it.
 
-Modified by Zero, from 2026-11-01.
+Modified by Jatin Bharati, from 2026-11-01.
 Fork base: 3f5a1242892ce778f30192d4545108cc9d184112 (tagged `upstream-base`), 2026-10-22.
 Upstream: https://github.com/dhilipsiva/dex-parser-analyzer
 
@@ -97,5 +97,12 @@ Each changed file carries a "Modified by" note. Changes so far:
   (HTTP errors per APK); tests in dex-core/tests/manifest_test.rs, dex-sdk/tests/{matcher,diff,
   report,inventory}_test.rs, dex-cli/tests/sdks.rs and eval/tests/test_fdroid.py. NOTICE and
   eval/README.md corrections; dex-cli/README.md, docs/architecture.md, CHANGELOG.md.
+- Pre-publication fixes (2026-11-03): the author name in every "Modified by" header and in this
+  file; README.md (fork banner, a note on Exodus data in the License section); NOTES.md (a local
+  path replaced); .gitignore (`.gstack/`). Publish guard: dex-sdk/Cargo.toml sets
+  `publish = false` and .github/workflows/release.yml drops dexpa-sdk from CRATES, undoing the M5
+  change above; RELEASING.md and AGENTS.md follow. The fork does not publish crates: dexpa-cli
+  depends on dexpa-sdk, so a dexpa-cli release from the fork would fail (RELEASING.md).
+  CHANGELOG.md.
 
 Upstream tests edited: none.

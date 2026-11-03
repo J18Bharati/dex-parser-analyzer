@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new test file (fork M5); review fixes (2026-11-02). See NOTICE.
+// Modified by Jatin Bharati (2026-11-01): new test file (fork M5); review fixes (2026-11-02). See NOTICE.
 //! `dexpa sdks` and `dexpa sdks diff`, driven through the built binary.
 //!
 //! The DEX fixtures (`dex-sdk/tests/data/sdk-{positive,negative}.dex`) are compiled from

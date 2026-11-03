@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): the axml and manifest modules (fork M1b). See NOTICE.
+// Modified by Jatin Bharati (2026-11-01): the axml and manifest modules (fork M1b). See NOTICE.
 #![deny(unsafe_op_in_unsafe_fn)]
 #![deny(unused_must_use)]
 

@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new test file (fork M1); review fixes (2026-11-02). See NOTICE.
+// Modified by Jatin Bharati (2026-11-01): new test file (fork M1); review fixes (2026-11-02). See NOTICE.
 //! Which zip entries count as the app's DEX files, in what order, and how much is read.
 //!
 //! Android loads `classes.dex`, then `classes2.dex`, `classes3.dex`, ... from the archive root.

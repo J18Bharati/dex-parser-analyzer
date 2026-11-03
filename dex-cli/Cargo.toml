@@ -1,4 +1,4 @@
-# Modified by Zero (2026-11-01): dexpa-sdk and zip for `dexpa sdks` (fork M5). See NOTICE.
+# Modified by Jatin Bharati (2026-11-01): dexpa-sdk and zip for `dexpa sdks` (fork M5). See NOTICE.
 [package]
 name = "dexpa-cli"
 description = "Command-line DEX summaries and static-analysis findings"

@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M2); DEX v041 containers refused (2026-11-02,
+// Modified by Jatin Bharati (2026-11-01): new module (fork M2); DEX v041 containers refused (2026-11-02,
 // re-review). See NOTICE.
 //! Defined classes and package-prefix counts across an app's DEX files.
 

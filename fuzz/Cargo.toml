@@ -1,4 +1,4 @@
-# Modified by Zero (2026-11-01): the parse_manifest target (fork). See NOTICE.
+# Modified by Jatin Bharati (2026-11-01): the parse_manifest target (fork). See NOTICE.
 [package]
 name = "dex-fuzz"
 version = "0.0.0"

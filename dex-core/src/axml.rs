@@ -1,4 +1,4 @@
-// Modified by Zero (2026-11-01): new module (fork M1b); raw string index first (2026-11-02, /review); typed index first
+// Modified by Jatin Bharati (2026-11-01): new module (fork M1b); raw string index first (2026-11-02, /review); typed index first
 // for attributes with a resource id (re-review). See NOTICE.
 //! Android binary XML (AXML), as stored in an APK's `AndroidManifest.xml`.
 
