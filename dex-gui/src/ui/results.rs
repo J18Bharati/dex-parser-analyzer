@@ -4,12 +4,8 @@ use std::sync::Arc;
 use leptos::prelude::*;
 
 use super::{
-    AnalysisView,
-    arrival::{Picker, SAMPLE_NAME},
-    dex_view::ClassesView,
-    manifest_view::ManifestView,
-    sdk_view::SdkView,
-    state::LoadState,
+    AnalysisView, arrival::SAMPLE_NAME, dex_view::ClassesView, manifest_view::ManifestView,
+    sdk_view::SdkView, state::LoadState,
 };
 use crate::load::Section;
 
@@ -45,7 +41,14 @@ pub fn Results(state: LoadState) -> impl IntoView {
         <section class="res">
             <div class="res-head">
                 <p class="file-name">{move || (!name_is_title()).then(|| state.file_name.get())}</p>
-                <Picker state=state/>
+                <button
+                    type="button"
+                    class="btn ghost load-another"
+                    disabled=move || state.busy.get()
+                    on:click=move |_| state.clear()
+                >
+                    "load another file"
+                </button>
             </div>
             {move || state.error.get().map(|msg| view! { <p class="notice error" role="alert">{msg}</p> })}
             {move || ready().then(|| view! { <Loaded state=state selected=selected/> })}

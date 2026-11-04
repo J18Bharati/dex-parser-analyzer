@@ -91,6 +91,14 @@ impl LoadState {
         self.classes.set(Section::Pending);
     }
 
+    /// Forgets everything, so the page shows the arrival screen again. Ignored while busy.
+    pub fn clear(self) {
+        if self.busy.get_untracked() {
+            return;
+        }
+        self.reset(String::new());
+    }
+
     /// Shows `message` as the result of loading `name`, without loading anything.
     pub fn fail(self, name: String, message: String) {
         if self.busy.get_untracked() {

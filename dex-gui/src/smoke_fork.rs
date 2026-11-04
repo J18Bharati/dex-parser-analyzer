@@ -78,7 +78,7 @@ fn sample_report_matches_the_cli_golden() {
 }
 
 #[wasm_bindgen_test]
-async fn the_sample_app_loads_and_the_picker_is_free_again() {
+async fn the_sample_app_loads_and_loading_another_is_free_again() {
     let page = mounted();
     let button: HtmlElement = page
         .query_selector("button.ghost")
@@ -108,11 +108,11 @@ async fn the_sample_app_loads_and_the_picker_is_free_again() {
         !text.contains("See what's inside"),
         "the arrival screen stayed: {text}"
     );
-    let input = page
-        .query_selector("input[type=file]")
+    let again = page
+        .query_selector("button.load-another")
         .expect("valid selector")
-        .expect("the picker is missing");
-    assert!(input.get_attribute("disabled").is_none(), "still busy");
+        .expect("the load another file button is missing");
+    assert!(again.get_attribute("disabled").is_none(), "still busy");
 }
 
 /// Mounts `view` into a fresh container and returns it.
@@ -406,4 +406,34 @@ async fn corrupt_dex_in_an_apk_keeps_the_manifest() {
     tab_named("Manifest").click();
     wait(50).await;
     assert!(text_of(&page).contains("app.fixture"), "{}", text_of(&page));
+}
+
+#[wasm_bindgen_test]
+async fn load_another_file_returns_to_arrival() {
+    let page = mounted();
+    let sample: HtmlElement = page
+        .query_selector("button.ghost")
+        .expect("valid selector")
+        .expect("the sample button is missing")
+        .unchecked_into();
+    sample.click();
+    let loaded = || text_of(&page).contains("app.fixture") && !text_of(&page).contains("Working");
+    until(loaded).await;
+    assert_eq!(tab_count(&page), 4, "{}", text_of(&page));
+    let again: HtmlElement = page
+        .query_selector("button.load-another")
+        .expect("valid selector")
+        .expect("the load another file button is missing")
+        .unchecked_into();
+    again.click();
+    wait(50).await;
+    let text = text_of(&page);
+    assert!(text.contains("See what's inside an Android app"), "{text}");
+    assert_eq!(tab_count(&page), 0);
+    assert!(!text.contains("app.fixture"), "{text}");
+    assert!(
+        page.query_selector("input[type=file]")
+            .expect("selector")
+            .is_some()
+    );
 }
