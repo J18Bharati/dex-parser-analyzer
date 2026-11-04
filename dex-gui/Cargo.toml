@@ -1,4 +1,4 @@
-# Modified by Jatin Bharati (2026-11-04): dexpa-sdk for the browser SDK report (fork-webapp). See NOTICE.
+# Modified by Jatin Bharati (2026-11-04): dexpa-sdk for the browser SDK report; js-sys, wasm-bindgen-futures and web-sys for the staged load and drag and drop (fork-webapp). See NOTICE.
 [package]
 name = "dex-gui"
 description = "In-browser DEX analyzer (Leptos and WebAssembly); the uploaded file never leaves the machine"
@@ -22,6 +22,9 @@ console_error_panic_hook = "0.1"
 wasm-logger = "0.2"
 log = "0.4"
 gloo-file = { version = "0.3", features = ["futures"] }
+js-sys = "0.3"
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = ["DataTransfer", "DragEvent", "File", "FileList", "HtmlInputElement", "Window"] }
 
 dexpa-core = { path = "../dex-core", version = "0.1.0" }
 dexpa-analysis = { path = "../dex-analysis", version = "0.1.0" }

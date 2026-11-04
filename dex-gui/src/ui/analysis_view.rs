@@ -1,7 +1,10 @@
+// Modified by Jatin Bharati (2026-11-04): classes from the fork's stylesheet, rows capped at MAX_ROWS (fork-webapp). See NOTICE.
 use std::sync::Arc;
 
 use dexpa_analysis::model::{AnalysisReport, Finding, Severity};
 use leptos::prelude::*;
+
+use crate::load::MAX_ROWS;
 
 const SEVERITY_ORDER: [Severity; 5] = [
     Severity::Critical,
@@ -17,12 +20,22 @@ pub fn AnalysisView(report: Arc<AnalysisReport>) -> impl IntoView {
     let (selected, set_selected) = signal(Option::<Finding>::None);
     let findings_source = Arc::clone(&report);
 
+    let count_source = Arc::clone(&report);
+    let filtered_count = move || {
+        let active = active_severities.get();
+        count_source
+            .findings
+            .iter()
+            .filter(|finding| active.contains(&finding.severity))
+            .count()
+    };
     let filtered_findings = move || {
         let active = active_severities.get();
         findings_source
             .findings
             .iter()
             .filter(|finding| active.contains(&finding.severity))
+            .take(MAX_ROWS)
             .cloned()
             .collect::<Vec<_>>()
     };
@@ -37,56 +50,40 @@ pub fn AnalysisView(report: Arc<AnalysisReport>) -> impl IntoView {
         });
     };
 
+    let stat = |label: &'static str, value: String| {
+        view! {
+            <div class="stat">
+                <div class="stat-label">{label}</div>
+                <div class="stat-value">{value}</div>
+            </div>
+        }
+    };
+    let elapsed = report
+        .stats
+        .elapsed_ms
+        .map(|elapsed| stat("Elapsed", format!("{elapsed} ms")));
+    let total = report.findings.len();
+
     view! {
-        <div class="vstack gap-4">
+        <div class="stack">
             <section>
-                <div class="row row-cols-2 row-cols-md-3 g-3">
-                    <div class="col">
-                        <div class="border rounded p-3 bg-light">
-                            <div class="text-secondary text-uppercase small">"Findings"</div>
-                            <div class="fw-semibold">{report.findings.len()}</div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="border rounded p-3 bg-light">
-                            <div class="text-secondary text-uppercase small">"Methods"</div>
-                            <div class="fw-semibold">{report.stats.method_count}</div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="border rounded p-3 bg-light">
-                            <div class="text-secondary text-uppercase small">"Strings"</div>
-                            <div class="fw-semibold">{report.stats.string_count}</div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="border rounded p-3 bg-light">
-                            <div class="text-secondary text-uppercase small">"Instructions"</div>
-                            <div class="fw-semibold">{report.stats.instruction_count}</div>
-                        </div>
-                    </div>
-                    {report.stats.elapsed_ms.map(|elapsed| view! {
-                        <div class="col">
-                            <div class="border rounded p-3 bg-light">
-                                <div class="text-secondary text-uppercase small">"Elapsed"</div>
-                                <div class="fw-semibold">{elapsed} " ms"</div>
-                            </div>
-                        </div>
-                    })}
+                <div class="stats">
+                    {stat("Findings", total.to_string())}
+                    {stat("Methods", report.stats.method_count.to_string())}
+                    {stat("Strings", report.stats.string_count.to_string())}
+                    {stat("Instructions", report.stats.instruction_count.to_string())}
+                    {elapsed}
                 </div>
-                <div class="mt-3 d-flex flex-wrap gap-2">
+                <div class="chips">
                     { SEVERITY_ORDER.iter().map(|severity| {
                         let label = format!("{severity:?}");
                         let sev = *severity;
                         view! {
                             <button
-                                class=move || {
-                                    if active_severities.get().contains(&sev) {
-                                        "btn btn-primary btn-sm"
-                                    } else {
-                                        "btn btn-outline-primary btn-sm"
-                                    }
-                                }
+                                type="button"
+                                class="chip"
+                                class:on=move || active_severities.get().contains(&sev)
+                                aria-pressed=move || active_severities.get().contains(&sev).to_string()
                                 on:click=move |_| toggle(sev)
                             >
                                 {label.clone()}
@@ -97,10 +94,9 @@ pub fn AnalysisView(report: Arc<AnalysisReport>) -> impl IntoView {
             </section>
 
             <section>
-                <h3 class="h5 mb-3">"Findings"</h3>
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover align-middle">
-                        <thead class="table-light">
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
                             <tr>
                                 <th scope="col">"Severity"</th>
                                 <th scope="col">"Rule"</th>
@@ -114,7 +110,7 @@ pub fn AnalysisView(report: Arc<AnalysisReport>) -> impl IntoView {
                                 if rows.is_empty() {
                                     return view! {
                                         <tr>
-                                            <td colspan="4" class="text-secondary">
+                                            <td colspan="4" class="muted">
                                                 "No findings with the selected severities."
                                             </td>
                                         </tr>
@@ -132,9 +128,9 @@ pub fn AnalysisView(report: Arc<AnalysisReport>) -> impl IntoView {
                                     view! {
                                         <tr on:click=move |_| set_selected.set(Some(row_finding.clone())) class="clickable">
                                             <td>{severity}</td>
-                                            <td class="text-nowrap">{rule}</td>
-                                            <td class="font-monospace">{location}</td>
-                                            <td>{message}</td>
+                                            <td class="nowrap">{rule}</td>
+                                            <td class="mono wrap">{location}</td>
+                                            <td class="wrap">{message}</td>
                                         </tr>
                                     }
                                 }).collect_view().into_any()
@@ -142,13 +138,16 @@ pub fn AnalysisView(report: Arc<AnalysisReport>) -> impl IntoView {
                         </tbody>
                     </table>
                 </div>
+                { move || (filtered_count() > MAX_ROWS).then(|| view! {
+                    <p class="muted">{format!("Showing the first {MAX_ROWS} of {} findings.", filtered_count())}</p>
+                }) }
             </section>
 
             { move || selected.get().map(|finding| {
                 view! {
                     <section>
-                        <h3 class="h6">"Finding Details"</h3>
-                        <pre class="bg-dark text-light p-3 rounded pre-wrap">{format!("{finding:#?}")}</pre>
+                        <h3>"Finding Details"</h3>
+                        <pre class="code">{format!("{finding:#?}")}</pre>
                     </section>
                 }
             }) }

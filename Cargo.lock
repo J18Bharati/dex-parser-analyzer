@@ -416,12 +416,15 @@ dependencies = [
  "dexpa-core",
  "dexpa-sdk",
  "gloo-file",
+ "js-sys",
  "leptos",
  "log",
  "serde_json",
  "wasm-bindgen",
+ "wasm-bindgen-futures",
  "wasm-bindgen-test",
  "wasm-logger",
+ "web-sys",
 ]
 
 [[package]]

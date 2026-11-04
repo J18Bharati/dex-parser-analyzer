@@ -1,187 +1,223 @@
-use std::sync::Arc;
+// Modified by Jatin Bharati (2026-11-04): rebuilt on the fork's shell, arrival screen and staged load (fork-webapp). See NOTICE.
+use leptos::{ev, prelude::*};
 
-use dexpa_analysis::{config::AnalysisConfig, engine::analyze_dex, model::AnalysisReport};
-use dexpa_core::{
-    dto::{DexOverviewDto, dex_to_overview},
-    parse_dex,
+use super::{
+    AnalysisView,
+    arrival::{Arrival, Picker, load_file},
+    state::LoadState,
 };
-use gloo_file::{File as GlooFile, futures::read_as_bytes};
-use leptos::web_sys::HtmlInputElement;
-use leptos::{prelude::*, task::spawn_local};
+use crate::load::{MAX_ROWS, Section, is_tracking_category};
 
-use super::{AnalysisView, DexView};
+const FORK_URL: &str = "https://github.com/J18Bharati/dex-parser-analyzer";
+const ORIGINAL_URL: &str = "https://github.com/dhilipsiva/dex-parser-analyzer";
 
 #[component]
 pub fn App() -> impl IntoView {
-    let (loading, set_loading) = signal(false);
-    let (error, set_error) = signal(Option::<String>::None);
-    let (selected_file, set_selected_file) = signal_local(Option::<GlooFile>::None);
-    let (selected_file_name, set_selected_file_name) = signal(String::new());
+    let state = LoadState::new();
 
-    let (dex_overview, set_dex_overview) = signal(Option::<Arc<DexOverviewDto>>::None);
-    let (analysis_report, set_analysis_report) = signal(Option::<Arc<AnalysisReport>>::None);
-
-    let on_file_change = {
-        move |ev: leptos::ev::Event| {
-            let input: HtmlInputElement = event_target(&ev);
-            if let Some(file_list) = input.files()
-                && let Some(file) = file_list.item(0)
-            {
-                let gloo_file = GlooFile::from(file);
-                set_selected_file.set(Some(gloo_file.clone()));
-                set_selected_file_name.set(gloo_file.name());
-                set_error.set(None);
-                return;
-            }
-            set_selected_file.set(None);
-            set_selected_file_name.set(String::new());
+    // A file dropped outside the drop area must not make the browser open it and leave the page.
+    // The first dropped file is the one that is loaded.
+    let dragover = window_event_listener(ev::dragover, |ev| ev.prevent_default());
+    let drop = window_event_listener(ev::drop, move |ev| {
+        ev.prevent_default();
+        let file = ev
+            .data_transfer()
+            .and_then(|transfer| transfer.files())
+            .and_then(|files| files.item(0));
+        if let Some(file) = file {
+            load_file(state, file);
         }
-    };
-
-    let on_load = {
-        move |_| {
-            let Some(file) = selected_file.get() else {
-                set_error.set(Some(
-                    "Please select a .dex file before loading.".to_string(),
-                ));
-                return;
-            };
-
-            set_error.set(None);
-            set_loading.set(true);
-            set_dex_overview.set(None);
-            set_analysis_report.set(None);
-
-            spawn_local(async move {
-                let file_name = file.name();
-                let bytes = match read_as_bytes(&file).await {
-                    Ok(bytes) => bytes,
-                    Err(err) => {
-                        set_error.set(Some(format!("Failed to read file: {err}")));
-                        set_loading.set(false);
-                        return;
-                    }
-                };
-
-                let dex = match parse_dex(&bytes) {
-                    Ok(dex) => dex,
-                    Err(err) => {
-                        set_error.set(Some(format!("Dex parse error ({file_name}): {err}")));
-                        set_loading.set(false);
-                        return;
-                    }
-                };
-
-                let overview = match dex_to_overview(&dex) {
-                    Ok(overview) => overview,
-                    Err(err) => {
-                        set_error.set(Some(format!("Failed to build overview: {err}")));
-                        set_loading.set(false);
-                        return;
-                    }
-                };
-
-                let cfg = AnalysisConfig::default();
-                let report = analyze_dex(&dex, &cfg);
-
-                set_dex_overview.set(Some(Arc::new(overview)));
-                set_analysis_report.set(Some(Arc::new(report)));
-                set_loading.set(false);
-            });
-        }
-    };
+    });
+    on_cleanup(move || {
+        dragover.remove();
+        drop.remove();
+    });
 
     view! {
-        <div class="bg-light min-vh-100 d-flex flex-column">
-            <header class="bg-dark text-white py-4">
-                <div class="container">
-                    <h1 class="h3 mb-3">"Dex Parser Analyzer"</h1>
-                    <div class="row g-3 align-items-center">
-                        <p>
-                            <a href="https://github.com/dhilipsiva/dex-parser-analyzer">"dhilipsiva/dex-parser-analyzer"</a>
-                        </p>
-                    </div>
-                    <div class="row g-3 align-items-center">
-                        <div class="col-md-6">
-                            <input
-                                class="form-control"
-                                type="file"
-                                accept=".dex"
-                                disabled=move || loading.get()
-                                on:change=on_file_change
-                            />
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-light-emphasis small">
-                                { move || {
-                                    let name = selected_file_name.get();
-                                    if name.is_empty() {
-                                        view! { <span>"No file selected"</span> }.into_any()
-                                    } else {
-                                        view! { <span>{name}</span> }.into_any()
-                                    }
-                                }}
+        <header class="top">
+            <h1 class="brand">"Dex Parser Analyzer"</h1>
+            <nav class="links" aria-label="Project links">
+                <a href=FORK_URL>"fork by J18Bharati"</a>
+                <span aria-hidden="true">" · "</span>
+                <a href=ORIGINAL_URL>"original by dhilipsiva"</a>
+            </nav>
+        </header>
+        <main>
+            {move || {
+                if state.file_name.get().is_empty() {
+                    view! { <Arrival state=state/> }.into_any()
+                } else {
+                    view! { <Results state=state/> }.into_any()
+                }
+            }}
+            <DocumentationSection/>
+        </main>
+        <footer class="foot">
+            <span>"Based on dhilipsiva/dex-parser-analyzer. MIT or Apache-2.0."</span>
+        </footer>
+    }
+}
+
+/// The result of a load, shown as plain sections until the tabbed view replaces it.
+#[component]
+fn Results(state: LoadState) -> impl IntoView {
+    let title = move || match state.sdk.get() {
+        Section::Ready(report) => report
+            .package
+            .clone()
+            .unwrap_or_else(|| state.file_name.get()),
+        _ => state.file_name.get(),
+    };
+    let meta = move || match state.sdk.get() {
+        Section::Ready(report) => {
+            let version = match (&report.version_name, &report.version_code) {
+                (Some(name), Some(code)) => format!("v{name} ({code}) · "),
+                (Some(name), None) => format!("v{name} · "),
+                (None, Some(code)) => format!("version code {code} · "),
+                (None, None) => String::new(),
+            };
+            format!(
+                "{version}{} DEX {} · {} classes · {} of {} catalogued SDKs found",
+                report.dex_count,
+                if report.dex_count == 1 {
+                    "file"
+                } else {
+                    "files"
+                },
+                report.class_count,
+                report.matches.len(),
+                report.catalogue_size,
+            )
+        }
+        _ => String::new(),
+    };
+    view! {
+        <section class="res">
+            <div class="res-head">
+                <p class="file-name">{move || state.file_name.get()}</p>
+                <Picker state=state/>
+            </div>
+            {move || state.busy.get().then(|| view! { <p class="notice" role="status">"Reading the file…"</p> })}
+            {move || state.error.get().map(|msg| view! { <p class="notice error" role="alert">{msg}</p> })}
+            {move || match state.input.get() {
+                Section::Ready(input) => input.manifest_error.clone().map(|why| view! {
+                    <p class="notice">"The manifest could not be read, so only the code was scanned: " {why}</p>
+                }),
+                _ => None,
+            }}
+            <div class="pkg">{title}</div>
+            <div class="meta">{meta}</div>
+            <SdkSection state=state/>
+            <FindingsSection state=state/>
+            <ClassesSection state=state/>
+        </section>
+    }
+}
+
+/// A section that is not ready: a note while the load runs, the reason when it failed.
+fn waiting<T>(section: &Section<T>, busy: bool) -> Option<AnyView> {
+    match section {
+        Section::Ready(_) => None,
+        Section::Pending => busy.then(|| view! { <p class="muted">"Working…"</p> }.into_any()),
+        Section::Unavailable(why) => {
+            Some(view! { <p class="notice error">{why.clone()}</p> }.into_any())
+        }
+    }
+}
+
+#[component]
+fn SdkSection(state: LoadState) -> impl IntoView {
+    view! {
+        <section class="panel">
+            <h2>"SDKs"</h2>
+            {move || {
+                let section = state.sdk.get();
+                if let Some(note) = waiting(&section, state.busy.get()) {
+                    return note;
+                }
+                let Section::Ready(report) = section else { return ().into_any() };
+                if report.matches.is_empty() {
+                    return view! { <p class="muted">"No catalogued SDKs found."</p> }.into_any();
+                }
+                let cards = report.matches.iter().map(|sdk| {
+                    let class = if is_tracking_category(&sdk.category) { "sdk warn" } else { "sdk" };
+                    let evidence = sdk.evidence.iter().map(|e| {
+                        let label = format!("{} under {}", e.count, e.rule);
+                        view! {
+                            <div class="ev">
+                                <span class="src">{e.source.as_str()}</span>
+                                <span class="wrap">{label}</span>
                             </div>
-                        </div>
-                        <div class="col-md-2 text-md-end">
-                            <button
-                                class="btn btn-warning w-100"
-                                disabled=move || loading.get()
-                                on:click=on_load
-                            >
-                                { move || if loading.get() { "Loading…" } else { "Load" } }
-                            </button>
-                        </div>
-                    </div>
-                    { move || error.get().map(|msg| view! { <div class="alert alert-danger mt-3 mb-0" role="alert">{msg}</div> }) }
-                </div>
-            </header>
+                        }
+                    }).collect_view();
+                    view! {
+                        <li class=class>
+                            <div class="name">{sdk.name.clone()}</div>
+                            <div class="cat">{sdk.category.clone()}</div>
+                            {evidence}
+                        </li>
+                    }
+                }).collect_view();
+                view! { <ul class="sdks">{cards}</ul> }.into_any()
+            }}
+        </section>
+    }
+}
 
-            <main class="container my-4 flex-grow-1">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body">
-                        { move || {
-                            if loading.get() {
-                                return view! { <div class="text-secondary">"Loading…"</div> }.into_any();
-                            }
+#[component]
+fn FindingsSection(state: LoadState) -> impl IntoView {
+    view! {
+        <section class="panel">
+            <h2>"Findings"</h2>
+            {move || {
+                let section = state.findings.get();
+                if let Some(note) = waiting(&section, state.busy.get()) {
+                    return note;
+                }
+                let Section::Ready(merged) = section else { return ().into_any() };
+                let capped = merged.capped.then(|| view! {
+                    <p class="notice">"A DEX file reached the findings limit, so there may be more."</p>
+                });
+                let report = std::sync::Arc::new(merged.report.clone());
+                view! { {capped} <AnalysisView report=report/> }.into_any()
+            }}
+        </section>
+    }
+}
 
-                            match (dex_overview.get(), analysis_report.get()) {
-                                (Some(dex), Some(report)) => view! {
-                                    <div class="vstack gap-4">
-                                        <section>
-                                            <h2 class="h4 mb-3">"Dex Overview"</h2>
-                                            <DexView dex=dex.clone()/>
-                                        </section>
-                                        <section>
-                                            <h2 class="h4 mb-3">"Analysis Report"</h2>
-                                            <AnalysisView report=report.clone()/>
-                                        </section>
-                                    </div>
-                                }.into_any(),
-                                (Some(dex), None) => view! {
-                                    <section>
-                                        <h2 class="h4 mb-3">"Dex Overview"</h2>
-                                        <DexView dex=dex.clone()/>
-                                    </section>
-                                }.into_any(),
-                                (None, Some(report)) => view! {
-                                    <section>
-                                        <h2 class="h4 mb-3">"Analysis Report"</h2>
-                                        <AnalysisView report=report.clone()/>
-                                    </section>
-                                }.into_any(),
-                                _ => view! {
-                                    <div class="text-secondary">
-                                        "Select a local .dex file above and click Load to begin."
-                                    </div>
-                                }.into_any(),
-                            }
-                        }}
-                    </div>
-                </div>
-                <DocumentationSection/>
-            </main>
-        </div>
+#[component]
+fn ClassesSection(state: LoadState) -> impl IntoView {
+    view! {
+        <section class="panel">
+            <h2>"Classes"</h2>
+            {move || {
+                let section = state.classes.get();
+                if let Some(note) = waiting(&section, state.busy.get()) {
+                    return note;
+                }
+                let Section::Ready(classes) = section else { return ().into_any() };
+                let shown = classes.rows.len().min(MAX_ROWS);
+                let more = (classes.rows.len() > shown).then(|| {
+                    format!("Showing the first {shown} of {} classes.", classes.rows.len())
+                });
+                let skipped = (classes.unreadable > 0).then(|| {
+                    format!("{} class definitions could not be read.", classes.unreadable)
+                });
+                let rows = classes.rows.iter().take(shown).map(|row| {
+                    view! {
+                        <li class="class-row">
+                            <span class="mono wrap">{row.descriptor.clone()}</span>
+                            <span class="muted">{row.method_count} " methods"</span>
+                        </li>
+                    }
+                }).collect_view();
+                view! {
+                    <ul class="classes">{rows}</ul>
+                    {more.map(|text| view! { <p class="muted">{text}</p> })}
+                    {skipped.map(|text| view! { <p class="muted">{text}</p> })}
+                }.into_any()
+            }}
+        </section>
     }
 }
 
@@ -208,36 +244,27 @@ fn run_analysis(bytes: &[u8]) -> anyhow::Result<()> {
     Ok(())
 }"#;
 
-const DEX_CLI_SNIPPET: &str = r#"cargo run -p dex-cli -- path/to/classes.dex --max-findings 25"#;
-
-const PRIVACY_NOTE: &str = "The dex-gui app executes entirely in your browser via Rust compiled to WebAssembly, so uploaded .dex files never leave your machine. Prefer server-side processing? Compile the same WASM and host it with Extism (or any runtime) to call it from Rust or other languages.";
+const DEX_CLI_SNIPPET: &str = r#"cargo run -p dexpa-cli -- path/to/classes.dex --max-findings 25"#;
 
 #[component]
 fn DocumentationSection() -> impl IntoView {
     view! {
-        <>
-            <div class="alert alert-info mb-3" role="alert">
-                {PRIVACY_NOTE}
-            </div>
-            <section class="card shadow-sm">
-                <div class="card-body">
-                    <h2 class="h4 mb-3">"Sample Usage"</h2>
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <h3 class="h6">"dex-core"</h3>
-                            <pre class="bg-dark text-light p-3 rounded small pre-wrap"><code class="language-rust">{DEX_CORE_SNIPPET}</code></pre>
-                        </div>
-                        <div class="col-md-4">
-                            <h3 class="h6">"dex-analysis"</h3>
-                            <pre class="bg-dark text-light p-3 rounded small pre-wrap"><code class="language-rust">{DEX_ANALYSIS_SNIPPET}</code></pre>
-                        </div>
-                        <div class="col-md-4">
-                            <h3 class="h6">"dex-cli"</h3>
-                            <pre class="bg-dark text-light p-3 rounded small pre-wrap"><code class="language-bash">{DEX_CLI_SNIPPET}</code></pre>
-                        </div>
-                    </div>
+        <section class="docs">
+            <h2>"Sample Usage"</h2>
+            <div class="snippets">
+                <div>
+                    <h3>"dex-core"</h3>
+                    <pre class="code"><code class="language-rust">{DEX_CORE_SNIPPET}</code></pre>
                 </div>
-            </section>
-        </>
+                <div>
+                    <h3>"dex-analysis"</h3>
+                    <pre class="code"><code class="language-rust">{DEX_ANALYSIS_SNIPPET}</code></pre>
+                </div>
+                <div>
+                    <h3>"dexpa-cli"</h3>
+                    <pre class="code"><code class="language-bash">{DEX_CLI_SNIPPET}</code></pre>
+                </div>
+            </div>
+        </section>
     }
 }

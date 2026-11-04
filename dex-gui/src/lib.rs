@@ -1,4 +1,4 @@
-// Modified by Jatin Bharati (2026-11-04): `pub mod load` (fork-webapp). See NOTICE.
+// Modified by Jatin Bharati (2026-11-04): `pub mod load`, `smoke_fork` (fork-webapp). See NOTICE.
 #![deny(unused_must_use)]
 #![doc = "Leptos-powered WASM GUI for dex parsing and analysis."]
 
@@ -30,3 +30,6 @@ pub fn mount() {
 
 #[cfg(all(test, target_arch = "wasm32"))]
 mod smoke;
+
+#[cfg(all(test, target_arch = "wasm32"))]
+mod smoke_fork;

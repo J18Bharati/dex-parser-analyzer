@@ -1,3 +1,4 @@
+# Modified by Jatin Bharati (2026-11-04): the img-src comment, Bootstrap is gone (fork-webapp). See NOTICE.
 """trunk post_build hook: add a Content-Security-Policy to a release build's index.html.
 
 GitHub Pages cannot send headers, so the policy is a <meta> tag, and the inline module script that
@@ -30,7 +31,7 @@ policy = "; ".join(
         "default-src 'none'",
         f"script-src 'self' 'wasm-unsafe-eval' {hashes}",
         "style-src 'self'",
-        # Bootstrap's form controls draw their icons from data: SVGs.
+        # The empty data: favicon in index.html.
         "img-src 'self' data:",
         # init() fetches the wasm module.
         "connect-src 'self'",
