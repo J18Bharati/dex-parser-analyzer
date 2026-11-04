@@ -8,7 +8,7 @@
 
 use dexpa_core::{
     DexError, DexResult,
-    manifest::{Manifest, read_manifest_from_apk_bytes_with_limit},
+    manifest::{MAX_MANIFEST_BYTES, Manifest, read_manifest_from_apk_bytes_with_limit},
     multidex::{MAX_DEX_ENTRY_BYTES, MAX_TOTAL_DEX_BYTES, read_dex_buffers_from_bytes_with_limits},
 };
 
@@ -20,7 +20,8 @@ use crate::{
 /// Size limits, in bytes, for reading an archive.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ScanLimits {
-    /// The largest inflated size of one DEX entry (and of the manifest).
+    /// The largest inflated size of one DEX entry. The manifest is held to the smaller of this
+    /// and [`MAX_MANIFEST_BYTES`] (16 MiB).
     pub entry_bytes: u64,
     /// The largest sum of all DEX entries.
     pub total_bytes: u64,
@@ -72,12 +73,14 @@ pub fn read_input(bytes: &[u8], limits: ScanLimits) -> Result<AppInput, ScanErro
     if buffers.is_empty() {
         return Err(ScanError::NoDex);
     }
-    let (manifest, manifest_error) =
-        match read_manifest_from_apk_bytes_with_limit(bytes, limits.entry_bytes) {
-            Ok(m) => (Some(m), None),
-            Err(DexError::Zip(zip::result::ZipError::FileNotFound)) => (None, None),
-            Err(err) => (None, Some(err.to_string())),
-        };
+    let (manifest, manifest_error) = match read_manifest_from_apk_bytes_with_limit(
+        bytes,
+        limits.entry_bytes.min(MAX_MANIFEST_BYTES),
+    ) {
+        Ok(m) => (Some(m), None),
+        Err(DexError::Zip(zip::result::ZipError::FileNotFound)) => (None, None),
+        Err(err) => (None, Some(err.to_string())),
+    };
     Ok(AppInput {
         buffers,
         manifest,

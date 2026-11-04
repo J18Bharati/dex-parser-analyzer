@@ -88,4 +88,24 @@ fn limits_are_applied() {
         ..ScanLimits::default()
     };
     assert!(matches!(read_input(&bytes, limits), Err(ScanError::Apk(_))));
+
+    let limits = ScanLimits {
+        total_bytes: 10,
+        ..ScanLimits::default()
+    };
+    assert!(matches!(read_input(&bytes, limits), Err(ScanError::Apk(_))));
+}
+
+#[test]
+fn oversized_manifest_is_not_parsed() {
+    // 17 MiB of zeros deflates to a few KiB but is over the 16 MiB manifest limit, even though
+    // the default entry limit is 256 MiB.
+    let bytes = zip_of(&[
+        ("classes.dex", dex()),
+        ("AndroidManifest.xml", vec![0u8; 17 * 1024 * 1024]),
+    ]);
+    let input = read_input(&bytes, ScanLimits::default()).unwrap();
+    assert_eq!(input.buffers.len(), 1);
+    assert!(input.manifest.is_none());
+    assert!(input.manifest_error.is_some());
 }
