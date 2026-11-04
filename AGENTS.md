@@ -1,11 +1,11 @@
-<!-- Modified by Jatin Bharati (2026-11-01): dex-sdk crate, sdk-fixtures recipe, dexpa-sdk is publish = false (fork). See NOTICE. -->
+<!-- Modified by Jatin Bharati (2026-11-01; 2026-11-04): dex-sdk crate, sdk-fixtures recipe, dexpa-sdk is publish = false (fork); dex-gui may use dexpa-sdk (2026-11-04). See NOTICE. -->
 # Agent guide
 
 dex-parser-analyzer is a Cargo workspace of five crates (layout and module roles: `docs/architecture.md`):
 
 - `dex-core/` (package `dexpa-core`): the DEX parser, bytecode decoder, graphs and DTOs. Tests are in `dex-core/tests/`, fixtures in `dex-core/tests/data/` (Androguard-derived, Apache-2.0; see NOTICE).
 - `dex-analysis/` (package `dexpa-analysis`): the pattern, structural and taint passes. Every rule id is in `docs/rules.md`, which must change in the same commit as any rule.
-- `dex-sdk/` (package `dexpa-sdk`, fork): the defined-class inventory, the SDK catalogue and matcher, SDK reports and their diff. `dex-gui` must not depend on it.
+- `dex-sdk/` (package `dexpa-sdk`, fork): the defined-class inventory, the SDK catalogue and matcher, SDK reports and their diff. `dex-gui` uses it for the browser SDK report.
 - `dex-cli/`: the `dexpa` command-line front end (package `dexpa-cli`; integration tests in `dex-cli/tests/cli.rs`, and `dex-cli/tests/sdks.rs` for `dexpa sdks` with golden files in `dex-cli/tests/golden/`, rewritten by `UPDATE_GOLDEN=1`).
 - `dex-gui/`: the Leptos 0.8 browser GUI (wasm32, built with trunk; `publish = false`).
 

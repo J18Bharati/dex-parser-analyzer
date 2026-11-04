@@ -1,4 +1,4 @@
-<!-- Modified by Jatin Bharati (2026-11-01): axml.rs and manifest.rs rows, multidex.rs entry rules, dex-sdk, `dexpa sdks` (fork); review fixes (2026-11-02). See NOTICE. -->
+<!-- Modified by Jatin Bharati (2026-11-01): axml.rs and manifest.rs rows, multidex.rs entry rules, dex-sdk, `dexpa sdks` (fork); review fixes (2026-11-02); dex-gui uses dexpa-sdk (2026-11-04). See NOTICE. -->
 # Architecture
 
 What exists in the workspace as of 2026-10-21. The documents in `docs/research/` are design surveys written before the code; where they describe something not listed here (for example a full OWASP static-analysis engine, CHA call graphs, or disassembly and hex views in the GUI), it is not built.
@@ -51,7 +51,7 @@ The engine sorts the findings by severity, most severe first (a stable sort, so 
 
 ## dex-sdk (fork)
 
-Published with the other crates since M5, because `dexpa-cli` depends on it. It depends on `dex-core` only; `dex-gui` does not depend on it. Its DEX fixtures (`tests/data/sdk-{positive,negative}.dex`) are compiled from `tests/fixtures-src` by `just sdk-fixtures`.
+Published with the other crates since M5, because `dexpa-cli` depends on it. It depends on `dex-core` only; `dex-gui` uses it for the browser SDK report. Its DEX fixtures (`tests/data/sdk-{positive,negative}.dex`) are compiled from `tests/fixtures-src` by `just sdk-fixtures`.
 
 | Module | Role |
 |---|---|

@@ -1,6 +1,8 @@
+// Modified by Jatin Bharati (2026-11-04): `pub mod load` (fork-webapp). See NOTICE.
 #![deny(unused_must_use)]
 #![doc = "Leptos-powered WASM GUI for dex parsing and analysis."]
 
+pub mod load;
 mod ui;
 
 pub use ui::App;
