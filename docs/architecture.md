@@ -1,7 +1,7 @@
 <!-- Modified by Jatin Bharati (2026-11-01): axml.rs and manifest.rs rows, multidex.rs entry rules, dex-sdk, `dexpa sdks` (fork); review fixes (2026-11-02); dex-gui uses dexpa-sdk, new load and ui modules (2026-11-04). See NOTICE. -->
 # Architecture
 
-What exists in the workspace as of 2026-10-21. The documents in `docs/research/` are design surveys written before the code; where they describe something not listed here (for example a full OWASP static-analysis engine, CHA call graphs, or disassembly and hex views in the GUI), it is not built.
+What exists in the workspace as of 2026-11-04. The documents in `docs/research/` are design surveys written before the code; where they describe something not listed here (for example a full OWASP static-analysis engine, CHA call graphs, or disassembly and hex views in the GUI), it is not built.
 
 ## Data flow
 
@@ -51,7 +51,7 @@ The engine sorts the findings by severity, most severe first (a stable sort, so 
 
 ## dex-sdk (fork)
 
-Published with the other crates since M5, because `dexpa-cli` depends on it. It depends on `dex-core` only; `dex-gui` uses it for the browser SDK report, through `scan`, which the CLI shares. Its DEX fixtures (`tests/data/sdk-{positive,negative}.dex`) are compiled from `tests/fixtures-src` by `just sdk-fixtures`.
+Not published (`publish = false`), although `dexpa-cli` depends on it; see [RELEASING.md](../RELEASING.md). It depends on `dex-core` only; `dex-gui` uses it for the browser SDK report, through `scan`, which the CLI shares. Its DEX fixtures (`tests/data/sdk-{positive,negative}.dex`) are compiled from `tests/fixtures-src` by `just sdk-fixtures`.
 
 | Module | Role |
 |---|---|
@@ -67,7 +67,7 @@ Published with the other crates since M5, because `dexpa-cli` depends on it. It 
 
 ## dex-gui
 
-A Leptos 0.8 client-side app compiled to wasm32 with trunk. The user picks an `.apk` or `.dex` file (or loads the bundled sample app), and `gloo-file` reads it in the browser. (fork) `load.rs` holds the loading logic, free of the browser so it tests natively: the size and row limits, `dexpa_sdk::scan` over the archive, class rows and the merged findings of every DEX file. `ui/state.rs` runs the load in stages, so the SDK report shows before the findings and class list are done; `ui/results.rs` renders the SDKs, Manifest, Findings and Classes tabs (`sdk_view.rs`, `manifest_view.rs`, `analysis_view.rs`, `dex_view.rs`), and `ui/arrival.rs` is the arrival screen with the file picker and drop area. Tables render at most 500 rows. All of it runs in the page; nothing is uploaded anywhere. `.github/workflows/deploy-dex-gui.yml` builds the bundle with `nix build .#dex-gui` (one self-hosted stylesheet, a Content-Security-Policy; see [dex-gui/README.md](../dex-gui/README.md)) and publishes it to GitHub Pages.
+A Leptos 0.8 client-side app compiled to wasm32 with trunk. The user picks an `.apk` or `.dex` file (or loads the bundled sample app), and `gloo-file` reads it in the browser. (fork) `load.rs` holds the loading logic, free of the browser so it tests natively: the size and row limits, `dexpa_sdk::scan` over the archive, class rows and the merged findings of every DEX file. `ui/state.rs` runs the load in stages, so the SDK report shows before the findings and class list are done; `ui/results.rs` renders the SDKs, Manifest, Findings and Classes tabs (`sdk_view.rs`, `manifest_view.rs`, `analysis_view.rs`, `dex_view.rs`), and `ui/arrival.rs` is the arrival screen with the file picker and drop area. Tables render at most 500 rows. A "load another file" button in the results returns to the arrival screen. All of it runs in the page; nothing is uploaded anywhere. `.github/workflows/deploy-dex-gui.yml` builds the bundle with `nix build .#dex-gui` (one self-hosted stylesheet, a Content-Security-Policy; see [dex-gui/README.md](../dex-gui/README.md)) and publishes it to GitHub Pages.
 
 ## Toolchain and gates
 

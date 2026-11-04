@@ -3,7 +3,7 @@
 
 The in-browser front end of [dex-parser-analyzer](../README.md): a client-side Leptos app, compiled to WebAssembly. In this fork it takes an `.apk` or a `.dex` file (the original takes a `.dex` file only) and shows four tabs: the SDKs the app contains with the evidence for each (`dexpa-sdk`), the Manifest, the Findings of every `dexpa-analysis` pass, and the Classes. A "try a sample app" button loads a bundled sample APK. The file is read in the page and never uploaded. Live at https://j18bharati.github.io/dex-parser-analyzer/; the original, which takes DEX files only, is at https://dhilipsiva.github.io/dex-parser-analyzer/.
 
-An APK is read for its archive-root `classes.dex`, `classes2.dex`, ... and its `AndroidManifest.xml`. Limits: 200 MiB per file, 256 MiB per DEX entry, 512 MiB of DEX in total, and 500 rows per table (each table says how many there are). A file that is neither an APK nor a DEX file, or an archive that cannot be read, is an error in the page, and the next file still loads. A bare DEX file has no manifest, so its SDK report rests on class names alone.
+An APK is read for its archive-root `classes.dex`, `classes2.dex`, ... and its `AndroidManifest.xml`. Limits: 200 MiB per file, 256 MiB per DEX entry, 512 MiB of DEX in total, and 500 rows per table (each table says how many there are). A file that is neither an APK nor a DEX file, or an archive that cannot be read, is an error in the page, and the next file still loads. "Load another file" in the results returns to the arrival screen. A bare DEX file has no manifest, so its SDK report rests on class names alone.
 
 ## Local development
 
