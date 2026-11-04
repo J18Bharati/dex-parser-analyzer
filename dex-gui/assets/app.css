@@ -285,11 +285,94 @@ main {
   border-left-color: var(--red);
 }
 
-.panel {
-  margin-top: 22px;
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
 }
 
-.panel h2,
+.tab {
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 0 0 7px;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--white);
+}
+
+.tab.on {
+  color: var(--teal);
+  border-bottom-color: var(--teal);
+}
+
+.count {
+  color: var(--soft);
+}
+
+.caveat {
+  margin-top: 14px;
+}
+
+.tabpanel h3 {
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  margin: 18px 0 8px;
+}
+
+.filter {
+  width: 100%;
+  max-width: 320px;
+  margin-bottom: 10px;
+  font: inherit;
+  color: var(--text);
+  background: var(--drop);
+  border: 1px solid var(--dash);
+  border-radius: 4px;
+  padding: 5px 8px;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 16px;
+  margin: 0;
+}
+
+.kv dt {
+  color: var(--muted);
+}
+
+.kv dd {
+  margin: 0;
+  font-size: 12px;
+}
+
+.linkish {
+  font: inherit;
+  color: var(--teal);
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.linkish:hover {
+  color: var(--white);
+  text-decoration: underline;
+}
+
 .docs h2 {
   color: var(--white);
   font-size: 15px;
@@ -512,6 +595,10 @@ main {
 
   .hero h2 {
     font-size: 22px;
+  }
+
+  .kv {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .class-row {

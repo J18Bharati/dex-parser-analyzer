@@ -1,4 +1,4 @@
-# Modified by Jatin Bharati (2026-11-04): dexpa-sdk for the browser SDK report; js-sys, wasm-bindgen-futures and web-sys for the staged load and drag and drop (fork-webapp). See NOTICE.
+# Modified by Jatin Bharati (2026-11-04): dexpa-sdk for the browser SDK report; js-sys, wasm-bindgen-futures and web-sys for the staged load and drag and drop; the NodeList feature for the browser tests (fork-webapp). See NOTICE.
 [package]
 name = "dex-gui"
 description = "In-browser DEX analyzer (Leptos and WebAssembly); the uploaded file never leaves the machine"
@@ -35,3 +35,4 @@ serde_json = "1.0"
 
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
 wasm-bindgen-test = "0.3"
+web-sys = { version = "0.3", features = ["NodeList"] }

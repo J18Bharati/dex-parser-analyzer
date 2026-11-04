@@ -6,7 +6,7 @@ use leptos::{prelude::*, task::spawn_local};
 use super::state::LoadState;
 use crate::load::{SAMPLE_APK, check_size};
 
-const SAMPLE_NAME: &str = "sample-app.apk";
+pub const SAMPLE_NAME: &str = "sample-app.apk";
 
 /// Loads `file`, refusing one over the size limit before reading it. Ignored while busy.
 pub fn load_file(state: LoadState, file: File) {

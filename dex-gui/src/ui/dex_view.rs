@@ -1,99 +1,60 @@
+// Modified by Jatin Bharati (2026-11-04): `ClassesView` replaces the Bootstrap `DexView`; rows capped at MAX_ROWS (fork-webapp). See NOTICE.
 use std::sync::Arc;
 
-use dexpa_core::dto::DexOverviewDto;
 use leptos::prelude::*;
 
+use crate::load::{ClassRows, MAX_ROWS};
+
+/// The classes of the file, with a filter on the descriptor that ignores case.
 #[component]
-pub fn DexView(dex: Arc<DexOverviewDto>) -> impl IntoView {
+pub fn ClassesView(classes: Arc<ClassRows>) -> impl IntoView {
     let (filter, set_filter) = signal(String::new());
-    let overview = Arc::clone(&dex);
-    let filter_source = Arc::clone(&dex);
-
-    let filtered_classes = move || {
-        let needle = filter.get().to_lowercase();
-        filter_source
-            .classes
-            .iter()
-            .filter_map(|cls| {
-                if needle.is_empty() || cls.descriptor.to_lowercase().contains(&needle) {
-                    Some((cls.descriptor.clone(), cls.method_count))
-                } else {
-                    None
-                }
-            })
-            .collect::<Vec<_>>()
-    };
-
-    let summary = vec![
-        ("Version", overview.version.clone()),
-        ("File size", format!("{} bytes", overview.file_size)),
-        ("Checksum", overview.checksum.to_string()),
-        ("Strings", overview.string_count.to_string()),
-        ("Types", overview.type_count.to_string()),
-        ("Fields", overview.field_count.to_string()),
-        ("Methods", overview.method_count.to_string()),
-        ("Classes", overview.class_count.to_string()),
-    ];
-
+    let source = Arc::clone(&classes);
+    let unreadable = (classes.unreadable > 0).then(|| {
+        format!(
+            "{} class definitions could not be read.",
+            classes.unreadable
+        )
+    });
     view! {
-        <div class="vstack gap-4">
-            <section>
-                <div class="row row-cols-2 row-cols-md-4 g-3">
-                    { summary.into_iter().map(|(label, value)| {
-                        view! {
-                            <div class="col">
-                                <div class="border rounded p-3 bg-light">
-                                    <div class="text-secondary text-uppercase small">{label}</div>
-                                    <div class="fw-semibold">{value}</div>
-                                </div>
-                            </div>
-                        }
-                    }).collect_view() }
-                </div>
-            </section>
-
-            <section>
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <h3 class="h5 mb-0">"Classes"</h3>
-                    <input
-                        class="form-control mw-280"
-                        type="text"
-                        placeholder="Filter by descriptor…"
-                        prop:value=move || filter.get()
-                        on:input=move |ev| set_filter.set(event_target_value(&ev))
-                    />
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-sm table-striped align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th scope="col">"Class"</th>
-                                <th scope="col">"Methods"</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            { move || {
-                                let rows = filtered_classes();
-                                if rows.is_empty() {
-                                    return view! {
-                                        <tr>
-                                            <td colspan="2" class="text-secondary">"No classes match the filter."</td>
-                                        </tr>
-                                    }.into_any();
-                                }
-                                rows.into_iter().map(|(descriptor, methods)| {
-                                    view! {
-                                        <tr>
-                                            <td class="font-monospace">{descriptor}</td>
-                                            <td>{methods}</td>
-                                        </tr>
-                                    }
-                                }).collect_view().into_any()
-                            }}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
+        <input
+            class="filter"
+            type="text"
+            placeholder="Filter by class name…"
+            aria-label="Filter classes"
+            prop:value=move || filter.get()
+            on:input=move |ev| set_filter.set(event_target_value(&ev))
+        />
+        {move || {
+            let needle = filter.get().to_lowercase();
+            let rows = source
+                .rows
+                .iter()
+                .filter(|row| needle.is_empty() || row.descriptor.to_lowercase().contains(&needle))
+                .collect::<Vec<_>>();
+            if rows.is_empty() {
+                return view! { <p class="muted">"No classes match the filter."</p> }.into_any();
+            }
+            let total = rows.len();
+            let note = (total > MAX_ROWS).then(|| format!("showing {MAX_ROWS} of {total} classes"));
+            let items = rows
+                .into_iter()
+                .take(MAX_ROWS)
+                .map(|row| {
+                    view! {
+                        <li class="class-row">
+                            <span class="mono wrap">{row.descriptor.clone()}</span>
+                            <span class="muted">{row.method_count} " methods"</span>
+                        </li>
+                    }
+                })
+                .collect_view();
+            view! {
+                <ul class="classes">{items}</ul>
+                {note.map(|text| view! { <p class="muted">{text}</p> })}
+            }
+            .into_any()
+        }}
+        {unreadable.map(|text| view! { <p class="muted">{text}</p> })}
     }
 }

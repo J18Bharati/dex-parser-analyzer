@@ -1,4 +1,4 @@
-// Modified by Jatin Bharati (2026-11-04): classes from the fork's stylesheet, rows capped at MAX_ROWS (fork-webapp). See NOTICE.
+// Modified by Jatin Bharati (2026-11-04): classes from the fork's stylesheet, rows capped at MAX_ROWS, keyboard-reachable rows, labelled finding details, a cap note (fork-webapp). See NOTICE.
 use std::sync::Arc;
 
 use dexpa_analysis::model::{AnalysisReport, Finding, Severity};
@@ -15,7 +15,12 @@ const SEVERITY_ORDER: [Severity; 5] = [
 ];
 
 #[component]
-pub fn AnalysisView(report: Arc<AnalysisReport>) -> impl IntoView {
+pub fn AnalysisView(
+    report: Arc<AnalysisReport>,
+    /// A DEX file reached the findings limit, so the list may be incomplete.
+    #[prop(optional)]
+    capped: bool,
+) -> impl IntoView {
     let (active_severities, set_active_severities) = signal(SEVERITY_ORDER.to_vec());
     let (selected, set_selected) = signal(Option::<Finding>::None);
     let findings_source = Arc::clone(&report);
@@ -66,6 +71,9 @@ pub fn AnalysisView(report: Arc<AnalysisReport>) -> impl IntoView {
 
     view! {
         <div class="stack">
+            {capped.then(|| view! {
+                <p class="notice">"Capped at 500 findings per DEX file, so the real total may be higher."</p>
+            })}
             <section>
                 <div class="stats">
                     {stat("Findings", total.to_string())}
@@ -125,11 +133,20 @@ pub fn AnalysisView(report: Arc<AnalysisReport>) -> impl IntoView {
                                     );
                                     let message = finding.message.clone();
                                     let row_finding = finding.clone();
+                                    let button_finding = finding.clone();
                                     view! {
                                         <tr on:click=move |_| set_selected.set(Some(row_finding.clone())) class="clickable">
                                             <td>{severity}</td>
                                             <td class="nowrap">{rule}</td>
-                                            <td class="mono wrap">{location}</td>
+                                            <td class="mono wrap">
+                                                <button
+                                                    type="button"
+                                                    class="linkish"
+                                                    on:click=move |_| set_selected.set(Some(button_finding.clone()))
+                                                >
+                                                    {location}
+                                                </button>
+                                            </td>
                                             <td class="wrap">{message}</td>
                                         </tr>
                                     }
@@ -139,18 +156,54 @@ pub fn AnalysisView(report: Arc<AnalysisReport>) -> impl IntoView {
                     </table>
                 </div>
                 { move || (filtered_count() > MAX_ROWS).then(|| view! {
-                    <p class="muted">{format!("Showing the first {MAX_ROWS} of {} findings.", filtered_count())}</p>
+                    <p class="muted">{format!("showing {MAX_ROWS} of {} findings", filtered_count())}</p>
                 }) }
             </section>
 
             { move || selected.get().map(|finding| {
                 view! {
                     <section>
-                        <h3>"Finding Details"</h3>
-                        <pre class="code">{format!("{finding:#?}")}</pre>
+                        <h3>"Finding details"</h3>
+                        <FindingDetails finding=finding/>
                     </section>
                 }
             }) }
         </div>
     }
+}
+
+/// The fields of one finding, labelled.
+#[component]
+fn FindingDetails(finding: Finding) -> impl IntoView {
+    let mut fields = vec![
+        ("Rule", finding.id.to_string()),
+        ("Severity", format!("{:?}", finding.severity)),
+        ("Kind", format!("{:?}", finding.kind)),
+        ("Class", finding.location.class_descriptor.clone()),
+        ("Method", finding.location.method_name.clone()),
+        ("Signature", finding.location.method_signature.clone()),
+    ];
+    if let Some(pc) = finding.location.pc {
+        fields.push(("Offset", pc.to_string()));
+    }
+    if let Some(cwe) = finding.cwe {
+        fields.push(("CWE", format!("CWE-{cwe}")));
+    }
+    fields.push(("Message", finding.message.clone()));
+    if let Some(remediation) = &finding.remediation {
+        fields.push(("Remediation", remediation.clone()));
+    }
+    if !finding.extra.is_null() {
+        fields.push(("Extra", finding.extra.to_string()));
+    }
+    let rows = fields
+        .into_iter()
+        .map(|(label, value)| {
+            view! {
+                <dt>{label}</dt>
+                <dd class="mono wrap">{value}</dd>
+            }
+        })
+        .collect_view();
+    view! { <dl class="kv">{rows}</dl> }
 }
