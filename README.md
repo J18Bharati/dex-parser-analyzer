@@ -1,13 +1,18 @@
-<!-- Modified by Jatin Bharati (2026-11-01): dexpa-sdk and `dexpa sdks` rows (fork M5), F-Droid evaluation link (M6). See NOTICE. -->
-> **Fork** of [dhilipsiva/dex-parser-analyzer](https://github.com/dhilipsiva/dex-parser-analyzer) at `3f5a124`. This fork adds Android manifest (AXML) parsing and third-party SDK detection (`dexpa-sdk`, `dexpa sdks`), evaluated on 90 F-Droid APKs. See [NOTICE](NOTICE) for every change.
-
+<!-- Modified by Jatin Bharati (2026-11-01; 2026-11-04): dexpa-sdk and `dexpa sdks` rows (fork M5), F-Droid evaluation link (M6); fork site links, "What this fork adds", GUI row (2026-11-04). See NOTICE. -->
 Status: alpha, unreleased (every crate is 0.1.0). The parser and analyzer run on the bundled fixtures; v0.2.0 will be the first crates.io release of `dexpa-core`, `dexpa-analysis` and `dexpa-cli` (binary `dexpa`). This fork adds `dexpa-sdk`, which `dexpa-cli` depends on.
 
 # dex-parser-analyzer
 
 A DEX parser and static-analysis toolkit for Android bytecode, in Rust: a library, a CLI, and an in-browser GUI. The GUI runs the parser and analyzer as WebAssembly, so the file you analyze never leaves your machine.
 
-In-browser demo: https://dhilipsiva.github.io/dex-parser-analyzer/
+In-browser demos:
+
+- This fork: https://j18bharati.github.io/dex-parser-analyzer/ (APK upload, SDK detection, manifest, findings)
+- Original: https://dhilipsiva.github.io/dex-parser-analyzer/ (DEX upload, findings)
+
+## What this fork adds
+
+This is a fork of [dhilipsiva/dex-parser-analyzer](https://github.com/dhilipsiva/dex-parser-analyzer) at `3f5a124`. It adds Android manifest (AXML) parsing and third-party SDK detection (`dexpa-sdk`, `dexpa sdks`), evaluated on 90 F-Droid APKs, and a GUI that takes an APK and shows the SDK report, the manifest, the findings and the classes. [NOTICE](NOTICE) lists every change.
 
 ## Workspace
 
@@ -17,7 +22,7 @@ In-browser demo: https://dhilipsiva.github.io/dex-parser-analyzer/
 | [`dexpa-analysis`](dex-analysis/) | Static-analysis passes over a parsed file (pattern, structural and intraprocedural taint), producing serde-serializable findings. The rules are listed in [docs/rules.md](docs/rules.md). |
 | [`dexpa-sdk`](dex-sdk/) | (fork) Which third-party SDKs an app contains, with the evidence for each: classes the app defines, manifest components and meta-data keys. Reports and version-to-version diffs. Evaluated on 90 F-Droid APKs: [eval/README.md](eval/README.md). |
 | [`dexpa-cli`](dex-cli/) | The `dexpa` command: a summary and the findings of a DEX file or APK, as text or JSON, with CI-friendly exit codes; `dexpa sdks` (fork) for SDK detection and diffs. |
-| `dex-gui` | The Leptos and WebAssembly GUI behind the demo (not published to crates.io). |
+| `dex-gui` | The Leptos and WebAssembly GUI behind the demos (not published to crates.io). In this fork it takes an `.apk` or a `.dex` file and shows the SDK report, the manifest, the findings and the classes. |
 
 How the crates fit together is described in [docs/architecture.md](docs/architecture.md).
 
@@ -44,7 +49,7 @@ fn run(bytes: &[u8]) -> anyhow::Result<()> {
 
 ```bash
 cargo run -p dexpa-cli -- path/to/app.apk --format json --fail-on high
-nix run github:dhilipsiva/dex-parser-analyzer -- path/to/app.apk   # or, with Nix, no checkout
+nix run github:J18Bharati/dex-parser-analyzer -- path/to/app.apk   # or, with Nix, no checkout
 ```
 
 `dexpa` prints the header summary, the ten classes with the most methods and the findings of every DEX file in the input. The options, the JSON schema and the exit codes are in [dex-cli/README.md](dex-cli/README.md).

@@ -99,5 +99,17 @@ Each changed file carries a "Modified by" note. Changes so far:
   change above; RELEASING.md and AGENTS.md follow. The fork does not publish crates: dexpa-cli
   depends on dexpa-sdk, so a dexpa-cli release from the fork would fail (RELEASING.md).
   CHANGELOG.md.
+- GUI (2026-11-04): dex-gui takes an APK and shows SDK, manifest, findings and class tabs.
+  New: dex-sdk/src/scan.rs (the scan shared by the CLI and the GUI) and dex-sdk/tests/scan_test.rs,
+  dex-sdk/tests/data/sample-app.apk (built by a test in dex-cli/tests/sdks.rs), dex-gui/src/load.rs,
+  dex-gui/src/smoke_fork.rs (browser tests), dex-gui/tests/load_test.rs and
+  dex-gui/src/ui/{arrival,manifest_view,results,sdk_view,state}.rs. Changed: dex-sdk/src/lib.rs,
+  dex-sdk/Cargo.toml, dex-cli/src/sdks.rs (uses the shared scan), dex-cli/tests/sdks.rs,
+  dex-cli/Cargo.toml, dex-gui/Cargo.toml, dex-gui/index.html, dex-gui/csp.py, dex-gui/src/lib.rs,
+  dex-gui/src/ui/{app,analysis_view,dex_view,mod}.rs, dex-gui/assets/app.css (rewritten),
+  Cargo.lock. Bootstrap is no longer used: dex-gui/assets/bootstrap.min.css is removed, with its
+  entry above. README.md (fork site link, "What this fork adds"), dex-gui/README.md,
+  docs/architecture.md, AGENTS.md, .github/workflows/deploy-dex-gui.yml (paths include
+  dex-sdk/**), CHANGELOG.md.
 
 Upstream tests edited: none.

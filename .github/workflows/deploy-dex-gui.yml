@@ -1,3 +1,4 @@
+# Modified by Jatin Bharati (2026-11-04): paths include dex-sdk/** (fork-webapp). See NOTICE.
 # Build the GUI with the flake and publish it to GitHub Pages. `nix build .#dex-gui` takes trunk,
 # wasm-bindgen and the Rust toolchain from flake.lock and rust-toolchain.toml, so every version is
 # pinned, and the Nix store cache replaces building trunk from source on each run. The bundle is the
@@ -17,6 +18,7 @@ on:
     paths:
       - "dex-core/**"
       - "dex-analysis/**"
+      - "dex-sdk/**"
       - "dex-gui/**"
       - "Cargo.toml"
       - "Cargo.lock"
