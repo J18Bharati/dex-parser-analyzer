@@ -128,3 +128,9 @@ From the 2026-11-01 eng review of the plan. They are recorded here before any AP
   - partial downloads are removed in `finally`;
   - the AXML parser bounds depth and decoded strings, and the manifest is capped at 16 MiB.
 - **No independent reviewer:** the challenge was a sequential pass, labelled as such in the report.
+
+## 2026-11-04: real-browser check of the webapp
+
+- Chromium 155 (headless), release bundle served over HTTP so the Content-Security-Policy applied. No CSP violations or console errors.
+- **Memory limit not reached.** A 174.8 MiB test APK (20 stored DEX entries, 160,698 classes) loaded without running out of wasm memory: SDK tab in 3.0 s, everything filled in by 23.7 s, longest main-thread block 3.75 s. The file-size limit (200 MiB) was not probed above that, so the size at which wasm actually runs out is still unrecorded.
+- Real F-Droid APK `com.a10miaomiao.bilimiao_115.apk` (31.2 MiB, 80,349 classes, 10 DEX): SDK tab in 1.7 s, all tabs filled in by 12.7 s, longest block 4.07 s (headless, one laptop). The SDK report equals `dexpa sdks --format json`.
