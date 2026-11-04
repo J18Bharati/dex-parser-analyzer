@@ -1,4 +1,4 @@
-// Modified by Jatin Bharati (2026-11-01): new test file (fork M5); review fixes (2026-11-02). See NOTICE.
+// Modified by Jatin Bharati (2026-11-01): new test file (fork M5); review fixes (2026-11-02); sample app fixture (2026-11-04). See NOTICE.
 //! `dexpa sdks` and `dexpa sdks diff`, driven through the built binary.
 //!
 //! The DEX fixtures (`dex-sdk/tests/data/sdk-{positive,negative}.dex`) are compiled from
@@ -115,16 +115,30 @@ fn write_apk(name: &str, version: i32, dex_kind: &str) -> String {
 }
 
 fn write_apk_with_manifest(name: &str, manifest: Vec<u8>, dex_kind: &str) -> String {
+    let path = scratch(name);
+    fs::write(&path, apk_bytes(manifest, dex_kind)).unwrap();
+    path.display().to_string()
+}
+
+/// A two-entry APK around a fixture DEX. The entry timestamp is fixed (the zip epoch, 1980), so
+/// the same inputs always give the same bytes: the committed sample app depends on it.
+fn apk_bytes(manifest: Vec<u8>, dex_kind: &str) -> Vec<u8> {
     let dex = fs::read(sdk_fixture(dex_kind)).unwrap();
     let mut zip = ZipWriter::new(Cursor::new(Vec::new()));
-    let opts = SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+    let opts = SimpleFileOptions::default()
+        .compression_method(zip::CompressionMethod::Deflated)
+        .last_modified_time(zip::DateTime::default());
     for (entry, data) in [("AndroidManifest.xml", manifest), ("classes.dex", dex)] {
         zip.start_file(entry, opts).unwrap();
         zip.write_all(&data).unwrap();
     }
-    let path = scratch(name);
-    fs::write(&path, zip.finish().unwrap().into_inner()).unwrap();
-    path.display().to_string()
+    zip.finish().unwrap().into_inner()
+}
+
+/// The sample app the GUI offers to visitors without an APK (`dex-sdk/tests/data/sample-app.apk`):
+/// the v2 manifest around the positive DEX.
+fn sample_app_path() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("../dex-sdk/tests/data/sample-app.apk")
 }
 
 /// Compares `actual` with `tests/golden/<name>`; `UPDATE_GOLDEN=1` rewrites the file instead.
@@ -603,5 +617,36 @@ fn diff_rejects_other_json_and_other_schema_versions() {
         stderr(&output).contains("schema_version"),
         "{}",
         stderr(&output)
+    );
+}
+
+/// The committed sample APK is exactly what these fixtures build. `UPDATE_GOLDEN=1` rewrites it.
+#[test]
+fn sample_app_is_current() {
+    let built = apk_bytes(manifest(2), "positive");
+    let path = sample_app_path();
+    if std::env::var_os("UPDATE_GOLDEN").is_some() {
+        fs::write(&path, &built).unwrap();
+        return;
+    }
+    let committed = fs::read(&path)
+        .unwrap_or_else(|_| panic!("missing {}; run with UPDATE_GOLDEN=1", path.display()));
+    assert!(
+        committed == built,
+        "sample-app.apk is out of date; rerun with UPDATE_GOLDEN=1 if the change is intended"
+    );
+}
+
+#[test]
+fn sample_app_reports_the_golden() {
+    let report = json(&dexpa(&[
+        "sdks",
+        sample_app_path().to_str().unwrap(),
+        "--format",
+        "json",
+    ]));
+    golden(
+        "sdks-positive-apk.json",
+        &serde_json::to_string_pretty(&report).unwrap(),
     );
 }
