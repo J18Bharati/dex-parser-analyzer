@@ -1,21 +1,17 @@
 // Modified by Jatin Bharati (2026-11-01): new module (fork M5); manifest_error, diff catalogue check and
 // escaped text output (2026-11-02, /review); unread-manifest warning, Cf escapes,
-// escaped warnings, unreadable count (re-review). See NOTICE.
+// escaped warnings, unreadable count (re-review); scan moved to dexpa-sdk (2026-11-04). See NOTICE.
 //! `dexpa sdks`: which third-party SDKs an app contains, and `dexpa sdks diff`: what changed.
 
 use std::{fs, path::Path, path::PathBuf};
 
 use anyhow::{Context, Result, bail};
 use clap::{Args, Subcommand};
-use dexpa_core::{
-    DexError,
-    manifest::{Manifest, read_manifest_from_apk_bytes},
-    multidex::read_dex_buffers_from_bytes,
-};
 use dexpa_sdk::{
     catalogue::{self, Catalogue},
     diff::{DiffEvent, diff, manifest_read},
-    report::{SCHEMA_VERSION, SdkReport, build_report},
+    report::{SCHEMA_VERSION, SdkReport},
+    scan::{ScanError, ScanLimits, read_input, report_for},
 };
 use serde::Serialize;
 
@@ -128,40 +124,27 @@ fn load_catalogue(toml: Option<&Path>, exodus: Option<&Path>) -> Result<Catalogu
     }
 }
 
-/// The DEX buffers and, for an APK, the manifest. An APK without `AndroidManifest.xml` is read
-/// as DEX only. A manifest that is present but does not parse is not silently skipped: Android
-/// may still install the app, so the report keeps the DEX evidence, records the error in
-/// `manifest_error`, and the error is printed on stderr.
+/// Reads the file and builds its report. An APK without `AndroidManifest.xml` is read as DEX
+/// only. A manifest that is present but does not parse is not silently skipped: the report keeps
+/// the DEX evidence, records the error in `manifest_error`, and the error is printed on stderr.
 fn scan(input: &Path, catalogue: &Catalogue) -> Result<SdkReport> {
     let bytes = fs::read(input).with_context(|| format!("failed to read {}", input.display()))?;
-    let mut manifest_error = None;
-    let (buffers, manifest): (Vec<Vec<u8>>, Option<Manifest>) = if bytes.starts_with(b"PK\x03\x04")
-    {
-        let buffers = read_dex_buffers_from_bytes(&bytes).context("failed to read the APK")?;
-        if buffers.is_empty() {
-            bail!("{} contains no classes*.dex entry", input.display());
+    let app = match read_input(&bytes, ScanLimits::default()) {
+        Ok(app) => app,
+        Err(ScanError::Apk(err)) => {
+            return Err(anyhow::Error::new(err).context("failed to read the APK"));
         }
-        let manifest = match read_manifest_from_apk_bytes(&bytes) {
-            Ok(m) => Some(m),
-            Err(DexError::Zip(zip::result::ZipError::FileNotFound)) => None,
-            Err(err) => {
-                eprintln!(
-                    "warning: {}: AndroidManifest.xml not read ({}); the report has DEX evidence only",
-                    shown(&input.display().to_string()),
-                    shown(&err.to_string())
-                );
-                manifest_error = Some(err.to_string());
-                None
-            }
-        };
-        (buffers, manifest)
-    } else {
-        (vec![bytes], None)
+        Err(ScanError::NoDex) => bail!("{} contains no classes*.dex entry", input.display()),
     };
-    let mut report = build_report(catalogue, &buffers, manifest.as_ref())
-        .with_context(|| format!("failed to read the DEX files of {}", input.display()))?;
-    report.manifest_error = manifest_error;
-    Ok(report)
+    if let Some(err) = &app.manifest_error {
+        eprintln!(
+            "warning: {}: AndroidManifest.xml not read ({}); the report has DEX evidence only",
+            shown(&input.display().to_string()),
+            shown(err)
+        );
+    }
+    report_for(catalogue, &app)
+        .with_context(|| format!("failed to read the DEX files of {}", input.display()))
 }
 
 fn load_report(path: &Path) -> Result<SdkReport> {

@@ -1,4 +1,4 @@
-# Modified by Jatin Bharati (2026-11-01): new crate (fork M2); publish = false, the fork publishes no crates. See NOTICE.
+# Modified by Jatin Bharati (2026-11-01): new crate (fork M2); zip for `scan` (2026-11-04); publish = false, the fork publishes no crates. See NOTICE.
 [package]
 name = "dexpa-sdk"
 description = "Class-prefix inventory, SDK catalogue matching and version diffs over DEX files and APK manifests"
@@ -21,5 +21,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 thiserror = "2"
 toml = { version = "0.9", default-features = false, features = ["parse", "serde"] }
+# Only to tell a missing AndroidManifest.xml from a broken one (`scan`).
+zip = { version = "9", default-features = false, features = ["deflate"] }
 
 [dev-dependencies]

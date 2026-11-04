@@ -1,4 +1,4 @@
-// Modified by Jatin Bharati (2026-11-01): new crate (fork M2). See NOTICE.
+// Modified by Jatin Bharati (2026-11-01): new crate (fork M2); scan module (2026-11-04). See NOTICE.
 #![deny(unsafe_code)]
 #![deny(unused_must_use)]
 
@@ -12,3 +12,4 @@ pub mod diff;
 pub mod inventory;
 pub mod matcher;
 pub mod report;
+pub mod scan;
