@@ -1,4 +1,4 @@
-// Modified by Jatin Bharati (2026-11-04): new module, the staged load, every DEX file parsed before the input shows (fork-webapp). See NOTICE.
+// Modified by Jatin Bharati (2026-11-04): new module, the staged load (fork-webapp). See NOTICE.
 //! The page's load state: one signal per part of a result, filled in stages so the page can show
 //! what is ready while the rest is still being computed.
 
@@ -131,21 +131,17 @@ impl LoadState {
         let is_zip = bytes.starts_with(b"PK\x03\x04");
         drop(bytes);
 
-        // Parse every DEX file before showing anything, so a file that is not an APK or a DEX
-        // file is an error, not a page of empty tabs.
-        let mut dexes = Vec::with_capacity(input.buffers.len());
-        for (index, buffer) in input.buffers.iter().enumerate() {
-            match parse_dex(buffer) {
-                Ok(dex) => dexes.push(dex),
-                Err(err) => {
-                    self.error.set(Some(if is_zip {
-                        format!("DEX file {index} could not be parsed: {err}")
-                    } else {
-                        format!("this is neither an APK (a zip archive) nor a DEX file: {err}")
-                    }));
-                    return;
-                }
-            }
+        // A file that is not a zip claims to be a bare DEX file. If it does not parse it cannot be
+        // opened at all: an error, not a page of empty tabs. Inside an APK a bad DEX file only
+        // makes the sections that need it unavailable.
+        if !is_zip
+            && let Some(buffer) = input.buffers.first()
+            && let Err(err) = parse_dex(buffer)
+        {
+            self.error.set(Some(format!(
+                "this is neither an APK (a zip archive) nor a DEX file: {err}"
+            )));
+            return;
         }
         self.input.set(Section::Ready(Arc::new(AppSummary {
             dex_count: input.buffers.len(),
@@ -160,13 +156,22 @@ impl LoadState {
         }
 
         let config = AnalysisConfig::default();
-        let mut reports = Vec::with_capacity(dexes.len());
+        let mut reports = Vec::with_capacity(input.buffers.len());
         let mut rows = Vec::new();
         let mut unreadable = 0;
-        for (index, dex) in dexes.iter().enumerate() {
+        for (index, buffer) in input.buffers.iter().enumerate() {
             pause(0).await;
-            reports.push(analyze_dex(dex, &config));
-            let part = class_rows(dex, index);
+            let dex = match parse_dex(buffer) {
+                Ok(dex) => dex,
+                Err(err) => {
+                    let why = format!("DEX file {index} could not be parsed: {err}");
+                    self.findings.set(Section::Unavailable(why.clone()));
+                    self.classes.set(Section::Unavailable(why));
+                    return;
+                }
+            };
+            reports.push(analyze_dex(&dex, &config));
+            let part = class_rows(&dex, index);
             unreadable += part.unreadable;
             rows.extend(part.rows);
         }

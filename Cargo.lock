@@ -425,6 +425,7 @@ dependencies = [
  "wasm-bindgen-test",
  "wasm-logger",
  "web-sys",
+ "zip",
 ]
 
 [[package]]

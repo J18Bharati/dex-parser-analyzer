@@ -350,3 +350,60 @@ async fn second_load_clears_the_first_result() {
     // A bare DEX has no package, so its name is the title and appears once.
     assert_eq!(text.matches("second.dex").count(), 1, "{text}");
 }
+
+/// An APK with the sample's manifest and a `classes.dex` that is not a DEX file.
+fn apk_with_corrupt_dex() -> Vec<u8> {
+    use std::io::{Cursor, Read, Write};
+    use zip::{CompressionMethod, ZipArchive, ZipWriter, write::SimpleFileOptions};
+
+    let mut sample = ZipArchive::new(Cursor::new(SAMPLE_APK)).expect("the sample is a zip");
+    let mut manifest = Vec::new();
+    sample
+        .by_name("AndroidManifest.xml")
+        .expect("the sample has a manifest")
+        .read_to_end(&mut manifest)
+        .expect("reads");
+    let options = SimpleFileOptions::default().compression_method(CompressionMethod::Stored);
+    let mut zip = ZipWriter::new(Cursor::new(Vec::new()));
+    zip.start_file("AndroidManifest.xml", options)
+        .expect("start");
+    zip.write_all(&manifest).expect("write");
+    zip.start_file("classes.dex", options).expect("start");
+    zip.write_all(b"dex\n035\0 and then nothing that parses")
+        .expect("write");
+    zip.finish().expect("finish").into_inner()
+}
+
+#[wasm_bindgen_test]
+async fn corrupt_dex_in_an_apk_keeps_the_manifest() {
+    let state = LoadState::new();
+    let page = mount_view(move || view! { <Results state=state/> });
+    state.start_load("broken.apk".to_owned(), apk_with_corrupt_dex());
+    until(|| !state.busy.get_untracked()).await;
+    wait(50).await;
+    assert_eq!(tab_count(&page), 4, "{}", text_of(&page));
+    assert!(text_of(&page).contains("app.fixture"), "{}", text_of(&page));
+    assert!(
+        matches!(state.findings.get_untracked(), Section::Unavailable(_)),
+        "findings: {:?}",
+        state.findings.get_untracked()
+    );
+    let tab_named = |name: &str| -> HtmlElement {
+        let tabs = page.query_selector_all("[role=tab]").expect("selector");
+        (0..tabs.length())
+            .filter_map(|i| tabs.item(i))
+            .find(|tab| tab.text_content().unwrap_or_default().starts_with(name))
+            .unwrap_or_else(|| panic!("no {name} tab"))
+            .unchecked_into()
+    };
+    tab_named("Findings").click();
+    wait(50).await;
+    assert!(
+        text_of(&page).contains("could not be parsed"),
+        "{}",
+        text_of(&page)
+    );
+    tab_named("Manifest").click();
+    wait(50).await;
+    assert!(text_of(&page).contains("app.fixture"), "{}", text_of(&page));
+}
