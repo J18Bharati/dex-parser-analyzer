@@ -42,7 +42,7 @@ fn list_block(title: &str, rows: Vec<(String, String)>) -> AnyView {
             view! {
                 <li class="class-row">
                     <span class="mono wrap">{text}</span>
-                    <span class="muted">{label}</span>
+                    <span class="muted wrap">{label}</span>
                 </li>
             }
         })
@@ -57,11 +57,21 @@ fn list_block(title: &str, rows: Vec<(String, String)>) -> AnyView {
 
 /// The manifest of an APK, or the reason there is none.
 #[component]
-pub fn ManifestView(manifest: Option<Arc<Manifest>>, error: Option<String>) -> impl IntoView {
+pub fn ManifestView(
+    manifest: Option<Arc<Manifest>>,
+    error: Option<String>,
+    /// The input is an APK; a bare DEX file has no manifest to read.
+    #[prop(optional)]
+    is_apk: bool,
+) -> impl IntoView {
     let Some(manifest) = manifest else {
         return match error {
             Some(why) => view! {
                 <p class="notice">"The manifest could not be read: " {why}</p>
+            }
+            .into_any(),
+            None if is_apk => view! {
+                <p class="muted">"No manifest: this APK has no AndroidManifest.xml."</p>
             }
             .into_any(),
             None => view! {

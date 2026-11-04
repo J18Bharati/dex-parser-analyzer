@@ -1,11 +1,12 @@
 // Modified by Jatin Bharati (2026-11-04): new module, the tabbed results (fork-webapp). See NOTICE.
 use std::sync::Arc;
 
+use dexpa_sdk::report::value_text;
 use leptos::prelude::*;
 
 use super::{
-    AnalysisView, arrival::SAMPLE_NAME, dex_view::ClassesView, manifest_view::ManifestView,
-    sdk_view::SdkView, state::LoadState,
+    AnalysisView, dex_view::ClassesView, manifest_view::ManifestView, sdk_view::SdkView,
+    state::LoadState,
 };
 use crate::load::Section;
 
@@ -88,7 +89,37 @@ fn Loaded(state: LoadState, selected: RwSignal<Tab>) -> impl IntoView {
                 report.catalogue_size,
             )
         }
-        _ => String::new(),
+        // The SDK section failed: keep what the manifest and the file summary still say.
+        _ => {
+            let manifest = state.manifest.get();
+            let version = manifest.as_deref().map_or_else(String::new, |m| {
+                let name = m.version_name.as_ref().and_then(value_text);
+                let code = m.version_code.as_ref().and_then(value_text);
+                match (name, code) {
+                    (Some(name), Some(code)) => format!("v{name} ({code})"),
+                    (Some(name), None) => format!("v{name}"),
+                    (None, Some(code)) => format!("version code {code}"),
+                    (None, None) => String::new(),
+                }
+            });
+            let files = match state.input.get() {
+                Section::Ready(input) => Some(format!(
+                    "{} DEX {}",
+                    input.dex_count,
+                    if input.dex_count == 1 {
+                        "file"
+                    } else {
+                        "files"
+                    }
+                )),
+                _ => None,
+            };
+            [(!version.is_empty()).then_some(version), files]
+                .into_iter()
+                .flatten()
+                .collect::<Vec<_>>()
+                .join(" · ")
+        }
     };
     let notices = move || {
         let mut notes = Vec::new();
@@ -107,7 +138,14 @@ fn Loaded(state: LoadState, selected: RwSignal<Tab>) -> impl IntoView {
                 report.unreadable_classes
             ));
         }
-        if state.file_name.get() == SAMPLE_NAME {
+        if let Section::Ready(input) = state.input.get()
+            && input.manifest_error.is_none()
+            && state.manifest.get().is_none()
+            && matches!(state.sdk.get(), Section::Ready(_))
+        {
+            notes.push("No manifest was read, so only classes were checked for SDKs.".to_owned());
+        }
+        if state.is_sample.get() {
             notes.push("This is a test fixture with stub classes, not a real app.".to_owned());
         }
         notes
@@ -200,7 +238,11 @@ fn ManifestTab(state: LoadState) -> impl IntoView {
             Section::Ready(input) => input.manifest_error.clone(),
             _ => None,
         };
-        view! { <ManifestView manifest=state.manifest.get() error=error/> }
+        let is_apk = match state.input.get() {
+            Section::Ready(input) => input.is_apk,
+            _ => false,
+        };
+        view! { <ManifestView manifest=state.manifest.get() error=error is_apk=is_apk/> }
     }
 }
 

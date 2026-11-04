@@ -5,6 +5,15 @@ use leptos::prelude::*;
 
 use crate::load::{ClassRows, MAX_ROWS};
 
+/// `classes2.dex ` for the DEX file at `index`, nothing for the first (`classes.dex`).
+fn dex_label(index: usize) -> String {
+    if index == 0 {
+        String::new()
+    } else {
+        format!("classes{}.dex · ", index + 1)
+    }
+}
+
 /// The classes of the file, with a filter on the descriptor that ignores case.
 #[component]
 pub fn ClassesView(classes: Arc<ClassRows>) -> impl IntoView {
@@ -44,7 +53,9 @@ pub fn ClassesView(classes: Arc<ClassRows>) -> impl IntoView {
                     view! {
                         <li class="class-row">
                             <span class="mono wrap">{row.descriptor.clone()}</span>
-                            <span class="muted">{row.method_count} " methods"</span>
+                            <span class="muted nowrap">
+                                {dex_label(row.dex_index)} {row.method_count} " methods"
+                            </span>
                         </li>
                     }
                 })

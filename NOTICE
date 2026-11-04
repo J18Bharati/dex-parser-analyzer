@@ -110,6 +110,6 @@ Each changed file carries a "Modified by" note. Changes so far:
   Cargo.lock. Bootstrap is no longer used: dex-gui/assets/bootstrap.min.css is removed, with its
   entry above. README.md (fork site link, "What this fork adds"), dex-gui/README.md,
   docs/architecture.md, AGENTS.md, .github/workflows/deploy-dex-gui.yml (paths include
-  dex-sdk/**), CHANGELOG.md.
+  dex-sdk/**), CHANGELOG.md, NOTES.md.
 
 Upstream tests edited: none.

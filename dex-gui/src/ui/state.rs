@@ -16,15 +16,19 @@ use leptos::{prelude::*, task::spawn_local};
 use wasm_bindgen_futures::JsFuture;
 
 use crate::load::{
-    ClassRows, GUI_LIMITS, MergedFindings, Section, check_size, class_rows, merge_reports,
-    scan_error_text,
+    ClassRows, GUI_LIMITS, MergedFindings, SAMPLE_APK, Section, check_size, class_rows,
+    merge_reports, scan_error_text,
 };
+
+use super::arrival::SAMPLE_NAME;
 
 /// What was read from the file, before any analysis.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AppSummary {
     /// DEX files in the file.
     pub dex_count: usize,
+    /// The input is a zip archive (an APK), not a bare DEX file.
+    pub is_apk: bool,
     /// Why a present manifest could not be read.
     pub manifest_error: Option<String>,
 }
@@ -38,6 +42,8 @@ pub struct LoadState {
     pub error: RwSignal<Option<String>>,
     /// The file being or last loaded; empty before the first.
     pub file_name: RwSignal<String>,
+    /// The result is of the bundled sample app, whatever the file is called.
+    pub is_sample: RwSignal<bool>,
     /// What was read from the file.
     pub input: RwSignal<Section<Arc<AppSummary>>>,
     /// The SDK report.
@@ -72,6 +78,7 @@ impl LoadState {
             busy: RwSignal::new(false),
             error: RwSignal::new(None),
             file_name: RwSignal::new(String::new()),
+            is_sample: RwSignal::new(false),
             input: RwSignal::new(Section::Pending),
             sdk: RwSignal::new(Section::Pending),
             manifest: RwSignal::new(None),
@@ -84,6 +91,7 @@ impl LoadState {
     fn reset(self, name: String) {
         self.error.set(None);
         self.file_name.set(name);
+        self.is_sample.set(false);
         self.input.set(Section::Pending);
         self.sdk.set(Section::Pending);
         self.manifest.set(None);
@@ -111,10 +119,20 @@ impl LoadState {
     /// Loads `bytes`, a `.dex` or `.apk` file called `name`, in stages: the SDK report first,
     /// then the findings and the class list one DEX file at a time. Ignored while a load runs.
     pub fn start_load(self, name: String, bytes: Vec<u8>) {
+        self.begin(name, bytes, false);
+    }
+
+    /// Loads the bundled sample app, which the results label as a fixture. Ignored while busy.
+    pub fn start_sample(self) {
+        self.begin(SAMPLE_NAME.to_owned(), SAMPLE_APK.to_vec(), true);
+    }
+
+    fn begin(self, name: String, bytes: Vec<u8>, sample: bool) {
         if self.busy.get_untracked() {
             return;
         }
         self.reset(name);
+        self.is_sample.set(sample);
         self.busy.set(true);
         spawn_local(async move {
             self.run(bytes).await;
@@ -146,13 +164,17 @@ impl LoadState {
             && let Some(buffer) = input.buffers.first()
             && let Err(err) = parse_dex(buffer)
         {
-            self.error.set(Some(format!(
-                "this is neither an APK (a zip archive) nor a DEX file: {err}"
-            )));
+            let message = if buffer.starts_with(b"dex\n") {
+                format!("this is not a readable DEX file: {err}")
+            } else {
+                format!("this is neither an APK (a zip archive) nor a DEX file: {err}")
+            };
+            self.error.set(Some(message));
             return;
         }
         self.input.set(Section::Ready(Arc::new(AppSummary {
             dex_count: input.buffers.len(),
+            is_apk: is_zip,
             manifest_error: input.manifest_error.clone(),
         })));
         self.manifest.set(input.manifest.clone().map(Arc::new));

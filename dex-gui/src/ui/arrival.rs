@@ -4,7 +4,7 @@ use leptos::web_sys::{File, HtmlInputElement};
 use leptos::{prelude::*, task::spawn_local};
 
 use super::state::LoadState;
-use crate::load::{SAMPLE_APK, check_size};
+use crate::load::check_size;
 
 pub const SAMPLE_NAME: &str = "sample-app.apk";
 
@@ -43,7 +43,7 @@ pub fn Picker(state: LoadState) -> impl IntoView {
             load_file(state, file);
         }
     };
-    let on_sample = move |_| state.start_load(SAMPLE_NAME.to_owned(), SAMPLE_APK.to_vec());
+    let on_sample = move |_| state.start_sample();
     view! {
         <div class="actions">
             <label class="btn" class:disabled=move || state.busy.get()>

@@ -269,6 +269,7 @@ async fn unavailable_section_shows_the_reason() {
     state.file_name.set("x.apk".to_owned());
     state.input.set(Section::Ready(Arc::new(AppSummary {
         dex_count: 1,
+        is_apk: true,
         manifest_error: None,
     })));
     state
@@ -436,4 +437,164 @@ async fn load_another_file_returns_to_arrival() {
             .expect("selector")
             .is_some()
     );
+}
+
+#[wasm_bindgen_test]
+fn long_owner_label_wraps() {
+    use dexpa_core::manifest::MetaData;
+    let owner = "com.example.averyveryverylongcomponentname.SomethingElseEntirelyX".to_owned();
+    assert_eq!(owner.len(), 65);
+    let manifest = Manifest {
+        package: Some("app.example".to_owned()),
+        meta_data: vec![MetaData {
+            owner: Some(owner.clone()),
+            name: Some("k".to_owned()),
+            value: Some(XmlValue::Reference(1)),
+        }],
+        ..Manifest::default()
+    };
+    let page =
+        mount_view(move || view! { <ManifestView manifest=Some(Arc::new(manifest)) error=None/> });
+    let spans = page
+        .query_selector_all("li.class-row span")
+        .expect("selector");
+    let label: HtmlElement = (0..spans.length())
+        .filter_map(|i| spans.item(i))
+        .find(|s| s.text_content().unwrap_or_default() == owner)
+        .expect("the owner label")
+        .unchecked_into();
+    let classes = label.class_name();
+    assert!(
+        classes.split_whitespace().any(|c| c == "wrap"),
+        "the label span class is {classes:?}"
+    );
+    assert!(
+        !classes.split_whitespace().any(|c| c == "nowrap"),
+        "the label span class is {classes:?}"
+    );
+}
+
+/// An APK holding only a `classes.dex`: no manifest.
+fn apk_without_manifest() -> Vec<u8> {
+    use std::io::{Cursor, Read, Write};
+    use zip::{CompressionMethod, ZipArchive, ZipWriter, write::SimpleFileOptions};
+
+    let mut sample = ZipArchive::new(Cursor::new(SAMPLE_APK)).expect("the sample is a zip");
+    let mut dex = Vec::new();
+    sample
+        .by_name("classes.dex")
+        .expect("the sample has classes.dex")
+        .read_to_end(&mut dex)
+        .expect("reads");
+    let options = SimpleFileOptions::default().compression_method(CompressionMethod::Stored);
+    let mut zip = ZipWriter::new(Cursor::new(Vec::new()));
+    zip.start_file("classes.dex", options).expect("start");
+    zip.write_all(&dex).expect("write");
+    zip.finish().expect("finish").into_inner()
+}
+
+fn tab_click(page: &HtmlElement, name: &str) {
+    let tabs = page.query_selector_all("[role=tab]").expect("selector");
+    let tab: HtmlElement = (0..tabs.length())
+        .filter_map(|i| tabs.item(i))
+        .find(|tab| tab.text_content().unwrap_or_default().starts_with(name))
+        .unwrap_or_else(|| panic!("no {name} tab"))
+        .unchecked_into();
+    tab.click();
+}
+
+#[wasm_bindgen_test]
+async fn apk_without_a_manifest_says_so() {
+    let state = LoadState::new();
+    let page = mount_view(move || view! { <Results state=state/> });
+    state.start_load("nomanifest.apk".to_owned(), apk_without_manifest());
+    until(|| !state.busy.get_untracked()).await;
+    wait(50).await;
+    let text = text_of(&page);
+    assert!(
+        text.contains("No manifest was read, so only classes were checked for SDKs."),
+        "{text}"
+    );
+    tab_click(&page, "Manifest");
+    wait(50).await;
+    let text = text_of(&page);
+    assert!(
+        text.contains("No manifest: this APK has no AndroidManifest.xml."),
+        "{text}"
+    );
+    assert!(!text.contains("not an APK"), "{text}");
+}
+
+#[wasm_bindgen_test]
+async fn sample_named_user_file_is_not_labelled() {
+    let state = LoadState::new();
+    let page = mount_view(move || view! { <Results state=state/> });
+    state.start_load("sample-app.apk".to_owned(), SAMPLE_APK.to_vec());
+    until(|| !state.busy.get_untracked()).await;
+    wait(50).await;
+    let text = text_of(&page);
+    assert!(text.contains("Google Mobile Ads"), "{text}");
+    assert!(!text.contains("test fixture"), "{text}");
+
+    let app = mounted();
+    let sample: HtmlElement = app
+        .query_selector("button.ghost")
+        .expect("valid selector")
+        .expect("the sample button is missing")
+        .unchecked_into();
+    sample.click();
+    until(|| text_of(&app).contains("test fixture")).await;
+    assert!(text_of(&app).contains("test fixture"), "{}", text_of(&app));
+}
+
+#[wasm_bindgen_test]
+async fn sample_usage_is_only_on_arrival() {
+    let app = mounted();
+    assert!(text_of(&app).contains("Sample Usage"));
+    let sample: HtmlElement = app
+        .query_selector("button.ghost")
+        .expect("valid selector")
+        .expect("the sample button is missing")
+        .unchecked_into();
+    sample.click();
+    until(|| text_of(&app).contains("app.fixture") && !text_of(&app).contains("Working")).await;
+    assert!(!text_of(&app).contains("Sample Usage"), "{}", text_of(&app));
+}
+
+#[wasm_bindgen_test]
+async fn unreadable_dex_with_magic_is_named_so() {
+    let state = LoadState::new();
+    let page = mount_view(move || view! { <Results state=state/> });
+    state.start_load(
+        "bad.dex".to_owned(),
+        b"dex\n035\0 and then nothing that parses".to_vec(),
+    );
+    until(|| !state.busy.get_untracked()).await;
+    wait(50).await;
+    let text = text_of(&page);
+    assert!(text.contains("not a readable DEX file"), "{text}");
+    assert!(!text.contains("neither an APK"), "{text}");
+}
+
+#[wasm_bindgen_test]
+fn classes_view_labels_later_dex_files() {
+    let classes = Arc::new(ClassRows {
+        rows: vec![
+            ClassRow {
+                descriptor: "Lcom/a/First;".to_owned(),
+                method_count: 1,
+                dex_index: 0,
+            },
+            ClassRow {
+                descriptor: "Lcom/a/Second;".to_owned(),
+                method_count: 1,
+                dex_index: 1,
+            },
+        ],
+        unreadable: 0,
+    });
+    let page = mount_view(move || view! { <ClassesView classes=classes/> });
+    let text = text_of(&page);
+    assert!(text.contains("classes2.dex"), "{text}");
+    assert!(!text.contains("classes.dex"), "{text}");
 }

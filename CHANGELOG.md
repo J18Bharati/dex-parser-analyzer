@@ -1,4 +1,4 @@
-<!-- Modified by Jatin Bharati (2026-11-01): fork entries marked (fork). See NOTICE. -->
+<!-- Modified by Jatin Bharati (2026-11-01; 2026-11-04): fork entries marked (fork). See NOTICE. -->
 # Changelog
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project adheres to [Semantic Versioning](https://semver.org/).
@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Changed
+- (fork) The new `dexpa_sdk::scan` module (`read_input`, `report_for`) is the scan the CLI and the GUI share. A corrupt DEX file inside an APK keeps partial results: the manifest and the SDK evidence that does not need that DEX still show, and only the findings and class list say why they are unavailable. A file with DEX magic that does not parse reads "not a readable DEX file", an APK with no manifest says so, and the sample-app label applies only to the sample button.
 - (fork) The README, the GUI README and the architecture notes describe the fork's GUI, and the README links the fork's site (https://j18bharati.github.io/dex-parser-analyzer/) next to the original's. The Pages deploy also runs on changes to `dex-sdk/`.
 - (fork) Release wasm bundle (`nix build .#dex-gui`, the `.wasm` file): 2,501,054 bytes on `main`, built locally from the branch point, to 3,513,613 bytes with the fork's GUI (about 1.0 MB more: `dexpa-sdk`, the manifest and ZIP code, and the new views).
 - (fork) The GUI has a new shell without Bootstrap: an arrival screen with drop and sample, `.apk` and `.dex` files, and a staged load that shows the SDK report before the findings and class list. The results are tabs: SDKs (with the evidence for each and a note on what a scan cannot prove), Manifest, Findings (rows reachable by keyboard, with labelled details) and Classes (with a case-insensitive filter). Every table shows at most 500 rows and says how many there are. A file that is neither an APK nor a DEX file is an error in the page, with no empty tabs. A file over 200 MiB or an unreadable archive is an error in the page, and the next file still loads.

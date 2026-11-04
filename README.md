@@ -7,8 +7,8 @@ A DEX parser and static-analysis toolkit for Android bytecode, in Rust: a librar
 
 In-browser demos:
 
-- This fork: https://j18bharati.github.io/dex-parser-analyzer/ (APK upload, SDK detection, manifest, findings)
-- Original: https://dhilipsiva.github.io/dex-parser-analyzer/ (DEX upload, findings)
+- This fork: https://j18bharati.github.io/dex-parser-analyzer/ (APK input, SDK detection, manifest, findings)
+- Original: https://dhilipsiva.github.io/dex-parser-analyzer/ (DEX input, findings)
 
 ## What this fork adds
 

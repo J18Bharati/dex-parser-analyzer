@@ -8,6 +8,7 @@ use super::{
 };
 
 const FORK_URL: &str = "https://github.com/J18Bharati/dex-parser-analyzer";
+const ADDS_URL: &str = "https://github.com/J18Bharati/dex-parser-analyzer#what-this-fork-adds";
 const ORIGINAL_URL: &str = "https://github.com/dhilipsiva/dex-parser-analyzer";
 
 #[component]
@@ -50,10 +51,12 @@ pub fn App() -> impl IntoView {
                     view! { <Results state=state/> }.into_any()
                 }
             }}
-            <DocumentationSection/>
+            {move || state.file_name.get().is_empty().then(|| view! { <DocumentationSection/> })}
         </main>
         <footer class="foot">
             <span>"Based on dhilipsiva/dex-parser-analyzer. MIT or Apache-2.0."</span>
+            <span aria-hidden="true">" · "</span>
+            <a href=ADDS_URL>"what this fork adds"</a>
         </footer>
     }
 }

@@ -442,7 +442,7 @@ main {
   border-bottom: 1px solid var(--border);
 }
 
-.class-row .muted {
+.class-row .nowrap {
   white-space: nowrap;
 }
 
